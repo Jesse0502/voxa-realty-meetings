@@ -60,7 +60,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {/* Nav */}
       <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-6xl px-6 h-16 flex items-center justify-between mx-[83px] my-[17px]">
           <img src={voxaLogo} alt="Voxa Realty" className="h-10" />
           <a href="#waitlist">
             <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full px-6">
