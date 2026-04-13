@@ -1,20 +1,36 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PhoneOff, Phone, CalendarCheck, Users, ArrowRight, CheckCircle2, Zap, BarChart3, Clock } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { PhoneOff, Phone, CalendarCheck, Users, ArrowRight, CheckCircle2, Zap, BarChart3, Clock, PhoneCall } from "lucide-react";
 import { toast } from "sonner";
 import voxaLogo from "@/assets/voxa-logo.png";
 
 const Index = () => {
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [heroEmail, setHeroEmail] = useState("");
+  const [heroSubmitted, setHeroSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [formName, setFormName] = useState("");
+  const [formEmail, setFormEmail] = useState("");
+  const [formPhone, setFormPhone] = useState("");
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
+  const handleHeroSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
-    setSubmitted(true);
-    toast.success("You're on the list! We'll be in touch soon.");
-    setEmail("");
+    if (!heroEmail) return;
+    setHeroSubmitted(true);
+    toast.success("You're in! We'll be in touch soon.");
+    setHeroEmail("");
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formName || !formEmail) return;
+    setFormSubmitted(true);
+    toast.success("You're in! We'll reach out with early access details.");
+    setFormName("");
+    setFormEmail("");
+    setFormPhone("");
   };
 
   const features = [
@@ -62,9 +78,9 @@ const Index = () => {
       <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <img src={voxaLogo} alt="Voxa Realty" className="h-10" />
-          <a href="#waitlist">
+          <a href="#early-access">
             <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full px-6">
-              Join Waitlist
+              Get Early Access
             </Button>
           </a>
         </div>
@@ -83,29 +99,40 @@ const Index = () => {
             <span className="text-primary">Start Closing Deals.</span>
           </h1>
 
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed">
             Voxa Realty is an AI sales assistant that handles your missed calls, 
             follows up with cold leads, and books meetings on your calendar — so you 
             can focus on what you do best: selling homes.
           </p>
 
+          {/* Demo phone */}
+          <div className="flex items-center justify-center gap-3 mb-10">
+            <a
+              href="tel:+15753052236"
+              className="inline-flex items-center gap-3 px-6 py-3 rounded-full border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors group"
+            >
+              <PhoneCall className="w-5 h-5 text-primary animate-pulse" />
+              <span className="text-foreground font-semibold">Try the demo:</span>
+              <span className="text-primary font-bold">+1 (575) 305-2236</span>
+            </a>
+          </div>
+
           <form
-            id="waitlist"
-            onSubmit={handleSubmit}
+            onSubmit={handleHeroSubmit}
             className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
           >
-            {submitted ? (
+            {heroSubmitted ? (
               <div className="flex items-center gap-3 text-primary font-semibold text-lg mx-auto">
                 <CheckCircle2 className="w-6 h-6" />
-                You're on the waitlist!
+                You're in! Check your inbox soon.
               </div>
             ) : (
               <>
                 <Input
                   type="email"
                   placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={heroEmail}
+                  onChange={(e) => setHeroEmail(e.target.value)}
                   required
                   className="h-12 rounded-full px-5 bg-card border-border text-foreground placeholder:text-muted-foreground"
                 />
@@ -193,21 +220,86 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-24 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Ready to Never Miss Another Lead?
-          </h2>
-          <p className="text-muted-foreground text-lg mb-10 max-w-xl mx-auto">
-            Join hundreds of real estate agents getting early access to Voxa Realty.
-          </p>
-          <a href="#waitlist">
-            <Button size="lg" className="rounded-full px-10 h-14 text-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
-              Join the Waitlist
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-          </a>
+      {/* Early Access Form */}
+      <section id="early-access" className="py-24 px-6">
+        <div className="max-w-lg mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+              Get Early Access
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+              Be among the first real estate agents to use Voxa Realty. Limited spots available.
+            </p>
+          </div>
+
+          {formSubmitted ? (
+            <div className="flex flex-col items-center gap-4 p-8 rounded-2xl border border-primary/30 bg-primary/5 text-center">
+              <CheckCircle2 className="w-12 h-12 text-primary" />
+              <h3 className="text-xl font-semibold text-foreground">You're in!</h3>
+              <p className="text-muted-foreground">We'll reach out with early access details soon.</p>
+            </div>
+          ) : (
+            <form onSubmit={handleFormSubmit} className="space-y-5 p-8 rounded-2xl border border-border/60 bg-card">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-foreground font-medium">
+                  Name <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Your full name"
+                  value={formName}
+                  onChange={(e) => setFormName(e.target.value)}
+                  required
+                  maxLength={100}
+                  className="h-12 rounded-xl px-4 bg-background border-border text-foreground placeholder:text-muted-foreground"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="form-email" className="text-foreground font-medium">
+                  Email <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="form-email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={formEmail}
+                  onChange={(e) => setFormEmail(e.target.value)}
+                  required
+                  maxLength={255}
+                  className="h-12 rounded-xl px-4 bg-background border-border text-foreground placeholder:text-muted-foreground"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-foreground font-medium">
+                  Phone <span className="text-muted-foreground text-sm font-normal">(optional)</span>
+                </Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="+1 (555) 000-0000"
+                  value={formPhone}
+                  onChange={(e) => setFormPhone(e.target.value)}
+                  maxLength={20}
+                  className="h-12 rounded-xl px-4 bg-background border-border text-foreground placeholder:text-muted-foreground"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base"
+              >
+                Request Early Access
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+
+              <p className="text-xs text-muted-foreground text-center">
+                No credit card required · We'll never spam you
+              </p>
+            </form>
+          )}
         </div>
       </section>
 
