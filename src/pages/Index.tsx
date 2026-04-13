@@ -2,67 +2,133 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PhoneOff, Phone, CalendarCheck, Users, ArrowRight, CheckCircle2, Zap, BarChart3, Clock, PhoneCall } from "lucide-react";
+import {
+  PhoneOff,
+  Phone,
+  CalendarCheck,
+  Users,
+  ArrowRight,
+  CheckCircle2,
+  Zap,
+  BarChart3,
+  Clock,
+  PhoneCall,
+  Loader2,
+} from "lucide-react";
 import { toast } from "sonner";
 import voxaLogo from "@/assets/voxa-logo.png";
 
 const Index = () => {
   const [heroEmail, setHeroEmail] = useState("");
   const [heroSubmitted, setHeroSubmitted] = useState(false);
+  const [heroLoading, setHeroLoading] = useState(false);
 
   const [formName, setFormName] = useState("");
   const [formEmail, setFormEmail] = useState("");
   const [formPhone, setFormPhone] = useState("");
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
 
-  const handleHeroSubmit = (e: React.FormEvent) => {
+  const handleHeroSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!heroEmail) return;
-    setHeroSubmitted(true);
-    toast.success("You're in! We'll be in touch soon.");
-    setHeroEmail("");
+    if (!heroEmail || heroLoading) return;
+
+    setHeroLoading(true);
+
+    try {
+      await fetch(
+        "https://n8n-production-a988.up.railway.app/webhook/7b58b4a9-bd2d-4f48-80a7-1fb8b25f8d69",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: heroEmail }),
+        },
+      );
+
+      setHeroSubmitted(true);
+      toast.success("You're in! We'll be in touch soon.");
+      setHeroEmail("");
+    } catch (error) {
+      console.error("Failed to submit hero form:", error);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setHeroLoading(false);
+    }
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formName || !formEmail) return;
-    setFormSubmitted(true);
-    toast.success("You're in! We'll reach out with early access details.");
-    setFormName("");
-    setFormEmail("");
-    setFormPhone("");
+    if (!formName || !formEmail || formLoading) return;
+
+    setFormLoading(true);
+
+    try {
+      await fetch(
+        "https://n8n-production-a988.up.railway.app/webhook/7b58b4a9-bd2d-4f48-80a7-1fb8b25f8d69",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: formName,
+            email: formEmail,
+            phone: formPhone,
+          }),
+        },
+      );
+
+      setFormSubmitted(true);
+      toast.success("You're in! We'll reach out with early access details.");
+      setFormName("");
+      setFormEmail("");
+      setFormPhone("");
+    } catch (error) {
+      console.error("Failed to submit form:", error);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setFormLoading(false);
+    }
   };
 
   const features = [
     {
       icon: PhoneOff,
       title: "Never Miss a Call Again",
-      description: "AI instantly answers missed calls, qualifies leads, and captures their info — even at 2 AM.",
+      description:
+        "AI instantly answers missed calls, qualifies leads, and captures their info — even at 2 AM.",
     },
     {
       icon: Users,
       title: "Cold Outreach on Autopilot",
-      description: "Automatically reach out to your cold leads via call and text with personalized, human-like conversations.",
+      description:
+        "Automatically reach out to your cold leads via call and text with personalized, human-like conversations.",
     },
     {
       icon: CalendarCheck,
       title: "Book More Meetings",
-      description: "Voxa schedules appointments directly on your calendar. You just show up and close.",
+      description:
+        "Voxa schedules appointments directly on your calendar. You just show up and close.",
     },
     {
       icon: Zap,
       title: "Instant Lead Qualification",
-      description: "AI asks the right questions to separate tire-kickers from serious buyers and sellers.",
+      description:
+        "AI asks the right questions to separate tire-kickers from serious buyers and sellers.",
     },
     {
       icon: BarChart3,
       title: "Real-Time Dashboard",
-      description: "See every conversation, lead score, and booked appointment in one clean dashboard.",
+      description:
+        "See every conversation, lead score, and booked appointment in one clean dashboard.",
     },
     {
       icon: Clock,
       title: "24/7 Availability",
-      description: "Your AI assistant works around the clock so you never lose a deal to slow response times.",
+      description:
+        "Your AI assistant works around the clock so you never lose a deal to slow response times.",
     },
   ];
 
@@ -76,10 +142,13 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {/* Nav */}
       <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <img src={voxaLogo} alt="Voxa Realty" className="h-10" />
+        <div className="max-w-6xl mx-auto py-12 px-6 h-16 flex items-center justify-between">
+          <img src={voxaLogo} alt="Voxa Realty" className="h-16" />
           <a href="#early-access">
-            <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full px-6">
+            <Button
+              size="sm"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full px-6"
+            >
               Get Early Access
             </Button>
           </a>
@@ -87,7 +156,16 @@ const Index = () => {
       </nav>
 
       {/* Hero */}
-      <section className="pt-32 pb-20 px-6">
+      <section className="pt-32 pb-20 px-6 relative overflow-hidden">
+        <div
+          className="absolute inset-0 -z-10"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(168, 85, 247, 0.1), rgba(236, 72, 153, 0.1))",
+            backgroundSize: "400% 400%",
+            animation: "gradient 15s ease infinite",
+          }}
+        ></div>
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8">
             <Phone className="w-4 h-4" />
@@ -95,14 +173,15 @@ const Index = () => {
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-[1.1] mb-6">
-            Stop Losing Leads.<br />
+            Stop Losing Leads.
+            <br />
             <span className="text-primary">Start Closing Deals.</span>
           </h1>
 
           <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed">
-            Voxa Realty is an AI sales assistant that handles your missed calls, 
-            follows up with cold leads, and books meetings on your calendar — so you 
-            can focus on what you do best: selling homes.
+            Voxa Realty is an AI sales assistant that handles your missed calls,
+            follows up with cold leads, and books meetings on your calendar — so
+            you can focus on what you do best: selling homes.
           </p>
 
           {/* Demo phone */}
@@ -112,12 +191,14 @@ const Index = () => {
               className="inline-flex items-center gap-3 px-6 py-3 rounded-full border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors group"
             >
               <PhoneCall className="w-5 h-5 text-primary animate-pulse" />
-              <span className="text-foreground font-semibold">Try the demo:</span>
+              <span className="text-foreground font-semibold">
+                Try the demo:
+              </span>
               <span className="text-primary font-bold">+1 (575) 305-2236</span>
             </a>
           </div>
 
-          <form
+          {/* <form
             onSubmit={handleHeroSubmit}
             className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
           >
@@ -145,10 +226,10 @@ const Index = () => {
                 </Button>
               </>
             )}
-          </form>
+          </form> */}
 
           <p className="text-sm text-muted-foreground mt-4">
-            Free to join · No credit card required · Limited spots
+            Works on your existing phone number
           </p>
         </div>
       </section>
@@ -158,7 +239,9 @@ const Index = () => {
         <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
           {stats.map((stat) => (
             <div key={stat.label}>
-              <div className="text-3xl sm:text-4xl font-bold text-primary mb-2">{stat.value}</div>
+              <div className="text-3xl sm:text-4xl font-bold text-primary mb-2">
+                {stat.value}
+              </div>
               <p className="text-muted-foreground text-sm">{stat.label}</p>
             </div>
           ))}
@@ -173,7 +256,8 @@ const Index = () => {
               Your AI Agent That Never Sleeps
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Built specifically for real estate agents who are tired of losing deals to slow follow-ups.
+              Built specifically for real estate agents who are tired of losing
+              deals to slow follow-ups.
             </p>
           </div>
 
@@ -186,36 +270,207 @@ const Index = () => {
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/15 transition-colors">
                   <feature.icon className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">{feature.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  {feature.description}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* How it works */}
+      {/* Pricing */}
       <section className="py-24 px-6 bg-card/50 border-y border-border/50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground text-center mb-16">
-            How It Works
-          </h2>
-          <div className="space-y-12">
-            {[
-              { step: "01", title: "Connect Your Number", desc: "Link your business phone line in under 2 minutes. No hardware needed." },
-              { step: "02", title: "Import Your Leads", desc: "Upload your cold leads or connect your CRM. Voxa handles the rest." },
-              { step: "03", title: "Watch Meetings Roll In", desc: "Voxa calls, texts, qualifies, and books — you just show up and close." },
-            ].map((item) => (
-              <div key={item.step} className="flex gap-6 items-start">
-                <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-primary text-primary-foreground font-bold text-lg flex items-center justify-center">
-                  {item.step}
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-foreground mb-1">{item.title}</h3>
-                  <p className="text-muted-foreground">{item.desc}</p>
-                </div>
-              </div>
-            ))}
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+              Simple, Transparent Pricing
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-6">
+              Pricing for a single agent and their existing phone number. All
+              plans include inbound + outbound AI-handled calls.
+            </p>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
+              One-time Setup Fee: $49
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b border-border/50">
+                  <th className="text-left py-6 px-4 w-1/3">
+                    <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                      Features
+                    </div>
+                  </th>
+                  <th className="text-center py-6 px-4">
+                    <div className="mb-4">
+                      <div className="text-xl font-semibold text-foreground mb-1">
+                        Basic
+                      </div>
+                      <div className="flex items-baseline justify-center gap-1 mb-2">
+                        <span className="text-2xl font-bold text-primary">
+                          $149
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          /month
+                        </span>
+                      </div>
+                      <div className="text-xs text-muted-foreground mb-3">
+                        ~100 inbound + ~50 outbound
+                        <br />
+                        ~450 min included
+                        <br />
+                        $0.28/min overages
+                      </div>
+                  
+                    </div>
+                  </th>
+                  <th className="text-center py-6 px-4 relative">
+                    <div className="absolute -top-0 left-1/2 transform -translate-x-1/2">
+                      <div className="bg-primary text-primary-foreground text-xs font-semibold px-2 py-1 rounded-full">
+                        Most Popular
+                      </div>
+                    </div>
+                    <div className="mb-4">
+                      <div className="text-xl font-semibold text-foreground mb-1">
+                        Pro
+                      </div>
+                      <div className="flex items-baseline justify-center gap-1 mb-2">
+                        <span className="text-2xl font-bold text-primary">
+                          $249
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          /month
+                        </span>
+                      </div>
+                      <div className="text-xs text-muted-foreground mb-3">
+                        ~300 inbound + ~150 outbound
+                        <br />
+                        ~1,350 min included
+                        <br />
+                        $0.26/min overages
+                      </div>
+               
+                    </div>
+                  </th>
+                  <th className="text-center py-6 px-4">
+                    <div className="mb-4">
+                      <div className="text-xl font-semibold text-foreground mb-1">
+                        Agency
+                      </div>
+                      <div className="flex items-baseline justify-center gap-1 mb-2">
+                        <span className="text-2xl font-bold text-primary">
+                          $549
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          /month
+                        </span>
+                      </div>
+                      <div className="text-xs text-muted-foreground mb-3">
+                        ~800 inbound + ~400 outbound
+                        <br />
+                        ~3,600 min included
+                        <br />
+                        $0.24/min overages
+                      </div>
+                      
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  {
+                    feature: "Lead qualification",
+                    basic: true,
+                    pro: true,
+                    agency: true,
+                  },
+                  {
+                    feature: "Email/SMS summaries",
+                    basic: true,
+                    pro: true,
+                    agency: true,
+                  },
+                  {
+                    feature: "Business hours scheduling",
+                    basic: true,
+                    pro: true,
+                    agency: true,
+                  },
+                  {
+                    feature: "Priority support",
+                    basic: true,
+                    pro: true,
+                    agency: true,
+                  },
+                  {
+                    feature: "Call recordings & transcripts",
+                    basic: false,
+                    pro: true,
+                    agency: true,
+                  },
+                  {
+                    feature: "CRM integration",
+                    basic: false,
+                    pro: true,
+                    agency: true,
+                  },
+                  {
+                    feature: "Custom scripts",
+                    basic: true,
+                    pro: true,
+                    agency: true,
+                  },
+                  {
+                    feature: "Analytics dashboard",
+                    basic: true,
+                    pro: true,
+                    agency: true,
+                  },
+                ].map((row, index) => (
+                  <tr key={index} className="border-b border-border/30">
+                    <td className="py-4 px-4 text-sm text-foreground font-medium">
+                      {row.feature}
+                    </td>
+                    <td className="py-4 px-4 text-center">
+                      {row.basic ? (
+                        <CheckCircle2 className="w-5 h-5 text-primary mx-auto" />
+                      ) : (
+                        <div className="w-5 h-5 mx-auto"></div>
+                      )}
+                    </td>
+                    <td className="py-4 px-4 text-center">
+                      {row.pro ? (
+                        <CheckCircle2 className="w-5 h-5 text-primary mx-auto" />
+                      ) : (
+                        <div className="w-5 h-5 mx-auto"></div>
+                      )}
+                    </td>
+                    <td className="py-4 px-4 text-center">
+                      {row.agency ? (
+                        <CheckCircle2 className="w-5 h-5 text-primary mx-auto" />
+                      ) : (
+                        <div className="w-5 h-5 mx-auto"></div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="text-center mt-12">
+            <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+              All plans include a blended overage rate starting at
+              $0.24–$0.28/min depending on tier. No long-term contracts — cancel
+              anytime.
+            </p>
           </div>
         </div>
       </section>
@@ -228,18 +483,26 @@ const Index = () => {
               Get Early Access
             </h2>
             <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-              Be among the first real estate agents to use Voxa Realty. Limited spots available.
+              Be among the first real estate agents to use Voxa Realty. Limited
+              spots available.
             </p>
           </div>
 
           {formSubmitted ? (
             <div className="flex flex-col items-center gap-4 p-8 rounded-2xl border border-primary/30 bg-primary/5 text-center">
               <CheckCircle2 className="w-12 h-12 text-primary" />
-              <h3 className="text-xl font-semibold text-foreground">You're in!</h3>
-              <p className="text-muted-foreground">We'll reach out with early access details soon.</p>
+              <h3 className="text-xl font-semibold text-foreground">
+                You're in!
+              </h3>
+              <p className="text-muted-foreground">
+                We'll reach out with early access details soon.
+              </p>
             </div>
           ) : (
-            <form onSubmit={handleFormSubmit} className="space-y-5 p-8 rounded-2xl border border-border/60 bg-card">
+            <form
+              onSubmit={handleFormSubmit}
+              className="space-y-5 p-8 rounded-2xl border border-border/60 bg-card"
+            >
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-foreground font-medium">
                   Name <span className="text-destructive">*</span>
@@ -252,12 +515,16 @@ const Index = () => {
                   onChange={(e) => setFormName(e.target.value)}
                   required
                   maxLength={100}
-                  className="h-12 rounded-xl px-4 bg-background border-border text-foreground placeholder:text-muted-foreground"
+                  disabled={formLoading}
+                  className="h-12 rounded-xl px-4 bg-background border-border text-foreground placeholder:text-muted-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="form-email" className="text-foreground font-medium">
+                <Label
+                  htmlFor="form-email"
+                  className="text-foreground font-medium"
+                >
                   Email <span className="text-destructive">*</span>
                 </Label>
                 <Input
@@ -268,13 +535,17 @@ const Index = () => {
                   onChange={(e) => setFormEmail(e.target.value)}
                   required
                   maxLength={255}
-                  className="h-12 rounded-xl px-4 bg-background border-border text-foreground placeholder:text-muted-foreground"
+                  disabled={formLoading}
+                  className="h-12 rounded-xl px-4 bg-background border-border text-foreground placeholder:text-muted-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="phone" className="text-foreground font-medium">
-                  Phone <span className="text-muted-foreground text-sm font-normal">(optional)</span>
+                  Phone{" "}
+                  <span className="text-muted-foreground text-sm font-normal">
+                    (optional)
+                  </span>
                 </Label>
                 <Input
                   id="phone"
@@ -283,16 +554,27 @@ const Index = () => {
                   value={formPhone}
                   onChange={(e) => setFormPhone(e.target.value)}
                   maxLength={20}
-                  className="h-12 rounded-xl px-4 bg-background border-border text-foreground placeholder:text-muted-foreground"
+                  disabled={formLoading}
+                  className="h-12 rounded-xl px-4 bg-background border-border text-foreground placeholder:text-muted-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>
 
               <Button
                 type="submit"
-                className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base"
+                disabled={formLoading}
+                className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Request Early Access
-                <ArrowRight className="w-4 h-4 ml-2" />
+                {formLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    Request Early Access
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </>
+                )}
               </Button>
 
               <p className="text-xs text-muted-foreground text-center">
@@ -306,9 +588,8 @@ const Index = () => {
       {/* Footer */}
       <footer className="py-10 px-6 border-t border-border/50">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <img src={voxaLogo} alt="Voxa Realty" className="h-8" />
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Voxa Realty. All rights reserved.
+          <p className="text-sm text-center w-full text-muted-foreground">
+            Voxa Realty. All Calls answered.
           </p>
         </div>
       </footer>
