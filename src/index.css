@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Space+Grotesk:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -6,35 +6,35 @@
 
 @layer base {
   :root {
-    --background: 200 20% 98%;
-    --foreground: 200 25% 15%;
+    --background: 42 24% 97%;
+    --foreground: 193 18% 14%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 200 25% 15%;
+    --card: 40 25% 99%;
+    --card-foreground: 193 18% 14%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 200 25% 15%;
+    --popover: 40 25% 99%;
+    --popover-foreground: 193 18% 14%;
 
-    --primary: 178 55% 35%;
+    --primary: 170 37% 28%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 200 15% 93%;
-    --secondary-foreground: 200 25% 15%;
+    --secondary: 36 18% 92%;
+    --secondary-foreground: 193 18% 14%;
 
-    --muted: 200 15% 93%;
-    --muted-foreground: 200 10% 45%;
+    --muted: 42 18% 93%;
+    --muted-foreground: 192 9% 38%;
 
-    --accent: 178 55% 35%;
+    --accent: 170 37% 28%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 200 15% 88%;
-    --input: 200 15% 88%;
-    --ring: 178 55% 35%;
+    --border: 190 14% 82%;
+    --input: 190 14% 82%;
+    --ring: 170 37% 28%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -47,33 +47,33 @@
   }
 
   .dark {
-    --background: 200 25% 8%;
-    --foreground: 200 15% 95%;
+    --background: 193 20% 10%;
+    --foreground: 42 25% 94%;
 
-    --card: 200 20% 12%;
-    --card-foreground: 200 15% 95%;
+    --card: 193 18% 12%;
+    --card-foreground: 42 25% 94%;
 
-    --popover: 200 20% 12%;
-    --popover-foreground: 200 15% 95%;
+    --popover: 193 18% 12%;
+    --popover-foreground: 42 25% 94%;
 
-    --primary: 178 55% 42%;
+    --primary: 170 37% 38%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 200 15% 18%;
-    --secondary-foreground: 200 15% 95%;
+    --secondary: 193 12% 18%;
+    --secondary-foreground: 42 25% 94%;
 
-    --muted: 200 15% 18%;
-    --muted-foreground: 200 10% 55%;
+    --muted: 193 12% 18%;
+    --muted-foreground: 42 12% 72%;
 
-    --accent: 200 15% 18%;
-    --accent-foreground: 200 15% 95%;
+    --accent: 170 24% 24%;
+    --accent-foreground: 42 25% 94%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 200 15% 20%;
-    --input: 200 15% 20%;
-    --ring: 178 55% 42%;
+    --border: 193 10% 24%;
+    --input: 193 10% 24%;
+    --ring: 170 37% 38%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -87,13 +87,37 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   * {
     @apply border-border;
   }
 
   body {
     @apply bg-background text-foreground;
-    font-family: "DM Sans", sans-serif;
+    font-family: "Manrope", sans-serif;
+    line-height: 1.5;
+    background-image:
+      radial-gradient(
+        circle at top left,
+        rgba(22, 101, 90, 0.08),
+        transparent 32%
+      ),
+      radial-gradient(
+        circle at 82% 12%,
+        rgba(77, 111, 102, 0.08),
+        transparent 24%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(252, 250, 246, 0.98),
+        rgba(247, 245, 240, 0.98)
+      );
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1,
@@ -102,25 +126,118 @@
   h4,
   h5,
   h6 {
-    font-family: "Space Grotesk", sans-serif;
+    font-family: "Cormorant Garamond", serif;
+    letter-spacing: -0.035em;
+    line-height: 0.96;
+    font-weight: 600;
+  }
+
+  ::selection {
+    background: rgba(22, 101, 90, 0.16);
+    color: inherit;
   }
 }
 
 @layer utilities {
-  @keyframes gradient {
+  @keyframes rise-fade {
     0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
+      opacity: 0;
+      transform: translate3d(0, 18px, 0);
     }
     100% {
-      background-position: 0% 50%;
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
     }
   }
 
-  .animate-gradient {
-    animation: gradient 15s ease infinite;
-    background-size: 400% 400%;
+  @keyframes slow-float {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(0, -8px, 0);
+    }
+  }
+
+  @keyframes soft-drift {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(12px, -10px, 0) scale(1.03);
+    }
+  }
+
+  .animate-rise-fade {
+    animation: rise-fade 700ms ease forwards;
+  }
+
+  .animate-delay-1 {
+    animation-delay: 120ms;
+  }
+
+  .animate-delay-2 {
+    animation-delay: 220ms;
+  }
+
+  .animate-delay-3 {
+    animation-delay: 320ms;
+  }
+
+  .animate-float-soft {
+    animation: slow-float 10s ease-in-out infinite;
+  }
+
+  .animate-drift-soft {
+    animation: soft-drift 18s ease-in-out infinite;
+  }
+
+  .bg-grid-soft {
+    background-image:
+      linear-gradient(to right, rgba(17, 24, 39, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(17, 24, 39, 0.05) 1px, transparent 1px);
+    background-size: 72px 72px;
+  }
+
+  .bg-noise-soft {
+    background-image: radial-gradient(
+      rgba(17, 24, 39, 0.055) 0.7px,
+      transparent 0.7px
+    );
+    background-size: 16px 16px;
+  }
+
+  .text-display {
+    font-family: "Cormorant Garamond", serif;
+  }
+
+  .section-kicker {
+    color: hsl(var(--primary));
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+  }
+
+  .surface-card {
+    border: 1px solid rgba(125, 143, 137, 0.24);
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.82),
+      rgba(252, 250, 246, 0.72)
+    );
+    box-shadow: 0 24px 70px -42px rgba(22, 30, 31, 0.28);
+  }
+
+  .surface-card-strong {
+    border: 1px solid rgba(138, 165, 156, 0.22);
+    background: linear-gradient(
+      180deg,
+      rgba(25, 37, 38, 0.96),
+      rgba(17, 27, 28, 0.98)
+    );
+    box-shadow: 0 30px 80px -40px rgba(11, 17, 18, 0.48);
   }
 }
