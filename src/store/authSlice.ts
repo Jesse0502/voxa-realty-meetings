@@ -47,7 +47,7 @@ const getErrorMessage = async (response: Response) => {
   }
 };
 
-const SERVER_URL = import.meta.env.SERVER_URL || "http://127.0.0.1:8000";
+const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 const authenticate = async (
   mode: AuthMode,
