@@ -9,7 +9,7 @@ import { useAppSelector, useAppDispatch } from "./store/hooks";
 import { fetchCurrentUser } from "./store/authSlice";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
-import LoginRegister from "./pages/login/index.tsx";
+import LoginRegister from "./pages/login/Index.tsx";
 import DashboardPage from "./pages/dashboard/Index.tsx";
 
 const queryClient = new QueryClient();
