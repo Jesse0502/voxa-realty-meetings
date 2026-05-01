@@ -36,7 +36,9 @@ const RequireAuth = ({ children }: { children: JSX.Element }) => {
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/10 backdrop-blur-sm">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
-          <p className="text-sm font-medium text-gray-500">Loading your profile...</p>
+          <p className="text-sm font-medium text-gray-500">
+            Loading your profile...
+          </p>
         </div>
       </div>
     );
