@@ -25,6 +25,7 @@ type Assistant = {
   id?: string;
   _id?: string;
   name?: string;
+  virtualNumber?: string;
   prompt?: string;
   openingLine?: string;
   firstLine?: string;

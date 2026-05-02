@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Phone, LogOut, Sun, Moon, Bot } from "lucide-react";
+import { Phone, LogOut, Sun, Moon, Bot, UserRound } from "lucide-react";
 import voxaLogo from "@/assets/voxa-logo.png";
 import voxaLogoDark from "@/assets/voxa-logo-dark.png";
 import { CallsSection } from "@/components/CallsSection";
 import { AssistantSection } from "@/components/AssistantSection";
+import { ProfileSection } from "@/components/ProfileSection";
 import { useAppDispatch } from "@/store/hooks";
 import { logout } from "@/store/authSlice";
+import { clearProfile } from "@/store/profileSlice";
 import { Button } from "@/components/ui/button";
 
 export default function DashboardPage() {
@@ -20,6 +22,7 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("Calls");
 
   const handleLogout = () => {
+    dispatch(clearProfile());
     dispatch(logout());
     navigate("/login");
   };
@@ -78,25 +81,26 @@ export default function DashboardPage() {
             <Bot className="h-4 w-4" />
             Assistant
           </button>
+
+          <button
+            onClick={() => setActiveTab("Profile")}
+            className={`flex justify-start w-full gap-3 rounded-lg px-4 py-3 text-sm font-medium items-center transition-colors ${
+              activeTab === "Profile"
+                ? isDark
+                  ? "bg-gray-700 text-white"
+                  : "bg-gray-100 text-gray-900"
+                : isDark
+                  ? "text-gray-400 hover:bg-gray-700 hover:text-white"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            }`}
+          >
+            <UserRound className="h-4 w-4" />
+            Profile
+          </button>
         </nav>
         <div
           className={`w-full p-4 border-t ${isDark ? "border-gray-700" : "border-gray-100"}`}
         >
-          <button
-            onClick={() => setIsDark(!isDark)}
-            className={`mb-2 flex h-12 w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-              isDark
-                ? "text-gray-300 hover:bg-gray-700 hover:text-white"
-                : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-            }`}
-          >
-            {isDark ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
-            {isDark ? "Light Mode" : "Dark Mode"}
-          </button>
           <button
             onClick={handleLogout}
             className={`flex h-12 w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
@@ -111,11 +115,9 @@ export default function DashboardPage() {
         </div>
       </aside>
       <div className="flex-1 relative flex flex-col min-w-0">
-        {activeTab === "Calls" ? (
-          <CallsSection isDark={isDark} />
-        ) : (
-          <AssistantSection isDark={isDark} />
-        )}
+        {activeTab === "Calls" && <CallsSection isDark={isDark} />}
+        {activeTab === "Assistant" && <AssistantSection isDark={isDark} />}
+        {activeTab === "Profile" && <ProfileSection isDark={isDark} />}
       </div>
     </div>
   );

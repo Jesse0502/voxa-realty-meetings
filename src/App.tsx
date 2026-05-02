@@ -7,7 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Loader2 } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "./store/hooks";
 import { fetchCurrentUser } from "./store/authSlice";
-import Index from "./pages/Index.tsx";
+import LandingPage from "./pages/LandingPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import LoginRegister from "./pages/login/Index.tsx";
 import DashboardPage from "./pages/dashboard/Index.tsx";
@@ -67,7 +67,7 @@ const App = () => (
             path="/"
             element={
               <RequireGuest>
-                <Index />
+                <LandingPage />
               </RequireGuest>
             }
           />

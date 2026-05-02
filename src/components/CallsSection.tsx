@@ -30,20 +30,31 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-import { useAppSelector } from "@/store/hooks";
+import { fetchCallsPage } from "@/store/callsSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 interface CallsSectionProps {
   isDark: boolean;
 }
 
 export function CallsSection({ isDark }: CallsSectionProps) {
+  const dispatch = useAppDispatch();
   const [selectedCall, setSelectedCall] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoadingNextPage, setIsLoadingNextPage] = useState(false);
   const itemsPerPage = 50;
 
   const calls = useAppSelector((state) => state.calls.calls);
   const callStats = useAppSelector((state) => state.calls.callStats);
   const assistant = useAppSelector((state) => state.assistant.assistant);
+  const totalCalls = Math.max(callStats?.totalCalls || 0, calls.length);
+  const totalPages = Math.max(1, Math.ceil(totalCalls / itemsPerPage));
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   const user = useAppSelector(
     (state) =>
@@ -83,6 +94,30 @@ export function CallsSection({ isDark }: CallsSectionProps) {
     const secs = totalSeconds % 60;
     if (mins > 0) return `${mins}m ${secs}s`;
     return `${secs}s`;
+  };
+
+  const handleNextPage = async () => {
+    const nextPage = currentPage + 1;
+    if (nextPage > totalPages) {
+      return;
+    }
+
+    const requiredLoadedCount = nextPage * itemsPerPage;
+    const shouldFetchPage = calls.length < requiredLoadedCount && calls.length < totalCalls;
+
+    if (shouldFetchPage) {
+      try {
+        setIsLoadingNextPage(true);
+        await dispatch(fetchCallsPage({ page: nextPage, limit: itemsPerPage })).unwrap();
+      } catch (error) {
+        console.error("Failed to fetch next calls page", error);
+        return;
+      } finally {
+        setIsLoadingNextPage(false);
+      }
+    }
+
+    setCurrentPage(nextPage);
   };
 
   return (
@@ -292,8 +327,8 @@ export function CallsSection({ isDark }: CallsSectionProps) {
           <div className="flex items-center justify-between px-4 py-4 border-t border-border">
             <span className="text-sm text-muted-foreground">
               Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-              {Math.min(currentPage * itemsPerPage, calls.length)} of{" "}
-              {calls.length} calls
+              {Math.min(currentPage * itemsPerPage, totalCalls)} of{" "}
+              {totalCalls} calls
             </span>
             <div className="flex gap-2">
               <Button
@@ -307,10 +342,10 @@ export function CallsSection({ isDark }: CallsSectionProps) {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage((prev) => prev + 1)}
-                disabled={currentPage * itemsPerPage >= calls.length}
+                onClick={handleNextPage}
+                disabled={currentPage >= totalPages || isLoadingNextPage}
               >
-                Next
+                {isLoadingNextPage ? "Loading..." : "Next"}
               </Button>
             </div>
           </div>
