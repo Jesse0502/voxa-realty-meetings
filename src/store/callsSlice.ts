@@ -71,35 +71,38 @@ export const fetchCallsPage = createAsyncThunk<
   FetchCallsPageResponse,
   { page: number; limit?: number },
   { rejectValue: string; state: any }
->("calls/fetchPage", async ({ page, limit = 50 }, { getState, rejectWithValue }) => {
-  const state = getState();
-  const token = state.auth?.token;
+>(
+  "calls/fetchPage",
+  async ({ page, limit = 50 }, { getState, rejectWithValue }) => {
+    const state = getState();
+    const token = state.auth?.token;
 
-  if (!token) {
-    return rejectWithValue("No token");
-  }
-
-  try {
-    const response = await fetch(
-      `${SERVER_URL}/auth/calls?page=${encodeURIComponent(page)}&limit=${encodeURIComponent(limit)}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
-
-    if (!response.ok) {
-      throw new Error(await getErrorMessage(response));
+    if (!token) {
+      return rejectWithValue("No token");
     }
 
-    return (await response.json()) as FetchCallsPageResponse;
-  } catch (error) {
-    return rejectWithValue(
-      error instanceof Error ? error.message : "Failed to fetch calls",
-    );
-  }
-});
+    try {
+      const response = await fetch(
+        `${SERVER_URL}/auth/calls?page=${encodeURIComponent(page)}&limit=${encodeURIComponent(limit)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(await getErrorMessage(response));
+      }
+
+      return (await response.json()) as FetchCallsPageResponse;
+    } catch (error) {
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Failed to fetch calls",
+      );
+    }
+  },
+);
 
 const callsSlice = createSlice({
   name: "calls",

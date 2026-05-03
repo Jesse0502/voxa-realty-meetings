@@ -125,7 +125,9 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
       <div className="mx-auto w-full max-w-4xl space-y-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Profile and Billing</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Profile and Billing
+            </h1>
             <p className={`${isDark ? "text-gray-400" : "text-gray-600"} mt-1`}>
               Manage subscription status, overages, and billing controls.
             </p>
@@ -142,7 +144,9 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
         <div className="grid gap-4 md:grid-cols-2">
           <Card className={isDark ? "bg-gray-800 border-gray-700" : "bg-white"}>
             <CardHeader>
-              <CardTitle className="text-sm font-medium">Virtual Number</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Virtual Number
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-lg font-semibold">
@@ -160,14 +164,19 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
             </CardHeader>
             <CardContent className="space-y-2">
               <Badge
-                variant={profile?.isSubscriptionActive ? "default" : "secondary"}
+                variant={
+                  profile?.isSubscriptionActive ? "default" : "secondary"
+                }
                 className={
                   profile?.isSubscriptionActive
                     ? "bg-emerald-600 hover:bg-emerald-700"
                     : ""
                 }
               >
-                {(profile?.subscriptionStatus || "inactive").replaceAll("_", " ")}
+                {(profile?.subscriptionStatus || "inactive").replaceAll(
+                  "_",
+                  " ",
+                )}
               </Badge>
               {profile?.cancelAtPeriodEnd && (
                 <div className="text-xs text-amber-600 flex items-center gap-1">
@@ -196,7 +205,9 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
 
           <Card className={isDark ? "bg-gray-800 border-gray-700" : "bg-white"}>
             <CardHeader>
-              <CardTitle className="text-sm font-medium">Overage Money Due</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Overage Money Due
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
@@ -214,7 +225,9 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
             <CardTitle className="text-base">Overage Limit</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Label htmlFor="overage-limit">Maximum overage amount for current month</Label>
+            <Label htmlFor="overage-limit">
+              Maximum overage amount for current month
+            </Label>
             <div className="flex flex-col sm:flex-row gap-3">
               <Input
                 id="overage-limit"
@@ -225,7 +238,10 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
                 onChange={(event) => setOverageLimitInput(event.target.value)}
                 className="sm:max-w-xs"
               />
-              <Button onClick={handleSaveLimit} disabled={actionStatus === "loading"}>
+              <Button
+                onClick={handleSaveLimit}
+                disabled={actionStatus === "loading"}
+              >
                 {actionStatus === "loading" ? "Saving..." : "Save Limit"}
               </Button>
             </div>
@@ -243,14 +259,18 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
             <Button
               variant="outline"
               onClick={handlePayOveragesNow}
-              disabled={actionStatus === "loading" || !profile?.canPayOveragesNow}
+              disabled={
+                actionStatus === "loading" || !profile?.canPayOveragesNow
+              }
             >
               Pay Overages Now
             </Button>
             <Button
               variant="destructive"
               onClick={handleCancelSubscription}
-              disabled={actionStatus === "loading" || !profile?.isSubscriptionActive}
+              disabled={
+                actionStatus === "loading" || !profile?.isSubscriptionActive
+              }
             >
               Cancel Subscription
             </Button>

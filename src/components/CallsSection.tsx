@@ -103,12 +103,15 @@ export function CallsSection({ isDark }: CallsSectionProps) {
     }
 
     const requiredLoadedCount = nextPage * itemsPerPage;
-    const shouldFetchPage = calls.length < requiredLoadedCount && calls.length < totalCalls;
+    const shouldFetchPage =
+      calls.length < requiredLoadedCount && calls.length < totalCalls;
 
     if (shouldFetchPage) {
       try {
         setIsLoadingNextPage(true);
-        await dispatch(fetchCallsPage({ page: nextPage, limit: itemsPerPage })).unwrap();
+        await dispatch(
+          fetchCallsPage({ page: nextPage, limit: itemsPerPage }),
+        ).unwrap();
       } catch (error) {
         console.error("Failed to fetch next calls page", error);
         return;
@@ -327,8 +330,8 @@ export function CallsSection({ isDark }: CallsSectionProps) {
           <div className="flex items-center justify-between px-4 py-4 border-t border-border">
             <span className="text-sm text-muted-foreground">
               Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-              {Math.min(currentPage * itemsPerPage, totalCalls)} of{" "}
-              {totalCalls} calls
+              {Math.min(currentPage * itemsPerPage, totalCalls)} of {totalCalls}{" "}
+              calls
             </span>
             <div className="flex gap-2">
               <Button
