@@ -26,6 +26,7 @@ import {
   Table,
   Link2,
   Lock,
+  CalendarDays,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -45,6 +46,8 @@ import {
   setSelectedSpreadsheetId,
   setSelectedSheetId,
   setSelectedPhoneColumnName,
+  connectGoogleCalendar,
+  disconnectGoogleCalendar,
 } from "@/store/assistantSlice";
 import { fetchCurrentUser } from "@/store/authSlice";
 import { useGoogleLogin } from "@react-oauth/google";
@@ -92,6 +95,7 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
   );
   const isUpdating = status === "loading";
   const hasGoogleCreds = assistant?.credentials?.google_sheets?.status;
+  const hasGoogleCalendarCreds = assistant?.credentials?.google_calendar?.status;
 
   const [formData, setFormData] = useState({
     openingLine: "",
@@ -285,6 +289,42 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
     },
   });
 
+  const loginWithGoogleCalendar = useGoogleLogin({
+    flow: "auth-code",
+    scope: "https://www.googleapis.com/auth/calendar profile email",
+    onSuccess: async (codeResponse) => {
+      try {
+        setIsConnecting(true);
+        await dispatch(connectGoogleCalendar({ code: codeResponse.code })).unwrap();
+        toast.success("Successfully connected Google Calendar");
+        dispatch(fetchCurrentUser());
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        toast.error(message || "Failed to connect Google Calendar");
+      } finally {
+        setIsConnecting(false);
+      }
+    },
+    onError: (error) => {
+      toast.error("Google authentication failed");
+      console.error(error);
+    },
+  });
+
+  const handleDisconnectCalendar = async () => {
+    setIsConnecting(true);
+    try {
+      await dispatch(disconnectGoogleCalendar()).unwrap();
+      toast.success("Google Calendar disconnected");
+      dispatch(fetchCurrentUser());
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      toast.error(message || "Failed to disconnect Google Calendar");
+    } finally {
+      setIsConnecting(false);
+    }
+  };
+
   const handleConnectGoogle = () => {
     loginWithGoogle();
   };
@@ -334,6 +374,23 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
                   {hasGoogleCreds
                     ? "Disconnect Google Sheets"
                     : "Connect Google Sheets"}
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={isConnecting}
+                onSelect={() => {
+                  if (hasGoogleCalendarCreds) {
+                    handleDisconnectCalendar();
+                  } else {
+                    loginWithGoogleCalendar();
+                  }
+                }}
+              >
+                <span className="flex items-center gap-2">
+                  <CalendarDays className="h-4 w-4" />
+                  {hasGoogleCalendarCreds
+                    ? "Disconnect Google Calendar"
+                    : "Connect Google Calendar"}
                 </span>
               </DropdownMenuItem>
               <DropdownMenuItem disabled>

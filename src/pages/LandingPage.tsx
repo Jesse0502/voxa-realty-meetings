@@ -9,41 +9,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ArrowRight, BarChart3, Building2, Check, CheckCircle2, Database, LayoutGrid, Loader2, MessageSquare, Phone, PhoneCall, Settings, TrendingUp, Users, Zap } from "lucide-react";
+import { ArrowRight, BarChart3, Building2, Check, CheckCircle2, Database, LayoutGrid, Layers, Loader2, MessageSquare, Phone, PhoneCall, Settings, TrendingUp, Users, Zap } from "lucide-react";
 import { toast } from "sonner";
 import voxaLogo from "@/assets/voxa-logo.png";
 
-const IgIcon = () => (
-  <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current">
-    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
-  </svg>
+const ReaIcon = () => (
+  <span className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-sm bg-[#e11b22] text-[6px] font-black leading-none text-white">RE</span>
 );
-const FbIcon = () => (
-  <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current">
-    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-  </svg>
-);
-const WaIcon = () => (
-  <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current">
-    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.117.549 4.103 1.508 5.83L.057 23.428a.5.5 0 00.609.61l5.64-1.48A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z" />
-  </svg>
-);
-const SheetIcon = () => (
-  <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current">
-    <path d="M11.318 0H1.333C.6 0 0 .6 0 1.333v21.334C0 23.4.6 24 1.333 24h21.334C23.4 24 24 23.4 24 22.667V8.727L11.318 0z" fill="#23A566"/>
-    <path d="M11.318 0v8.727H24L11.318 0z" fill="#1C8C57"/>
-    <path d="M7 10.5h10v1.5H7zm0 3h10v1.5H7zm0 3h7v1.5H7z" fill="white"/>
-  </svg>
+const DomainIcon = () => (
+  <span className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-sm bg-[#1a1a1a] text-[8px] font-black leading-none text-white">D</span>
 );
 
 const channelTags = [
-  { label: "Phone calls",    icon: <PhoneCall className="h-3.5 w-3.5" />,  color: "text-emerald-600" },
-  { label: "Instagram",      icon: <IgIcon />,                               color: "text-pink-600" },
-  { label: "Facebook",       icon: <FbIcon />,                               color: "text-blue-600" },
-  { label: "WhatsApp",       icon: <WaIcon />,                               color: "text-[#25D366]" },
-  { label: "Google Sheets",  icon: <SheetIcon />,                            color: "text-[#23A566]" },
-  { label: "ReapitSales",    icon: <Building2 className="h-3.5 w-3.5" />,   color: "text-violet-600" },
-  { label: "Rex",            icon: <LayoutGrid className="h-3.5 w-3.5" />,  color: "text-orange-500" },
+  { label: "Missed Calls",       icon: <PhoneCall className="h-3.5 w-3.5" />,  color: "text-emerald-600" },
+  { label: "RealEstate.com.au",  icon: <ReaIcon />,                             color: "" },
+  { label: "Domain.com.au",      icon: <DomainIcon />,                          color: "" },
+  { label: "ReapitSales",        icon: <Building2 className="h-3.5 w-3.5" />,  color: "text-violet-600" },
+  { label: "Rex",                icon: <LayoutGrid className="h-3.5 w-3.5" />, color: "text-orange-500" },
+  { label: "Zenu",               icon: <Layers className="h-3.5 w-3.5" />,     color: "text-blue-500" },
 ];
 
 const LandingPage = () => {
@@ -123,16 +106,33 @@ const LandingPage = () => {
           {/* LEFT: Copy */}
           <div className="flex flex-col gap-5">
             <p className="section-kicker animate-rise-fade [animation-fill-mode:both]">
-              sales automation for real estate
+              AI lead response for Australian real estate
             </p>
             <h1 className="animate-rise-fade animate-delay-1 [animation-fill-mode:both] text-[clamp(2.4rem,5.2vw,5rem)] font-bold leading-[0.92] tracking-tight text-foreground">
-              Automate sales.
+              Never miss a lead.
               <br />
-              Stop lead leakage.
+              Win more listings.
             </h1>
             <p className="animate-rise-fade animate-delay-2 [animation-fill-mode:both] max-w-lg text-base leading-7 text-muted-foreground">
-              Voxa replies to every missed call and social DM in under 5 seconds, qualifies the lead, and pushes it to your CRM — automatically.
+              Voxa instantly responds to every missed call and portal enquiry from RealEstate.com.au and Domain.com.au in under 5&nbsp;seconds — qualifies the prospect and syncs to your CRM automatically.
             </p>
+
+            <div className="animate-rise-fade animate-delay-2 [animation-fill-mode:both] flex items-center gap-6 border-y border-border/50 py-4">
+              <div className="flex flex-col">
+                <span className="text-xl font-bold tracking-tight text-foreground">&lt;&nbsp;5s</span>
+                <span className="text-[11px] text-muted-foreground">Response time</span>
+              </div>
+              <div className="h-8 w-px bg-border/60" />
+              <div className="flex flex-col">
+                <span className="text-xl font-bold tracking-tight text-foreground">100%</span>
+                <span className="text-[11px] text-muted-foreground">Enquiries captured</span>
+              </div>
+              <div className="h-8 w-px bg-border/60" />
+              <div className="flex flex-col">
+                <span className="text-xl font-bold tracking-tight text-foreground">6</span>
+                <span className="text-[11px] text-muted-foreground">Integrations</span>
+              </div>
+            </div>
 
             <div className="animate-rise-fade animate-delay-2 [animation-fill-mode:both] flex flex-wrap gap-2">
               {channelTags.map(({ label, icon, color }) => (
@@ -239,19 +239,19 @@ const LandingPage = () => {
                       active: true,
                     },
                     {
-                      avatar: <svg viewBox="0 0 24 24" className="h-3 w-3 fill-white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0z" /></svg>,
-                      avatarBg: "bg-gradient-to-br from-[#833ab4] via-[#fd1d1d] to-[#fcb045]",
+                      avatar: <span className="text-[6px] font-black text-white leading-none">RE</span>,
+                      avatarBg: "bg-[#e11b22]",
                       name: "James N.",
-                      preview: "Bondi viewing?",
+                      preview: "REA · Bondi Beach…",
                       time: "11m",
                       unread: true,
                       active: false,
                     },
                     {
-                      avatar: <svg viewBox="0 0 24 24" className="h-3 w-3 fill-white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.117.549 4.103 1.508 5.83L.057 23.428a.5.5 0 00.609.61l5.64-1.48A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z" /></svg>,
-                      avatarBg: "bg-[#25D366]",
+                      avatar: <span className="text-[8px] font-black text-white leading-none">D</span>,
+                      avatarBg: "bg-[#1a1a1a]",
                       name: "Priya S.",
-                      preview: "Surry Hills 2BR?",
+                      preview: "Domain · Surry Hills…",
                       time: "34m",
                       unread: true,
                       active: false,
@@ -478,7 +478,7 @@ const LandingPage = () => {
       <footer className="absolute inset-x-0 bottom-0 z-10 border-t border-border/60 bg-background/40 px-6 py-3 backdrop-blur-sm lg:px-10">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 text-xs text-muted-foreground sm:text-sm">
           <p>Voxa Realty</p>
-          <p>Automate sales. Eliminate lead leakage.</p>
+          <p>Every missed call followed up. Every portal lead captured.</p>
         </div>
       </footer>
     </div>

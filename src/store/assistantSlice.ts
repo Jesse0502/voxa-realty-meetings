@@ -274,6 +274,62 @@ export const saveKnowledgeBases = createAsyncThunk<
   },
 );
 
+export const connectGoogleCalendar = createAsyncThunk<
+  { success: boolean; message?: string },
+  { code: string },
+  { rejectValue: string; state: RootState }
+>(
+  "assistant/connectGoogleCalendar",
+  async (payload, { getState, rejectWithValue }) => {
+    const token = getState().auth.token;
+    if (!token) {
+      return rejectWithValue("No authentication token found");
+    }
+
+    const response = await fetch(`${SERVER_URL}/auth/google/calendar/callback`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      return rejectWithValue(await getErrorMessage(response));
+    }
+
+    return (await response.json()) as { success: boolean; message?: string };
+  },
+);
+
+export const disconnectGoogleCalendar = createAsyncThunk<
+  { success: boolean; message?: string },
+  void,
+  { rejectValue: string; state: RootState }
+>(
+  "assistant/disconnectGoogleCalendar",
+  async (_, { getState, rejectWithValue }) => {
+    const token = getState().auth.token;
+    if (!token) {
+      return rejectWithValue("No authentication token found");
+    }
+
+    const response = await fetch(`${SERVER_URL}/auth/google-calendar/connection`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      return rejectWithValue(await getErrorMessage(response));
+    }
+
+    return (await response.json()) as { success: boolean; message?: string };
+  },
+);
+
 export const updateAssistant = createAsyncThunk<
   Assistant,
   { prompt: string; openingLine: string },
