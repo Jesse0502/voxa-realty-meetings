@@ -286,14 +286,17 @@ export const connectGoogleCalendar = createAsyncThunk<
       return rejectWithValue("No authentication token found");
     }
 
-    const response = await fetch(`${SERVER_URL}/auth/google/calendar/callback`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+    const response = await fetch(
+      `${SERVER_URL}/auth/google/calendar/callback`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
       },
-      body: JSON.stringify(payload),
-    });
+    );
 
     if (!response.ok) {
       return rejectWithValue(await getErrorMessage(response));
@@ -315,12 +318,15 @@ export const disconnectGoogleCalendar = createAsyncThunk<
       return rejectWithValue("No authentication token found");
     }
 
-    const response = await fetch(`${SERVER_URL}/auth/google-calendar/connection`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const response = await fetch(
+      `${SERVER_URL}/auth/google-calendar/connection`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       return rejectWithValue(await getErrorMessage(response));

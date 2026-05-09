@@ -29,6 +29,63 @@ const channelTags = [
   { label: "Zenu",               icon: <Layers className="h-3.5 w-3.5" />,     color: "text-blue-500" },
 ];
 
+const seoFeatureCards = [
+  {
+    title: "AI receptionist for inbound calls",
+    description:
+      "Reply to every missed call in seconds with natural messaging that qualifies buyer and seller intent automatically.",
+    icon: <PhoneCall className="h-4 w-4 text-primary" />,
+  },
+  {
+    title: "AI sales agent for portal leads",
+    description:
+      "Follow up fresh portal enquiries from RealEstate.com.au and Domain.com.au before competitors respond.",
+    icon: <MessageSquare className="h-4 w-4 text-primary" />,
+  },
+  {
+    title: "CRM sync for real estate teams",
+    description:
+      "Push conversations, lead scores, and appointment outcomes into your CRM so agents can focus on inspections and listings.",
+    icon: <Database className="h-4 w-4 text-primary" />,
+  },
+];
+
+const seoFaqs = [
+  {
+    question: "How does Voxa work as an AI receptionist for real estate agents?",
+    answer:
+      "Voxa responds instantly to missed calls and website or portal leads, asks pre-qualification questions, and hands warm prospects to your team.",
+  },
+  {
+    question: "Can Voxa act like an AI sales agent and book appraisals?",
+    answer:
+      "Yes. Voxa can qualify motivation and timeline, suggest next steps, and route high-intent seller or buyer leads toward booked appointments.",
+  },
+  {
+    question: "Which channels are supported for real estate lead follow-up?",
+    answer:
+      "Most agencies use Voxa for missed call text-back and portal enquiries. The platform then syncs data into their existing CRM workflow.",
+  },
+  {
+    question: "Who is Voxa best for?",
+    answer:
+      "Voxa is built for solo agents, boutique agencies, and larger real estate teams that want faster first response times and better lead conversion.",
+  },
+];
+
+const faqStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: seoFaqs.map(({ question, answer }) => ({
+    "@type": "Question",
+    name: question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: answer,
+    },
+  })),
+};
+
 const LandingPage = () => {
   const [waitlistOpen, setWaitlistOpen] = useState(false);
   const [formName, setFormName] = useState("");
@@ -82,7 +139,7 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="relative h-[100svh] overflow-hidden bg-background text-foreground">
+    <div className="relative min-h-[100svh] bg-background text-foreground">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(22,101,90,0.16),transparent_36%),radial-gradient(circle_at_82%_16%,rgba(12,72,67,0.12),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.7),rgba(247,245,240,0.26))]" />
 
       <header className="relative z-20 border-b border-border/60 bg-background/80 backdrop-blur-xl">
@@ -100,21 +157,21 @@ const LandingPage = () => {
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto flex h-[calc(100svh-5rem)] max-w-7xl items-center px-6 py-4 lg:h-[calc(100svh-6rem)] lg:px-10">
+      <main className="relative z-10 mx-auto flex min-h-[calc(100svh-5rem)] max-w-7xl items-center px-6 py-8 lg:min-h-[calc(100svh-6rem)] lg:px-10">
         <section className="grid w-full items-center gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14">
 
           {/* LEFT: Copy */}
           <div className="flex flex-col gap-5">
             <p className="section-kicker animate-rise-fade [animation-fill-mode:both]">
-              AI lead response for Australian real estate
+              AI receptionist and sales agent for real estate agents
             </p>
             <h1 className="animate-rise-fade animate-delay-1 [animation-fill-mode:both] text-[clamp(2.4rem,5.2vw,5rem)] font-bold leading-[0.92] tracking-tight text-foreground">
-              Never miss a lead.
+              AI receptionist and sales agent
               <br />
-              Win more listings.
+              for real estate agents.
             </h1>
             <p className="animate-rise-fade animate-delay-2 [animation-fill-mode:both] max-w-lg text-base leading-7 text-muted-foreground">
-              Voxa instantly responds to every missed call and portal enquiry from RealEstate.com.au and Domain.com.au in under 5&nbsp;seconds — qualifies the prospect and syncs to your CRM automatically.
+              Voxa responds to every missed call and portal enquiry in under 5 seconds, qualifies buyer and seller intent, and syncs the conversation to your CRM automatically.
             </p>
 
             <div className="animate-rise-fade animate-delay-2 [animation-fill-mode:both] flex items-center gap-6 border-y border-border/50 py-4">
@@ -354,6 +411,54 @@ const LandingPage = () => {
         </section>
       </main>
 
+      <section className="relative z-10 border-y border-border/60 bg-white/55 py-14 backdrop-blur-sm lg:py-16">
+        <div className="mx-auto grid max-w-7xl gap-8 px-6 lg:px-10">
+          <div className="max-w-3xl">
+            <p className="section-kicker">Built for real estate lead conversion</p>
+            <h2 className="mt-3 text-4xl font-semibold leading-[0.95] tracking-tight text-foreground sm:text-5xl">
+              What makes Voxa an AI receptionist and AI sales agent for real estate agents
+            </h2>
+            <p className="mt-4 text-base leading-7 text-muted-foreground sm:text-lg">
+              Search intent for this category is clear: agents want faster first responses, better lead qualification, and more booked appointments. Voxa is designed for those exact workflows.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            {seoFeatureCards.map(({ title, description, icon }) => (
+              <article key={title} className="surface-card rounded-2xl p-5">
+                <div className="inline-flex rounded-full bg-primary/10 p-2">{icon}</div>
+                <h3 className="mt-4 text-xl font-semibold leading-tight text-foreground">{title}</h3>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">{description}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="relative z-10 py-14 lg:py-16">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
+        />
+        <div className="mx-auto grid max-w-7xl gap-8 px-6 lg:px-10">
+          <div className="max-w-3xl">
+            <p className="section-kicker">FAQ</p>
+            <h2 className="mt-3 text-4xl font-semibold leading-[0.95] tracking-tight text-foreground sm:text-5xl">
+              Frequently asked questions about AI receptionist software for real estate agents
+            </h2>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {seoFaqs.map(({ question, answer }) => (
+              <article key={question} className="surface-card rounded-2xl p-5">
+                <h3 className="text-xl font-semibold leading-tight text-foreground">{question}</h3>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">{answer}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <Dialog open={waitlistOpen} onOpenChange={handleWaitlistOpenChange}>
         <DialogContent className="overflow-hidden rounded-2xl border-border/70 p-0 sm:max-w-xl">
           {formSubmitted ? (
@@ -475,10 +580,10 @@ const LandingPage = () => {
         </DialogContent>
       </Dialog>
 
-      <footer className="absolute inset-x-0 bottom-0 z-10 border-t border-border/60 bg-background/40 px-6 py-3 backdrop-blur-sm lg:px-10">
+      <footer className="relative z-10 border-t border-border/60 bg-background/40 px-6 py-4 backdrop-blur-sm lg:px-10">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 text-xs text-muted-foreground sm:text-sm">
           <p>Voxa Realty</p>
-          <p>Every missed call followed up. Every portal lead captured.</p>
+          <p>AI receptionist and sales agent software for real estate agents.</p>
         </div>
       </footer>
     </div>

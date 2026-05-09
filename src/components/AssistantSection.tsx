@@ -95,7 +95,8 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
   );
   const isUpdating = status === "loading";
   const hasGoogleCreds = assistant?.credentials?.google_sheets?.status;
-  const hasGoogleCalendarCreds = assistant?.credentials?.google_calendar?.status;
+  const hasGoogleCalendarCreds =
+    assistant?.credentials?.google_calendar?.status;
 
   const [formData, setFormData] = useState({
     openingLine: "",
@@ -295,7 +296,9 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
     onSuccess: async (codeResponse) => {
       try {
         setIsConnecting(true);
-        await dispatch(connectGoogleCalendar({ code: codeResponse.code })).unwrap();
+        await dispatch(
+          connectGoogleCalendar({ code: codeResponse.code }),
+        ).unwrap();
         toast.success("Successfully connected Google Calendar");
         dispatch(fetchCurrentUser());
       } catch (err) {

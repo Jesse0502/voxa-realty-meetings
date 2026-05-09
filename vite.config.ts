@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-    allowedHosts: ["voxarealty.up.railway.app"],
+    allowedHosts: ["www.voxarealty.com", "voxarealty.com"],
     hmr: {
       overlay: false,
     },
