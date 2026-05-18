@@ -426,9 +426,12 @@ export function CallsSection({ isDark }: CallsSectionProps) {
                   </h4>
                   <div className="flex flex-col gap-3">
                     {selectedCall.structuredOutputs &&
-                    Object.keys(selectedCall.structuredOutputs).length > 0 ? (
-                      Object.entries(selectedCall.structuredOutputs).map(
-                        ([key, value], idx) => (
+                    Object.entries(selectedCall.structuredOutputs).filter(
+                      ([key]) => key.toLowerCase() !== "sms",
+                    ).length > 0 ? (
+                      Object.entries(selectedCall.structuredOutputs)
+                        .filter(([key]) => key.toLowerCase() !== "sms")
+                        .map(([key, value], idx) => (
                           <div key={idx} className="flex flex-col gap-1">
                             <span
                               className={`text-xs font-semibold ${isDark ? "text-gray-300" : "text-gray-600"}`}
@@ -441,8 +444,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
                               {String(value)}
                             </div>
                           </div>
-                        ),
-                      )
+                        ))
                     ) : (
                       <span className="text-xs text-muted-foreground">
                         No insights extracted

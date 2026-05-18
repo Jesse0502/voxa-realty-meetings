@@ -1,7 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import {
   Dialog,
   DialogContent,
@@ -9,67 +15,85 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ArrowRight, BarChart3, Building2, Check, CheckCircle2, Database, LayoutGrid, Layers, Loader2, MessageSquare, Phone, PhoneCall, Settings, TrendingUp, Users, Zap } from "lucide-react";
+import {
+  ArrowRight,
+  Bot,
+  CalendarCheck2,
+  CheckCircle2,
+  Clock3,
+  Fingerprint,
+  Loader2,
+  MessageSquare,
+  PhoneCall,
+  Sparkles,
+  Check,
+} from "lucide-react";
 import { toast } from "sonner";
-import voxaLogo from "@/assets/voxa-logo.png";
+import voxaLogoDark from "@/assets/voxa-logo.png";
 
-const ReaIcon = () => (
-  <span className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-sm bg-[#e11b22] text-[6px] font-black leading-none text-white">RE</span>
-);
-const DomainIcon = () => (
-  <span className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-sm bg-[#1a1a1a] text-[8px] font-black leading-none text-white">D</span>
-);
-
-const channelTags = [
-  { label: "Missed Calls",       icon: <PhoneCall className="h-3.5 w-3.5" />,  color: "text-emerald-600" },
-  { label: "RealEstate.com.au",  icon: <ReaIcon />,                             color: "" },
-  { label: "Domain.com.au",      icon: <DomainIcon />,                          color: "" },
-  { label: "ReapitSales",        icon: <Building2 className="h-3.5 w-3.5" />,  color: "text-violet-600" },
-  { label: "Rex",                icon: <LayoutGrid className="h-3.5 w-3.5" />, color: "text-orange-500" },
-  { label: "Zenu",               icon: <Layers className="h-3.5 w-3.5" />,     color: "text-blue-500" },
+const navLinks = [
+  { label: "How it works", href: "#how-it-works" },
+  { label: "Features", href: "#what-voxa-does" },
+  { label: "FAQ", href: "#faq" },
 ];
 
-const seoFeatureCards = [
+const proofStats = [
+  { value: "< 1s", label: "Instant reply time" },
+  { value: "24/7", label: "Coverage, no gaps" },
+  { value: "100%", label: "Leads Captured" },
+];
+
+const workflowSteps = [
   {
-    title: "AI receptionist for inbound calls",
+    number: "01",
+    title: "Capture",
     description:
-      "Reply to every missed call in seconds with natural messaging that qualifies buyer and seller intent automatically.",
-    icon: <PhoneCall className="h-4 w-4 text-primary" />,
+      "Missed calls and portal inquiries are intercepted automatically — no lead waits more than a few seconds for a response.",
   },
   {
-    title: "AI sales agent for portal leads",
+    number: "02",
+    title: "Qualify",
     description:
-      "Follow up fresh portal enquiries from RealEstate.com.au and Domain.com.au before competitors respond.",
-    icon: <MessageSquare className="h-4 w-4 text-primary" />,
+      "Voxa conducts a natural conversation, asking about intent, timeline, budget, and property type to score lead readiness.",
   },
   {
-    title: "CRM sync for real estate teams",
+    number: "03",
+    title: "Book",
     description:
-      "Push conversations, lead scores, and appointment outcomes into your CRM so agents can focus on inspections and listings.",
-    icon: <Database className="h-4 w-4 text-primary" />,
+      "High-intent prospects are routed directly to your calendar with a full context summary so agents are always prepared.",
   },
 ];
 
 const seoFaqs = [
   {
-    question: "How does Voxa work as an AI receptionist for real estate agents?",
+    question: "How does Voxa help real estate teams book more calls?",
     answer:
-      "Voxa responds instantly to missed calls and website or portal leads, asks pre-qualification questions, and hands warm prospects to your team.",
+      "Voxa replies instantly to missed calls and portal leads, qualifies intent, and hands agents lead context so booking conversations happen faster.",
   },
   {
-    question: "Can Voxa act like an AI sales agent and book appraisals?",
+    question: "Can Voxa follow up both buyer and seller leads?",
     answer:
-      "Yes. Voxa can qualify motivation and timeline, suggest next steps, and route high-intent seller or buyer leads toward booked appointments.",
+      "Yes. Voxa can guide both buyer and seller conversations, gather key details, and push only qualified leads toward your team.",
   },
   {
-    question: "Which channels are supported for real estate lead follow-up?",
+    question: "Is this only for large agencies?",
     answer:
-      "Most agencies use Voxa for missed call text-back and portal enquiries. The platform then syncs data into their existing CRM workflow.",
+      "No. Voxa works for solo agents, boutique teams, and larger brokerages that want reliable first response and more booked meetings.",
   },
   {
-    question: "Who is Voxa best for?",
+    question: "What happens after I book a call?",
     answer:
-      "Voxa is built for solo agents, boutique agencies, and larger real estate teams that want faster first response times and better lead conversion.",
+      "We review your current lead flow, show the recommended setup, and map exactly how Voxa can fit your sales process.",
+  },
+  {
+    question: "How long does setup take?",
+    answer:
+      "Most teams are live within 48 hours. We handle configuration, connect your existing systems, and run a test workflow before going live.",
+  },
+  {
+    question: "Does Voxa replace my agents?",
+    answer:
+      "No. Voxa handles first response and qualification so your agents spend their time on conversations that are already warmed up and ready to convert.",
   },
 ];
 
@@ -87,15 +111,27 @@ const faqStructuredData = {
 };
 
 const LandingPage = () => {
-  const [waitlistOpen, setWaitlistOpen] = useState(false);
+  const [bookingOpen, setBookingOpen] = useState(false);
   const [formName, setFormName] = useState("");
   const [formEmail, setFormEmail] = useState("");
   const [formPhone, setFormPhone] = useState("");
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
+  const [navHidden, setNavHidden] = useState(false);
 
-  const handleWaitlistOpenChange = (open: boolean) => {
-    setWaitlistOpen(open);
+  useEffect(() => {
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      setNavHidden(y > lastY && y > 80);
+      lastY = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const handleBookingOpenChange = (open: boolean) => {
+    setBookingOpen(open);
 
     if (!open) {
       setFormSubmitted(false);
@@ -105,13 +141,14 @@ const LandingPage = () => {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formName || !formEmail || formLoading) return;
+
+    if (!formName || !formPhone || formLoading) return;
 
     setFormLoading(true);
 
     try {
       await fetch(
-        "https://n8n-production-a988.up.railway.app/webhook/7b58b4a9-bd2d-4f48-80a7-1fb8b25f8d69",
+        "https://hook.eu1.make.com/gf20lg0ptytberzhnzite3oswucpsmv4",
         {
           method: "POST",
           headers: {
@@ -121,12 +158,16 @@ const LandingPage = () => {
             name: formName,
             email: formEmail,
             phone: formPhone,
+            intent: "book_call",
+            source: "landing_page",
           }),
         },
       );
 
       setFormSubmitted(true);
-      toast.success("You're in. We'll reach out with early access details.");
+      toast.success(
+        "Booking request received. We will email available times shortly.",
+      );
       setFormName("");
       setFormEmail("");
       setFormPhone("");
@@ -139,344 +180,937 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="relative min-h-[100svh] bg-background text-foreground">
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(22,101,90,0.16),transparent_36%),radial-gradient(circle_at_82%_16%,rgba(12,72,67,0.12),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.7),rgba(247,245,240,0.26))]" />
+    <div className="relative overflow-hidden bg-white text-slate-900">
+      {/* ═══════════════════════════════════════════
+          HERO
+      ═══════════════════════════════════════════ */}
+      <div className="relative min-h-[100svh] overflow-hidden">
+        {/* Dark hero base */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[100svh] bg-[#071220]" />
+        {/* Teal ambient glows */}
+        <div className="pointer-events-none absolute left-[-16%] top-[-12%] z-0 h-[38rem] w-[38rem] rounded-full bg-teal-500/12 blur-[120px]" />
+        <div className="pointer-events-none absolute right-[-14%] top-[0%] z-0 h-[32rem] w-[32rem] rounded-full bg-teal-400/10 blur-[120px]" />
+        {/* Teal grid */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[100svh] w-full bg-[linear-gradient(to_right,rgba(20,184,166,0.07)_1px,transparent_1px),linear-gradient(to_bottom,rgba(20,184,166,0.07)_1px,transparent_1px)] bg-[size:40px_40px]" />
+        {/* Center vignette */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[100svh] bg-[radial-gradient(ellipse_80%_55%_at_50%_42%,rgba(4,10,22,0.62),transparent)]" />
 
-      <header className="relative z-20 border-b border-border/60 bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:h-24 lg:px-10">
-          <a href="/" className="flex items-center gap-3">
-            <img src={voxaLogo} alt="Voxa Realty" className="h-12 w-auto sm:h-14" />
-          </a>
+        {/* Cityscape SVG */}
+        <svg
+          className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[100svh] w-full"
+          viewBox="0 0 1440 720"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <defs>
+            <pattern
+              id="win-warm"
+              width="8"
+              height="11"
+              patternUnits="userSpaceOnUse"
+            >
+              <rect
+                x="1.5"
+                y="2"
+                width="4"
+                height="5.5"
+                rx="0.3"
+                fill="rgba(255,200,60,0.8)"
+              />
+            </pattern>
+            <pattern
+              id="win-cool"
+              width="8"
+              height="11"
+              patternUnits="userSpaceOnUse"
+            >
+              <rect
+                x="1.5"
+                y="2"
+                width="4"
+                height="5.5"
+                rx="0.3"
+                fill="rgba(190,230,255,0.65)"
+              />
+            </pattern>
+            <pattern
+              id="win-wide"
+              width="11"
+              height="13"
+              patternUnits="userSpaceOnUse"
+            >
+              <rect
+                x="1.5"
+                y="2"
+                width="6"
+                height="7"
+                rx="0.3"
+                fill="rgba(255,205,65,0.75)"
+              />
+            </pattern>
+            <pattern
+              id="win-sparse"
+              width="14"
+              height="18"
+              patternUnits="userSpaceOnUse"
+            >
+              <rect
+                x="2"
+                y="3"
+                width="5"
+                height="7"
+                rx="0.3"
+                fill="rgba(255,200,60,0.6)"
+              />
+            </pattern>
+            <filter id="neon-glow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="4" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <filter id="soft-glow" x="-10%" y="-10%" width="120%" height="120%">
+              <feGaussianBlur stdDeviation="1.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <linearGradient id="bldg-shade" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="rgba(0,0,0,0.35)" />
+              <stop offset="30%" stopColor="rgba(0,0,0,0)" />
+            </linearGradient>
+          </defs>
 
-          <Button
-            className="h-11 rounded-full px-6 text-sm font-semibold shadow-[0_20px_50px_-30px_rgba(22,101,90,0.55)] transition-transform hover:-translate-y-0.5 hover:bg-primary/95"
-            onClick={() => setWaitlistOpen(true)}
+          <g fill="#0a1628" className="animate-bldg-back" opacity="0.78">
+            <rect x="0" y="380" width="60" height="240" />
+            <rect x="65" y="320" width="90" height="300" />
+            <rect x="160" y="350" width="55" height="270" />
+            <rect x="220" y="300" width="70" height="320" />
+            <rect x="295" y="260" width="100" height="360" />
+            <rect x="400" y="310" width="80" height="310" />
+            <rect x="485" y="240" width="110" height="380" />
+            <rect x="600" y="280" width="85" height="340" />
+            <rect x="690" y="320" width="70" height="300" />
+            <rect x="765" y="250" width="100" height="370" />
+            <rect x="870" y="300" width="75" height="320" />
+            <rect x="950" y="260" width="90" height="360" />
+            <rect x="1045" y="320" width="65" height="300" />
+            <rect x="1115" y="290" width="80" height="330" />
+            <rect x="1200" y="330" width="70" height="290" />
+            <rect x="1275" y="280" width="85" height="340" />
+            <rect x="1365" y="310" width="75" height="310" />
+          </g>
+
+          <g
+            transform="translate(0,-180)"
+            className="animate-bldg-main"
+            opacity="0.9"
           >
-            Join waitlist
-          </Button>
-        </div>
-      </header>
+            <rect x="0" y="550" width="75" height="350" fill="#0e1d38" />
+            <rect
+              x="0"
+              y="550"
+              width="75"
+              height="350"
+              fill="url(#win-warm)"
+              opacity="0.9"
+            />
+            <rect
+              x="0"
+              y="550"
+              width="75"
+              height="350"
+              fill="url(#bldg-shade)"
+            />
+            <rect x="80" y="470" width="58" height="430" fill="#111f3c" />
+            <rect
+              x="80"
+              y="470"
+              width="58"
+              height="430"
+              fill="url(#win-cool)"
+              opacity="0.75"
+            />
+            <rect
+              x="80"
+              y="470"
+              width="58"
+              height="430"
+              fill="url(#bldg-shade)"
+            />
+            <rect x="108" y="435" width="3" height="35" fill="#253a55" />
+            <circle
+              cx="109"
+              cy="435"
+              r="2"
+              fill="rgba(255,80,60,0.9)"
+              filter="url(#soft-glow)"
+              className="animate-aviation"
+            />
+            <rect x="143" y="500" width="88" height="400" fill="#0d1c36" />
+            <rect
+              x="143"
+              y="500"
+              width="88"
+              height="400"
+              fill="url(#win-warm)"
+              opacity="0.7"
+            />
+            <rect
+              x="143"
+              y="500"
+              width="88"
+              height="400"
+              fill="url(#bldg-shade)"
+            />
+            <rect x="156" y="450" width="62" height="50" fill="#0d1c36" />
+            <rect
+              x="156"
+              y="450"
+              width="62"
+              height="50"
+              fill="url(#win-warm)"
+              opacity="0.7"
+            />
+            <rect x="236" y="530" width="55" height="370" fill="#0c1b34" />
+            <rect x="296" y="400" width="98" height="500" fill="#0f1d37" />
+            <rect
+              x="296"
+              y="400"
+              width="98"
+              height="500"
+              fill="url(#win-cool)"
+              opacity="0.8"
+            />
+            <rect
+              x="296"
+              y="400"
+              width="98"
+              height="500"
+              fill="url(#bldg-shade)"
+            />
+            <rect x="312" y="348" width="66" height="52" fill="#0f1d37" />
+            <rect
+              x="312"
+              y="348"
+              width="66"
+              height="52"
+              fill="url(#win-cool)"
+              opacity="0.8"
+            />
+            <rect x="346" y="310" width="4" height="38" fill="#253a55" />
+            <rect x="400" y="475" width="78" height="425" fill="#0e1c35" />
+            <rect
+              x="400"
+              y="475"
+              width="78"
+              height="425"
+              fill="url(#win-warm)"
+              opacity="0.75"
+            />
+            <rect
+              x="400"
+              y="475"
+              width="78"
+              height="425"
+              fill="url(#bldg-shade)"
+            />
+            <rect x="485" y="335" width="112" height="565" fill="#121f3c" />
+            <rect
+              x="485"
+              y="335"
+              width="112"
+              height="565"
+              fill="url(#win-wide)"
+              opacity="0.82"
+            />
+            <rect
+              x="485"
+              y="335"
+              width="112"
+              height="565"
+              fill="url(#bldg-shade)"
+            />
+            <rect x="498" y="282" width="86" height="53" fill="#121f3c" />
+            <rect
+              x="498"
+              y="282"
+              width="86"
+              height="53"
+              fill="url(#win-wide)"
+              opacity="0.82"
+            />
+            <rect x="516" y="232" width="50" height="50" fill="#121f3c" />
+            <rect x="538" y="188" width="6" height="44" fill="#253a55" />
+            <circle
+              cx="541"
+              cy="188"
+              r="2.5"
+              fill="rgba(255,80,60,0.95)"
+              filter="url(#soft-glow)"
+              className="animate-aviation-2"
+            />
+            <rect x="603" y="430" width="82" height="470" fill="#0d1c35" />
+            <rect
+              x="603"
+              y="430"
+              width="82"
+              height="470"
+              fill="url(#win-warm)"
+              opacity="0.68"
+            />
+            <rect
+              x="603"
+              y="430"
+              width="82"
+              height="470"
+              fill="url(#bldg-shade)"
+            />
+            <rect x="690" y="490" width="62" height="410" fill="#10203a" />
+            <rect
+              x="690"
+              y="600"
+              width="62"
+              height="300"
+              fill="url(#win-sparse)"
+              opacity="0.55"
+            />
+            <rect
+              x="690"
+              y="490"
+              width="62"
+              height="410"
+              fill="url(#bldg-shade)"
+            />
+            <rect x="758" y="395" width="102" height="505" fill="#0e1d37" />
+            <rect
+              x="758"
+              y="395"
+              width="102"
+              height="505"
+              fill="url(#win-warm)"
+              opacity="0.78"
+            />
+            <rect
+              x="758"
+              y="395"
+              width="102"
+              height="505"
+              fill="url(#bldg-shade)"
+            />
+            <rect x="807" y="358" width="4" height="37" fill="#253a55" />
+            <ellipse cx="840" cy="393" rx="8" ry="3.5" fill="#0c1b2f" />
+            <rect x="832" y="393" width="16" height="18" fill="#0c1b2f" />
+            <ellipse cx="840" cy="411" rx="8" ry="3.5" fill="#0c1b2f" />
+            <line
+              x1="834"
+              y1="411"
+              x2="830"
+              y2="425"
+              stroke="#0c1b2f"
+              strokeWidth="2"
+            />
+            <line
+              x1="840"
+              y1="411"
+              x2="840"
+              y2="425"
+              stroke="#0c1b2f"
+              strokeWidth="2"
+            />
+            <line
+              x1="846"
+              y1="411"
+              x2="850"
+              y2="425"
+              stroke="#0c1b2f"
+              strokeWidth="2"
+            />
+            <rect x="866" y="450" width="78" height="450" fill="#0f1d38" />
+            <rect
+              x="866"
+              y="450"
+              width="78"
+              height="450"
+              fill="url(#win-cool)"
+              opacity="0.72"
+            />
+            <rect
+              x="866"
+              y="450"
+              width="78"
+              height="450"
+              fill="url(#bldg-shade)"
+            />
+            <rect x="950" y="408" width="92" height="492" fill="#0d1b34" />
+            <rect
+              x="950"
+              y="408"
+              width="92"
+              height="492"
+              fill="url(#win-warm)"
+              opacity="0.77"
+            />
+            <rect
+              x="950"
+              y="408"
+              width="92"
+              height="492"
+              fill="url(#bldg-shade)"
+            />
+            <rect x="963" y="356" width="66" height="52" fill="#0d1b34" />
+            <rect
+              x="963"
+              y="356"
+              width="66"
+              height="52"
+              fill="url(#win-warm)"
+              opacity="0.77"
+            />
+            <rect x="1048" y="478" width="68" height="422" fill="#0c1b33" />
+            <rect
+              x="1048"
+              y="700"
+              width="68"
+              height="200"
+              fill="url(#win-sparse)"
+              opacity="0.5"
+            />
+            <rect x="1122" y="435" width="82" height="465" fill="#0e1d37" />
+            <rect
+              x="1122"
+              y="435"
+              width="82"
+              height="465"
+              fill="url(#win-cool)"
+              opacity="0.74"
+            />
+            <rect
+              x="1122"
+              y="435"
+              width="82"
+              height="465"
+              fill="url(#bldg-shade)"
+            />
+            <rect x="1210" y="465" width="73" height="435" fill="#101f39" />
+            <rect
+              x="1210"
+              y="465"
+              width="73"
+              height="435"
+              fill="url(#win-warm)"
+              opacity="0.68"
+            />
+            <rect
+              x="1210"
+              y="465"
+              width="73"
+              height="435"
+              fill="url(#bldg-shade)"
+            />
+            <ellipse cx="1237" cy="463" rx="7" ry="3" fill="#0c1b2f" />
+            <rect x="1230" y="463" width="14" height="15" fill="#0c1b2f" />
+            <ellipse cx="1237" cy="478" rx="7" ry="3" fill="#0c1b2f" />
+            <line
+              x1="1232"
+              y1="478"
+              x2="1229"
+              y2="490"
+              stroke="#0c1b2f"
+              strokeWidth="2"
+            />
+            <line
+              x1="1237"
+              y1="478"
+              x2="1237"
+              y2="490"
+              stroke="#0c1b2f"
+              strokeWidth="2"
+            />
+            <line
+              x1="1242"
+              y1="478"
+              x2="1245"
+              y2="490"
+              stroke="#0c1b2f"
+              strokeWidth="2"
+            />
+            <rect x="1289" y="415" width="88" height="485" fill="#0d1c36" />
+            <rect
+              x="1289"
+              y="415"
+              width="88"
+              height="485"
+              fill="url(#win-warm)"
+              opacity="0.79"
+            />
+            <rect
+              x="1289"
+              y="415"
+              width="88"
+              height="485"
+              fill="url(#bldg-shade)"
+            />
+            <rect x="1301" y="363" width="64" height="52" fill="#0d1c36" />
+            <rect
+              x="1301"
+              y="363"
+              width="64"
+              height="52"
+              fill="url(#win-warm)"
+              opacity="0.79"
+            />
+            <rect x="1331" y="325" width="4" height="38" fill="#253a55" />
+            <circle
+              cx="1333"
+              cy="325"
+              r="2"
+              fill="rgba(255,80,60,0.9)"
+              filter="url(#soft-glow)"
+              className="animate-aviation-3"
+            />
+            <rect x="1383" y="490" width="57" height="410" fill="#111e38" />
+            <rect
+              x="1383"
+              y="490"
+              width="57"
+              height="410"
+              fill="url(#win-warm)"
+              opacity="0.72"
+            />
+            <rect
+              x="1383"
+              y="490"
+              width="57"
+              height="410"
+              fill="url(#bldg-shade)"
+            />
+          </g>
 
-      <main className="relative z-10 mx-auto flex min-h-[calc(100svh-5rem)] max-w-7xl items-center px-6 py-8 lg:min-h-[calc(100svh-6rem)] lg:px-10">
-        <section className="grid w-full items-center gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14">
+          <rect
+            x="0"
+            y="798"
+            width="1440"
+            height="2"
+            fill="rgba(20,184,166,0.6)"
+            filter="url(#neon-glow)"
+          />
+          <rect x="0" y="798" width="1440" height="282" fill="#071220" />
+        </svg>
 
-          {/* LEFT: Copy */}
-          <div className="flex flex-col gap-5">
-            <p className="section-kicker animate-rise-fade [animation-fill-mode:both]">
-              AI receptionist and sales agent for real estate agents
-            </p>
-            <h1 className="animate-rise-fade animate-delay-1 [animation-fill-mode:both] text-[clamp(2.4rem,5.2vw,5rem)] font-bold leading-[0.92] tracking-tight text-foreground">
-              AI receptionist and sales agent
-              <br />
-              for real estate agents.
-            </h1>
-            <p className="animate-rise-fade animate-delay-2 [animation-fill-mode:both] max-w-lg text-base leading-7 text-muted-foreground">
-              Voxa responds to every missed call and portal enquiry in under 5 seconds, qualifies buyer and seller intent, and syncs the conversation to your CRM automatically.
-            </p>
-
-            <div className="animate-rise-fade animate-delay-2 [animation-fill-mode:both] flex items-center gap-6 border-y border-border/50 py-4">
-              <div className="flex flex-col">
-                <span className="text-xl font-bold tracking-tight text-foreground">&lt;&nbsp;5s</span>
-                <span className="text-[11px] text-muted-foreground">Response time</span>
-              </div>
-              <div className="h-8 w-px bg-border/60" />
-              <div className="flex flex-col">
-                <span className="text-xl font-bold tracking-tight text-foreground">100%</span>
-                <span className="text-[11px] text-muted-foreground">Enquiries captured</span>
-              </div>
-              <div className="h-8 w-px bg-border/60" />
-              <div className="flex flex-col">
-                <span className="text-xl font-bold tracking-tight text-foreground">6</span>
-                <span className="text-[11px] text-muted-foreground">Integrations</span>
-              </div>
-            </div>
-
-            <div className="animate-rise-fade animate-delay-2 [animation-fill-mode:both] flex flex-wrap gap-2">
-              {channelTags.map(({ label, icon, color }) => (
-                <span
-                  key={label}
-                  className="flex items-center gap-1.5 rounded-full border border-border/80 bg-white/70 px-3.5 py-1.5 text-xs font-semibold text-foreground/80 transition-colors hover:bg-white"
+        {/* ── Nav ── */}
+        <header
+          className={`fixed inset-x-0 top-4 z-30 px-4 sm:top-6 transition-transform duration-300 ${navHidden ? "-translate-y-[calc(100%+1.5rem)]" : "translate-y-0"}`}
+        >
+          <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 rounded-2xl border border-white/30 bg-white/90 px-3 py-2 shadow-[0_22px_60px_-38px_rgba(15,23,42,0.75)] backdrop-blur-xl sm:px-4">
+            <a href="/" className="flex items-center gap-2">
+              <img
+                src={voxaLogoDark}
+                alt="Voxa Realty"
+                className="h-9 w-auto sm:h-10"
+              />
+            </a>
+            <nav className="hidden items-center gap-6 md:flex">
+              {navLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  className="text-sm font-semibold text-slate-900/80 transition-colors hover:text-slate-900"
                 >
-                  <span className={color}>{icon}</span>
-                  {label}
-                </span>
+                  {link.label}
+                </a>
               ))}
-            </div>
+            </nav>
+            <Button
+              className="h-10 rounded-xl bg-[#119c9e] px-4 text-sm font-semibold text-white hover:bg-[#0e8082]"
+              onClick={() => setBookingOpen(true)}
+            >
+              Book a call
+            </Button>
+          </div>
+        </header>
 
-            <div className="animate-rise-fade animate-delay-3 [animation-fill-mode:both] flex flex-wrap items-center gap-3">
+        {/* ── Hero copy — centered ── */}
+        <main className="relative z-20 mx-auto flex min-h-[100svh] w-full max-w-4xl flex-col items-center justify-center px-6 pb-14 pt-32 text-center lg:px-10">
+          <div className="w-full">
+            <p className="animate-rise-fade [animation-fill-mode:both] text-[0.68rem] font-bold uppercase tracking-[0.32em] text-[#119c9e]">
+              Based in Melbourne
+            </p>
+            <h1 className="animate-rise-fade animate-delay-1 [animation-fill-mode:both] mx-auto mt-4 max-w-4xl text-[clamp(2.6rem,6.5vw,5rem)] font-bold leading-[0.93] tracking-tight text-white  [text-shadow:0_10px_26px_rgba(15,23,42,0.32)]">
+              Your Phone Answered,{" "}
+              <span className="text-[#119c9e]">
+                Even When
+                <br />
+                You Cannot.
+              </span>
+            </h1>
+            <p className="animate-rise-fade animate-delay-2 [animation-fill-mode:both] mx-auto mt-6 max-w-xl text-base font-semibold leading-7 text-sky-50/90 sm:text-[1.05rem]">
+              Voxa answers missed calls, follows up portal leads, and qualifies
+              intent in real time so you walk into every conversation already
+              prepared.
+            </p>
+
+            <div className="animate-rise-fade animate-delay-3 [animation-fill-mode:both] mt-8 flex flex-wrap items-center justify-center gap-3">
               <Button
-                className="h-11 rounded-full px-6 text-sm font-semibold shadow-[0_20px_48px_-24px_rgba(22,101,90,0.6)] transition-transform hover:-translate-y-0.5 hover:bg-primary/95"
-                onClick={() => setWaitlistOpen(true)}
+                className="h-12 rounded-xl bg-[#119c9e] px-7 text-sm font-semibold text-white shadow-[0_18px_40px_-18px_rgba(17,156,158,0.7)] transition-transform hover:-translate-y-0.5 hover:bg-[#0e8082]"
+                onClick={() => setBookingOpen(true)}
               >
-                Join the waitlist
+                Book a strategy call
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-
               <a
-                href="tel:+15753052236"
-                className="inline-flex h-11 items-center gap-2 rounded-full border border-border/80 bg-white/75 px-5 text-sm font-semibold text-foreground transition-all hover:border-primary/30 hover:bg-white hover:-translate-y-0.5"
+                href="tel:+61494092756"
+                className="inline-flex h-12 items-center gap-2 rounded-xl border border-white/30 px-5 text-sm font-bold text-white/80 transition-colors hover:text-white"
               >
-                <PhoneCall className="h-4 w-4 text-primary" />
-                <span>+1 (575) 305-2236</span>
+                <PhoneCall className="h-4 w-4" />
+                +61 (494) 092-756
               </a>
             </div>
           </div>
 
-          {/* RIGHT: App UI mockup */}
-          <div className="animate-rise-fade animate-delay-2 [animation-fill-mode:both] relative hidden lg:block">
-            {/* Ambient glow */}
-            <div className="pointer-events-none absolute -inset-8 rounded-[3rem] bg-gradient-to-br from-primary/12 via-emerald-50/40 to-transparent blur-3xl" />
-
-            {/* Floating pill – top right */}
-            <div className="absolute -right-5 -top-3 z-20 flex items-center gap-1.5 rounded-full border border-border/60 bg-white/95 px-3 py-1.5 shadow-lg backdrop-blur-sm">
-              <Zap className="h-3 w-3 text-amber-500" />
-              <span className="text-[11px] font-bold tracking-tight">Lead captured · 2s</span>
-            </div>
-
-            {/* App window frame */}
-            <div className="overflow-hidden rounded-2xl border border-border/50 bg-white/80 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.14)] backdrop-blur-xl">
-
-              {/* Title bar */}
-              <div className="flex items-center gap-3 border-b border-border/40 bg-white/90 px-4 py-3">
-                <div className="flex gap-1.5">
-                  <div className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
-                  <div className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
-                  <div className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
-                </div>
-                <div className="flex flex-1 items-center justify-center">
-                  <span className="rounded-md bg-border/30 px-3 py-0.5 text-[11px] font-medium text-muted-foreground">
-                    Voxa — Lead Inbox
-                  </span>
-                </div>
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-                </span>
+          {/* ── Proof bar — centered ── */}
+          <div className="animate-rise-fade animate-delay-3 [animation-fill-mode:both] mt-16 flex  justify-center gap-x-10 gap-y-4">
+            {proofStats.map(({ value, label }) => (
+              <div key={label} className="text-center">
+                <p className="text-2xl font-bold text-white sm:text-3xl">
+                  {value}
+                </p>
+                <p className="mt-0.5 text-xs font-bold uppercase tracking-[0.18em] text-sky-200/70">
+                  {label}
+                </p>
               </div>
-
-              {/* 3-pane layout */}
-              <div className="flex" style={{ height: 320 }}>
-
-                {/* Nav sidebar */}
-                <div className="flex w-12 shrink-0 flex-col items-center gap-3 border-r border-border/40 bg-white/60 py-4">
-                  {[
-                    { icon: <MessageSquare className="h-4 w-4" />, active: true },
-                    { icon: <Users className="h-4 w-4" />, active: false },
-                    { icon: <BarChart3 className="h-4 w-4" />, active: false },
-                    { icon: <Database className="h-4 w-4" />, active: false },
-                    { icon: <Settings className="h-4 w-4" />, active: false },
-                  ].map(({ icon, active }, i) => (
-                    <div
-                      key={i}
-                      className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
-                        active
-                          ? "bg-primary text-white shadow-[0_4px_12px_-4px_rgba(22,101,90,0.5)]"
-                          : "text-muted-foreground/50 hover:bg-border/40"
-                      }`}
-                    >
-                      {icon}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Lead list */}
-                <div className="flex w-44 shrink-0 flex-col border-r border-border/40 bg-white/50">
-                  <div className="border-b border-border/40 px-3 py-2.5">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60">Inbox</p>
-                    <span className="mt-0.5 inline-flex rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold text-primary">3 new</span>
-                  </div>
-                  {[
-                    {
-                      avatar: <Phone className="h-3 w-3 text-white" />,
-                      avatarBg: "bg-emerald-500",
-                      name: "Sarah M.",
-                      preview: "4BR Paddington…",
-                      time: "2m",
-                      unread: true,
-                      active: true,
-                    },
-                    {
-                      avatar: <span className="text-[6px] font-black text-white leading-none">RE</span>,
-                      avatarBg: "bg-[#e11b22]",
-                      name: "James N.",
-                      preview: "REA · Bondi Beach…",
-                      time: "11m",
-                      unread: true,
-                      active: false,
-                    },
-                    {
-                      avatar: <span className="text-[8px] font-black text-white leading-none">D</span>,
-                      avatarBg: "bg-[#1a1a1a]",
-                      name: "Priya S.",
-                      preview: "Domain · Surry Hills…",
-                      time: "34m",
-                      unread: true,
-                      active: false,
-                    },
-                  ].map((lead, i) => (
-                    <div
-                      key={i}
-                      className={`flex items-start gap-2 px-3 py-2.5 ${
-                        lead.active ? "bg-primary/8 border-l-2 border-primary" : "border-l-2 border-transparent hover:bg-border/20"
-                      }`}
-                    >
-                      <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${lead.avatarBg}`}>
-                        {lead.avatar}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between">
-                          <p className="text-[11px] font-semibold text-foreground">{lead.name}</p>
-                          <span className="text-[9px] text-muted-foreground/60">{lead.time}</span>
-                        </div>
-                        <p className="truncate text-[10px] text-muted-foreground/70">{lead.preview}</p>
-                      </div>
-                      {lead.unread && <div className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Conversation panel */}
-                <div className="flex flex-1 flex-col bg-white/90">
-                  {/* Conv header */}
-                  <div className="flex items-center justify-between border-b border-border/40 px-4 py-2.5">
-                    <div>
-                      <p className="text-[12px] font-semibold text-foreground">Sarah Mitchell</p>
-                      <div className="flex items-center gap-1 text-[10px] text-muted-foreground/70">
-                        <Phone className="h-2.5 w-2.5 text-emerald-500" />
-                        Missed call · Paddington
-                      </div>
-                    </div>
-                    <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-bold text-emerald-600 ring-1 ring-emerald-200">
-                      Qualified
-                    </span>
-                  </div>
-
-                  {/* Messages */}
-                  <div className="flex flex-1 flex-col gap-2 overflow-hidden px-4 py-3">
-                    <div className="flex justify-start">
-                      <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-border/30 px-3 py-2">
-                        <p className="text-[10px] text-foreground/80">Hi, I missed your call. I'm interested in the 4BR on Oxford St.</p>
-                      </div>
-                    </div>
-                    <div className="flex justify-end">
-                      <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-primary px-3 py-2">
-                        <p className="text-[10px] text-white">Hi Sarah! Thanks for reaching out. The Paddington 4BR is available — happy to arrange a viewing. What time works for you?</p>
-                        <div className="mt-1 flex items-center justify-end gap-1 text-white/60">
-                          <Zap className="h-2 w-2" />
-                          <span className="text-[8px]">Voxa · 3s</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex justify-start">
-                      <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-border/30 px-3 py-2">
-                        <p className="text-[10px] text-foreground/80">Saturday morning would be perfect!</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Input bar */}
-                  <div className="border-t border-border/40 px-3 py-2">
-                    <div className="flex items-center gap-2 rounded-xl bg-border/20 px-3 py-2">
-                      <span className="flex-1 text-[10px] text-muted-foreground/50">Voxa is drafting a reply…</span>
-                      <div className="flex gap-0.5">
-                        <span className="inline-block h-1 w-1 animate-bounce rounded-full bg-primary/60" style={{ animationDelay: "0ms" }} />
-                        <span className="inline-block h-1 w-1 animate-bounce rounded-full bg-primary/60" style={{ animationDelay: "150ms" }} />
-                        <span className="inline-block h-1 w-1 animate-bounce rounded-full bg-primary/60" style={{ animationDelay: "300ms" }} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Status bar */}
-              <div className="flex items-center justify-between border-t border-border/40 bg-primary/5 px-4 py-2">
-                <div className="flex items-center gap-1.5 text-primary">
-                  <Database className="h-3 w-3" />
-                  <span className="text-[10px] font-semibold">Synced to Rex CRM</span>
-                </div>
-                <div className="flex items-center gap-1 text-muted-foreground/60">
-                  <Check className="h-3 w-3 text-emerald-500" />
-                  <span className="text-[10px]">Lead pushed · pipeline updated</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Floating pill – bottom left */}
-            <div className="absolute -bottom-3 -left-5 z-20 flex items-center gap-1.5 rounded-full border border-border/60 bg-white/95 px-3 py-1.5 shadow-lg backdrop-blur-sm">
-              <TrendingUp className="h-3.5 w-3.5 text-primary" />
-              <span className="text-[11px] font-bold tracking-tight">Pipeline updated</span>
-            </div>
-          </div>
-
-        </section>
-      </main>
-
-      <section className="relative z-10 border-y border-border/60 bg-white/55 py-14 backdrop-blur-sm lg:py-16">
-        <div className="mx-auto grid max-w-7xl gap-8 px-6 lg:px-10">
-          <div className="max-w-3xl">
-            <p className="section-kicker">Built for real estate lead conversion</p>
-            <h2 className="mt-3 text-4xl font-semibold leading-[0.95] tracking-tight text-foreground sm:text-5xl">
-              What makes Voxa an AI receptionist and AI sales agent for real estate agents
-            </h2>
-            <p className="mt-4 text-base leading-7 text-muted-foreground sm:text-lg">
-              Search intent for this category is clear: agents want faster first responses, better lead qualification, and more booked appointments. Voxa is designed for those exact workflows.
-            </p>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-3">
-            {seoFeatureCards.map(({ title, description, icon }) => (
-              <article key={title} className="surface-card rounded-2xl p-5">
-                <div className="inline-flex rounded-full bg-primary/10 p-2">{icon}</div>
-                <h3 className="mt-4 text-xl font-semibold leading-tight text-foreground">{title}</h3>
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">{description}</p>
-              </article>
             ))}
+          </div>
+        </main>
+      </div>
+
+      {/* ═══════════════════════════════════════════
+          CONVERSATION MOCKUP — visual proof of product
+      ═══════════════════════════════════════════ */}
+      <section
+        id="what-voxa-does"
+        className="relative z-10 bg-white py-20 lg:py-28"
+      >
+        <div className="mx-auto max-w-5xl px-6 lg:px-10">
+          <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.1fr]">
+            {/* Left: copy */}
+            <div>
+              <p className="section-kicker">What Voxa actually does</p>
+              <h2 className="mt-3 text-3xl font-semibold leading-[1.05] tracking-tight text-slate-900 sm:text-4xl">
+                Responds. Qualifies.
+                <br />
+                Informs. Automatically.
+              </h2>
+              <p className="mt-4 text-base leading-7 text-slate-500">
+                Every day agents miss calls on inspections, in meetings, or
+                after hours. Voxa answers on their behalf using their own phone
+                number picks up instantly, holds a natural conversation, and
+                qualifies every caller's intent so your agent knows exactly who
+                to call back and why.
+              </p>
+              <ul className="mt-6 space-y-3">
+                {[
+                  "Answers within seconds of a missed or declined call",
+                  "Asks qualifying questions naturally, just like a human",
+                  "Sends your agent a complete lead summary",
+                  "Dashboard of call logs with all call information handled by AI",
+                ].map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-start gap-3 text-sm text-slate-700"
+                  >
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#119c9e]/10 text-[#119c9e]">
+                      <Check className="h-3 w-3" strokeWidth={2.5} />
+                    </span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <a
+                href="/best-ai-receptionist-for-real-estate-agents"
+                className="mt-7 inline-flex items-center text-sm font-bold text-[#119c9e] transition-colors hover:text-[#0e8082]"
+              >
+                Read the guide
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </a>
+            </div>
+
+            {/* Right: call flow diagram */}
+            <div className="select-none rounded-2xl border border-slate-100 bg-slate-50 p-5 shadow-[0_32px_80px_-32px_rgba(15,23,42,0.14)]">
+              <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                Call flow
+              </p>
+
+              {/* Step 1 — Incoming call */}
+              <div className="flex flex-col items-center">
+                <div className="relative flex h-12 w-12 items-center justify-center rounded-full border border-rose-200 bg-rose-50">
+                  <PhoneCall className="h-5 w-5 text-rose-500" />
+                  <span className="absolute inset-0 animate-ping rounded-full bg-rose-300/40" />
+                </div>
+                <p className="mt-2 text-sm font-semibold text-slate-800">
+                  Incoming call
+                </p>
+                <p className="text-xs text-slate-400">
+                  Agent on inspection — unavailable
+                </p>
+              </div>
+
+              {/* Connector */}
+              <div className="relative mx-auto my-2 flex h-8 w-1 justify-center overflow-hidden rounded-full bg-slate-200">
+                <span className="animate-flow-dot-grey absolute left-1/2 h-3 w-3 -translate-x-1/2 rounded-full bg-slate-400" />
+              </div>
+
+              {/* Step 2 — Unanswered */}
+              <div className="flex justify-center">
+                <div className="rounded-full border border-amber-200 bg-amber-50 px-4 py-1.5">
+                  <p className="text-xs font-semibold text-amber-700">
+                    Call unanswered
+                  </p>
+                </div>
+              </div>
+
+              {/* Fork line */}
+              <div className="relative mx-8 mt-3 mb-1 h-5">
+                <div className="absolute inset-x-0 top-0 h-0.5 rounded-full bg-slate-200" />
+                <div className="absolute left-[12.5%] top-0 h-full w-0.5 rounded-full bg-slate-200" />
+                <div className="absolute right-[12.5%] top-0 h-full w-0.5 rounded-full bg-slate-200" />
+              </div>
+
+              {/* Two paths */}
+              <div className="mt-1 grid grid-cols-2 gap-3">
+                {/* Without Voxa */}
+                <div className="flex flex-col items-center gap-2">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                    Without Voxa
+                  </p>
+                  <div className="w-full rounded-xl border border-slate-200 bg-white p-3 text-center">
+                    <p className="text-sm">📭 No answer</p>
+                    <p className="mt-0.5 text-[11px] text-slate-400">
+                      Goes to voicemail
+                    </p>
+                  </div>
+                  <div className="h-5 w-0.5 rounded-full bg-slate-200" />
+                  <div className="w-full rounded-xl border border-red-100 bg-red-50 p-3 text-center">
+                    <p className="text-xs font-semibold text-red-600">
+                      Lead goes cold
+                    </p>
+                    <p className="mt-0.5 text-[11px] text-slate-400">
+                      Opportunity lost
+                    </p>
+                  </div>
+                </div>
+
+                {/* With Voxa */}
+                <div className="flex flex-col items-center gap-2">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#119c9e]">
+                    With Voxa
+                  </p>
+                  <div className="w-full rounded-xl border border-[#119c9e]/25 bg-[#119c9e]/5 p-3 text-center">
+                    <p className="text-xs font-semibold text-[#119c9e]">
+                      Voxa answers
+                    </p>
+                    <p className="mt-0.5 text-[11px] text-slate-500">
+                      On your own number
+                    </p>
+                  </div>
+                  <div className="relative h-6 w-1 overflow-hidden rounded-full bg-[#119c9e]/20">
+                    <span
+                      className="animate-flow-dot absolute left-1/2 h-3 w-3 -translate-x-1/2 rounded-full bg-[#119c9e]"
+                      style={{ animationDelay: "0.35s" }}
+                    />
+                  </div>
+                  <div className="w-full rounded-xl border border-[#119c9e]/25 bg-[#119c9e]/5 p-3 text-center">
+                    <p className="text-xs font-semibold text-[#119c9e]">
+                      Qualifies intent
+                    </p>
+                    <p className="mt-0.5 text-[11px] text-slate-500">
+                      Budget · timeline · type
+                    </p>
+                  </div>
+                  <div className="relative h-6 w-1 overflow-hidden rounded-full bg-[#119c9e]/20">
+                    <span
+                      className="animate-flow-dot absolute left-1/2 h-3 w-3 -translate-x-1/2 rounded-full bg-[#119c9e]"
+                      style={{ animationDelay: "0.7s" }}
+                    />
+                  </div>
+                  <div className="w-full rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-center">
+                    <p className="text-xs font-semibold text-emerald-700">
+                      ✓ Call booked
+                    </p>
+                    <p className="mt-0.5 text-[11px] text-slate-500">
+                      Agent gets full brief
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="relative z-10 py-14 lg:py-16">
+      {/* ═══════════════════════════════════════════
+          WORKFLOW — numbered, linear, connected
+      ═══════════════════════════════════════════ */}
+      <section id="how-it-works" className="bg-[#071220] py-20 lg:py-28">
+        <div className="mx-auto max-w-5xl px-6 lg:px-10">
+          <div className="max-w-xl">
+            <p className="section-kicker">How it works</p>
+            <h2 className="mt-3 text-3xl font-semibold leading-[1.05] tracking-tight text-white sm:text-4xl">
+              From inbound lead to booked call in three steps
+            </h2>
+          </div>
+
+          <div className="mt-14 grid gap-0 md:grid-cols-3">
+            {workflowSteps.map((step, i) => (
+              <div key={step.number} className="relative pl-0 md:pr-8">
+                {/* connector line (desktop) */}
+                {i < workflowSteps.length - 1 && (
+                  <span className="absolute right-0 top-5 hidden h-px w-8 bg-[#119c9e]/40 md:block" />
+                )}
+                <div className="mb-5 flex items-center gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-[#119c9e]/50 text-sm font-bold text-[#119c9e]">
+                    {step.number}
+                  </span>
+                  {i < workflowSteps.length - 1 && (
+                    <span className="h-px flex-1 bg-[#119c9e]/30 md:hidden" />
+                  )}
+                </div>
+                <h3 className="text-xl font-semibold tracking-tight text-white">
+                  {step.title}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-sky-100/60">
+                  {step.description}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 flex flex-wrap items-center gap-4">
+            <Button
+              className="h-11 rounded-xl bg-[#119c9e] px-6 text-sm font-semibold text-white hover:bg-[#0e8082]"
+              onClick={() => setBookingOpen(true)}
+            >
+              See it in action
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          FAQ — accordion, single column, light
+      ═══════════════════════════════════════════ */}
+      <section
+        id="faq"
+        className="border-t border-slate-100 bg-[#f8fbfb] py-20 lg:py-28"
+      >
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(faqStructuredData),
+          }}
         />
-        <div className="mx-auto grid max-w-7xl gap-8 px-6 lg:px-10">
-          <div className="max-w-3xl">
-            <p className="section-kicker">FAQ</p>
-            <h2 className="mt-3 text-4xl font-semibold leading-[0.95] tracking-tight text-foreground sm:text-5xl">
-              Frequently asked questions about AI receptionist software for real estate agents
-            </h2>
-          </div>
+        <div className="mx-auto max-w-5xl px-6 lg:px-10">
+          <div className="grid gap-14 lg:grid-cols-[1fr_1.6fr] lg:gap-20">
+            <div className="lg:sticky lg:top-24 lg:self-start">
+              <p className="section-kicker">FAQ</p>
+              <h2 className="mt-3 text-3xl font-semibold leading-[1.05] tracking-tight text-slate-900 sm:text-4xl">
+                Common questions
+              </h2>
+              <p className="mt-4 text-sm leading-6 text-slate-500">
+                Can't find your answer? Book a call and we'll walk you through
+                everything.
+              </p>
+              <Button
+                variant="outline"
+                className="mt-6 h-10 rounded-xl border-[#119c9e]/40 text-sm font-semibold text-[#119c9e] hover:border-[#119c9e]/70 hover:bg-[#119c9e]/5"
+                onClick={() => setBookingOpen(true)}
+              >
+                Book a call
+              </Button>
+            </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            {seoFaqs.map(({ question, answer }) => (
-              <article key={question} className="surface-card rounded-2xl p-5">
-                <h3 className="text-xl font-semibold leading-tight text-foreground">{question}</h3>
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">{answer}</p>
-              </article>
-            ))}
+            <Accordion
+              type="single"
+              collapsible
+              className="divide-y divide-slate-200/60"
+            >
+              {seoFaqs.map(({ question, answer }) => (
+                <AccordionItem
+                  key={question}
+                  value={question}
+                  className="border-0 py-1"
+                >
+                  <AccordionTrigger className="py-4 text-left text-base font-semibold text-slate-900 hover:no-underline">
+                    {question}
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-5 text-sm leading-6 text-slate-500">
+                    {answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
           </div>
         </div>
       </section>
 
-      <Dialog open={waitlistOpen} onOpenChange={handleWaitlistOpenChange}>
-        <DialogContent className="overflow-hidden rounded-2xl border-border/70 p-0 sm:max-w-xl">
+      {/* ═══════════════════════════════════════════
+          BOTTOM CTA BAND
+      ═══════════════════════════════════════════ */}
+      <section className="bg-[#071220] py-20 lg:py-24">
+        <div className="mx-auto max-w-5xl px-6 text-center lg:px-10">
+          <p className="text-[0.68rem] font-bold uppercase tracking-[0.3em] text-[#119c9e]">
+            Ready when you are
+          </p>
+          <h2 className="mt-4 text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
+            Stop losing leads to slow follow-up.
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-sky-100/70">
+            Book a 20-minute call and we'll map exactly how Voxa fits into your
+            current lead workflow.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <Button
+              className="h-12 rounded-xl bg-[#119c9e] px-8 text-sm font-semibold text-white shadow-[0_18px_40px_-18px_rgba(17,156,158,0.55)] transition-transform hover:-translate-y-0.5 hover:bg-[#0e8082]"
+              onClick={() => setBookingOpen(true)}
+            >
+              Book a strategy call
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+            <a
+              href="tel:+61494092756"
+              className="inline-flex h-12 items-center gap-2 rounded-xl border border-white/20 px-5 text-sm font-semibold text-white/70 transition-colors hover:text-white"
+            >
+              <PhoneCall className="h-4 w-4" />
+              +61 (494) 092-756
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          BOOKING DIALOG
+      ═══════════════════════════════════════════ */}
+      <Dialog open={bookingOpen} onOpenChange={handleBookingOpenChange}>
+        <DialogContent className="w-[calc(100%-2rem)] overflow-hidden rounded-2xl border-white/10 bg-[#071220] p-0 max-w-xl">
           {formSubmitted ? (
             <div className="flex min-h-[340px] flex-col items-center justify-center px-8 py-10 text-center sm:px-12">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#119c9e]/15 text-[#119c9e]">
                 <CheckCircle2 className="h-8 w-8" />
               </div>
-              <DialogTitle className="mt-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                You're on the list.
+              <DialogTitle className="mt-6 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                Request received.
               </DialogTitle>
-              <DialogDescription className="mt-4 max-w-md text-sm leading-7 text-muted-foreground sm:text-base">
-                We will follow up with early access details and next steps for
-                getting Voxa live on your number and channels.
+              <DialogDescription className="mt-4 max-w-md text-sm leading-7 text-sky-100/60 sm:text-base">
+                We'll send available times shortly so you can book a strategy
+                call with our team.
               </DialogDescription>
-
               <Button
-                className="mt-7 h-11 rounded-full px-6"
-                onClick={() => setWaitlistOpen(false)}
+                className="mt-7 h-11 rounded-full bg-[#119c9e] px-6 text-white hover:bg-[#0e8082]"
+                onClick={() => setBookingOpen(false)}
               >
                 Done
               </Button>
@@ -484,25 +1118,23 @@ const LandingPage = () => {
           ) : (
             <div className="p-6 sm:p-8">
               <DialogHeader>
-                <DialogTitle className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                  Join the waitlist
+                <DialogTitle className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                  Book a call
                 </DialogTitle>
-                <DialogDescription className="pt-2 text-sm leading-7 sm:text-base">
-                  Share your details and we will reach out with onboarding
-                  availability.
+                <DialogDescription className="pt-2 text-sm leading-7 text-sky-100/60 sm:text-base">
+                  Share your details and we'll call you soon!
                 </DialogDescription>
               </DialogHeader>
-
               <form onSubmit={handleFormSubmit} className="mt-6 grid gap-5">
                 <div className="space-y-2.5">
                   <Label
-                    htmlFor="waitlist-name"
-                    className="text-[13px] font-bold uppercase tracking-wider text-foreground/80"
+                    htmlFor="booking-name"
+                    className="text-[13px] font-bold uppercase tracking-wider text-sky-100/80"
                   >
-                    Name <span className="text-destructive">*</span>
+                    Name <span className="text-rose-400">*</span>
                   </Label>
                   <Input
-                    id="waitlist-name"
+                    id="booking-name"
                     type="text"
                     placeholder="Your full name"
                     value={formName}
@@ -510,69 +1142,66 @@ const LandingPage = () => {
                     required
                     maxLength={100}
                     disabled={formLoading}
-                    className="h-12 rounded-xl border-border/70 bg-white px-4"
+                    className="h-12 rounded-xl border-white/10 bg-white/5 px-4 text-white placeholder:text-white/30 focus-visible:ring-[#119c9e]"
                   />
                 </div>
 
                 <div className="space-y-2.5">
                   <Label
-                    htmlFor="waitlist-email"
-                    className="text-[13px] font-bold uppercase tracking-wider text-foreground/80"
+                    htmlFor="booking-phone"
+                    className="text-[13px] font-bold uppercase tracking-wider text-sky-100/80"
                   >
-                    Email <span className="text-destructive">*</span>
+                    Phone <span className="text-rose-400">*</span>
                   </Label>
                   <Input
-                    id="waitlist-email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={formEmail}
-                    onChange={(e) => setFormEmail(e.target.value)}
-                    required
-                    maxLength={255}
-                    disabled={formLoading}
-                    className="h-12 rounded-xl border-border/70 bg-white px-4"
-                  />
-                </div>
-
-                <div className="space-y-2.5">
-                  <Label
-                    htmlFor="waitlist-phone"
-                    className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-foreground/80"
-                  >
-                    Phone
-                    <span className="text-[10px] font-medium tracking-[0.14em] text-muted-foreground/70">
-                      optional
-                    </span>
-                  </Label>
-                  <Input
-                    id="waitlist-phone"
+                    id="booking-phone"
                     type="tel"
                     placeholder="+1 (555) 000-0000"
                     value={formPhone}
                     onChange={(e) => setFormPhone(e.target.value)}
+                    required
                     maxLength={20}
                     disabled={formLoading}
-                    className="h-12 rounded-xl border-border/70 bg-white px-4"
+                    className="h-12 rounded-xl border-white/10 bg-white/5 px-4 text-white placeholder:text-white/30 focus-visible:ring-[#119c9e]"
                   />
                 </div>
-
+                <div className="space-y-2.5">
+                  <Label
+                    htmlFor="booking-email"
+                    className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-sky-100/80"
+                  >
+                    Agency / Suburb
+                    <span className="text-[10px] font-medium tracking-[0.14em] text-sky-100/40">
+                      optional
+                    </span>
+                  </Label>
+                  <Input
+                    id="booking-email"
+                    type="text"
+                    placeholder="e.g. Ray White · Brighton"
+                    value={formEmail}
+                    onChange={(e) => setFormEmail(e.target.value)}
+                    maxLength={255}
+                    disabled={formLoading}
+                    className="h-12 rounded-xl border-white/10 bg-white/5 px-4 text-white placeholder:text-white/30 focus-visible:ring-[#119c9e]"
+                  />
+                </div>
                 <Button
                   type="submit"
-                  disabled={formLoading || !formName || !formEmail}
-                  className="mt-2 h-12 rounded-xl text-sm font-semibold"
+                  disabled={formLoading || !formName || !formPhone}
+                  className="mt-2 h-12 rounded-xl bg-[#119c9e] text-sm font-semibold text-white hover:bg-[#0e8082]"
                 >
                   {formLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Submitting...
+                      Sending request...
                     </>
                   ) : (
-                    <>Request early access</>
+                    <>Send booking request</>
                   )}
                 </Button>
-
-                <p className="text-center text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground/80">
-                  2-minute form - no credit card - early access only
+                <p className="text-center text-[11px] font-medium uppercase tracking-[0.14em] text-sky-100/40">
+                  A real person will call you back soon!
                 </p>
               </form>
             </div>
@@ -580,10 +1209,13 @@ const LandingPage = () => {
         </DialogContent>
       </Dialog>
 
-      <footer className="relative z-10 border-t border-border/60 bg-background/40 px-6 py-4 backdrop-blur-sm lg:px-10">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 text-xs text-muted-foreground sm:text-sm">
-          <p>Voxa Realty</p>
-          <p>AI receptionist and sales agent software for real estate agents.</p>
+      {/* ═══════════════════════════════════════════
+          FOOTER
+      ═══════════════════════════════════════════ */}
+      <footer className="border-t border-border/60 bg-white px-6 py-5 lg:px-10">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 text-xs text-muted-foreground sm:text-sm">
+          <p className="font-semibold text-slate-700">Voxa Realty</p>
+          <p>AI receptionist and sales agent software for real estate teams.</p>
         </div>
       </footer>
     </div>

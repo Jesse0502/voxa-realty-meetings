@@ -1,6 +1,12 @@
 import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, Navigate, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,16 +14,39 @@ import { Loader2 } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "./store/hooks";
 import { fetchCurrentUser } from "./store/authSlice";
 import LandingPage from "./pages/LandingPage.tsx";
+import BestAiReceptionistPage from "./pages/BestAiReceptionistPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import LoginRegister from "./pages/login/Index.tsx";
 import DashboardPage from "./pages/dashboard/Index.tsx";
 
 const queryClient = new QueryClient();
 const SITE_URL = "https://www.voxarealty.com";
-const INDEXABLE_PATHS = new Set(["/"]);
+
+type PageSeoMeta = {
+  title: string;
+  description: string;
+};
+
+const PAGE_SEO_BY_PATH: Record<string, PageSeoMeta> = {
+  "/": {
+    title:
+      "AI Receptionist for Real Estate Teams | Book More Calls | Voxa Realty",
+    description:
+      "Voxa Realty is an AI receptionist and AI sales agent for real estate teams. Respond to missed calls in seconds, follow up internet leads, and book more qualified calls.",
+  },
+  "/best-ai-receptionist-for-real-estate-agents": {
+    title: "Best AI Receptionist for Real Estate Agents in 2026 | Voxa Realty",
+    description:
+      "Compare what makes the best AI receptionist for real estate agents and see how Voxa improves lead response time, qualification quality, and booked appointments.",
+  },
+};
+
+const INDEXABLE_PATHS = new Set(Object.keys(PAGE_SEO_BY_PATH));
 
 const upsertMetaTag = (name: string, content: string) => {
-  let tag = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement | null;
+  let tag = document.querySelector(
+    `meta[name="${name}"]`,
+  ) as HTMLMetaElement | null;
 
   if (!tag) {
     tag = document.createElement("meta");
@@ -28,8 +57,24 @@ const upsertMetaTag = (name: string, content: string) => {
   tag.setAttribute("content", content);
 };
 
+const upsertPropertyMetaTag = (property: string, content: string) => {
+  let tag = document.querySelector(
+    `meta[property="${property}"]`,
+  ) as HTMLMetaElement | null;
+
+  if (!tag) {
+    tag = document.createElement("meta");
+    tag.setAttribute("property", property);
+    document.head.appendChild(tag);
+  }
+
+  tag.setAttribute("content", content);
+};
+
 const upsertCanonical = (href: string) => {
-  let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+  let canonical = document.querySelector(
+    'link[rel="canonical"]',
+  ) as HTMLLinkElement | null;
 
   if (!canonical) {
     canonical = document.createElement("link");
@@ -48,17 +93,29 @@ const RouteMetaManager = () => {
       location.pathname === "/"
         ? "/"
         : location.pathname.replace(/\/+$/, "") || "/";
+    const pageSeo = PAGE_SEO_BY_PATH[normalizedPath];
     const isIndexable = INDEXABLE_PATHS.has(normalizedPath);
 
-    if (isIndexable) {
+    if (isIndexable && pageSeo) {
       const indexableContent =
         "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1";
+      const canonicalUrl =
+        normalizedPath === "/"
+          ? `${SITE_URL}/`
+          : `${SITE_URL}${normalizedPath}`;
 
-      document.title =
-        "AI Receptionist & Sales Agent for Real Estate Agents | Voxa Realty";
+      document.title = pageSeo.title;
+      upsertMetaTag("description", pageSeo.description);
       upsertMetaTag("robots", indexableContent);
       upsertMetaTag("googlebot", indexableContent);
-      upsertCanonical(`${SITE_URL}/`);
+      upsertMetaTag("twitter:title", pageSeo.title);
+      upsertMetaTag("twitter:description", pageSeo.description);
+      upsertMetaTag("twitter:image", `${SITE_URL}/logo.png`);
+      upsertPropertyMetaTag("og:title", pageSeo.title);
+      upsertPropertyMetaTag("og:description", pageSeo.description);
+      upsertPropertyMetaTag("og:url", canonicalUrl);
+      upsertPropertyMetaTag("og:image", `${SITE_URL}/logo.png`);
+      upsertCanonical(canonicalUrl);
       return;
     }
 
@@ -127,6 +184,10 @@ const App = () => (
                 <LandingPage />
               </RequireGuest>
             }
+          />
+          <Route
+            path="/best-ai-receptionist-for-real-estate-agents"
+            element={<BestAiReceptionistPage />}
           />
           <Route
             path="/login"
