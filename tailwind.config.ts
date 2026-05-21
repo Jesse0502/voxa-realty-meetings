@@ -70,8 +70,8 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["Open Runde", "Open Runde Placeholder", "sans-serif"],
-        serif: ["Open Runde", "Open Runde Placeholder", "sans-serif"],
+        sans: ["Inter", "sans-serif"],
+        serif: ["Manrope", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {

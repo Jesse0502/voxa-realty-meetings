@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,7 +30,7 @@ import {
   Check,
 } from "lucide-react";
 import { toast } from "sonner";
-import voxaLogoDark from "@/assets/voxa-logo.png";
+import voxaLogoDark from "@/assets/voxa-logo-dark.png";
 
 const navLinks = [
   { label: "How it works", href: "#how-it-works" },
@@ -38,7 +39,7 @@ const navLinks = [
 ];
 
 const proofStats = [
-  { value: "< 1s", label: "Instant reply time" },
+  { value: "<1s", label: "Instant reply time" },
   { value: "24/7", label: "Coverage, no gaps" },
   { value: "100%", label: "Leads Captured" },
 ];
@@ -282,9 +283,18 @@ const LandingPage = () => {
               <stop offset="0%" stopColor="rgba(0,0,0,0.35)" />
               <stop offset="30%" stopColor="rgba(0,0,0,0)" />
             </linearGradient>
+            <linearGradient id="mid-haze" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgba(7,18,32,0)" />
+              <stop offset="100%" stopColor="rgba(7,18,32,0.8)" />
+            </linearGradient>
           </defs>
 
-          <g fill="#0a1628" className="animate-bldg-back" opacity="0.78">
+          {/* Hazier background layer */}
+          <g
+            fill="#0a1628"
+            className="animate-bldg-back hidden sm:block"
+            opacity="0.45"
+          >
             <rect x="0" y="380" width="60" height="240" />
             <rect x="65" y="320" width="90" height="300" />
             <rect x="160" y="350" width="55" height="270" />
@@ -304,11 +314,211 @@ const LandingPage = () => {
             <rect x="1365" y="310" width="75" height="310" />
           </g>
 
+          {/* Mobile skyline — 7 wide buildings, full width */}
           <g
             transform="translate(0,-180)"
-            className="animate-bldg-main"
+            className="animate-bldg-main sm:hidden"
             opacity="0.9"
           >
+            {/* Background haze for mobile */}
+            <rect
+              x="0"
+              y="400"
+              width="1440"
+              height="500"
+              fill="url(#mid-haze)"
+              className="pointer-events-none"
+            />
+            {/* Bldg 1 */}
+            <rect x="0" y="490" width="185" height="510" fill="#0e1d38" />
+            <rect
+              x="0"
+              y="490"
+              width="185"
+              height="510"
+              fill="url(#win-warm)"
+              opacity="0.75"
+            />
+            <rect
+              x="0"
+              y="490"
+              width="185"
+              height="510"
+              fill="url(#bldg-shade)"
+            />
+            <rect x="80" y="438" width="4" height="52" fill="#253a55" />
+            <circle
+              cx="82"
+              cy="438"
+              r="2.5"
+              fill="rgba(255,80,60,0.9)"
+              filter="url(#soft-glow)"
+              className="animate-aviation"
+            />
+            {/* Bldg 2 — shorter accent */}
+            <rect x="193" y="540" width="155" height="460" fill="#0c1b34" />
+            <rect
+              x="193"
+              y="540"
+              width="155"
+              height="460"
+              fill="url(#win-sparse)"
+              opacity="0.55"
+            />
+            <rect
+              x="193"
+              y="540"
+              width="155"
+              height="460"
+              fill="url(#bldg-shade)"
+            />
+            {/* Bldg 3 — tallest left-center */}
+            <rect x="356" y="350" width="230" height="650" fill="#121f3c" />
+            <rect
+              x="356"
+              y="350"
+              width="230"
+              height="650"
+              fill="url(#win-wide)"
+              opacity="0.78"
+            />
+            <rect
+              x="356"
+              y="350"
+              width="230"
+              height="650"
+              fill="url(#bldg-shade)"
+            />
+            <rect x="368" y="298" width="206" height="52" fill="#121f3c" />
+            <rect
+              x="368"
+              y="298"
+              width="206"
+              height="52"
+              fill="url(#win-wide)"
+              opacity="0.78"
+            />
+            <rect x="463" y="248" width="6" height="50" fill="#253a55" />
+            <circle
+              cx="466"
+              cy="248"
+              r="3"
+              fill="rgba(255,80,60,0.95)"
+              filter="url(#soft-glow)"
+              className="animate-aviation-2"
+            />
+            {/* Bldg 4 — medium center-left */}
+            <rect x="596" y="450" width="185" height="550" fill="#0d1c35" />
+            <rect
+              x="596"
+              y="450"
+              width="185"
+              height="550"
+              fill="url(#win-cool)"
+              opacity="0.6"
+            />
+            <rect
+              x="596"
+              y="450"
+              width="185"
+              height="550"
+              fill="url(#bldg-shade)"
+            />
+            {/* Bldg 5 — tall center-right */}
+            <rect x="789" y="390" width="255" height="610" fill="#0f1d37" />
+            <rect
+              x="789"
+              y="390"
+              width="255"
+              height="610"
+              fill="url(#win-cool)"
+              opacity="0.72"
+            />
+            <rect
+              x="789"
+              y="390"
+              width="255"
+              height="610"
+              fill="url(#bldg-shade)"
+            />
+            <rect x="802" y="338" width="229" height="52" fill="#0f1d37" />
+            <rect
+              x="802"
+              y="338"
+              width="229"
+              height="52"
+              fill="url(#win-cool)"
+              opacity="0.72"
+            />
+            {/* Bldg 6 — medium right-center */}
+            <rect x="1053" y="420" width="195" height="580" fill="#0d1b34" />
+            <rect
+              x="1053"
+              y="420"
+              width="195"
+              height="580"
+              fill="url(#win-warm)"
+              opacity="0.76"
+            />
+            <rect
+              x="1053"
+              y="420"
+              width="195"
+              height="580"
+              fill="url(#bldg-shade)"
+            />
+            <rect x="1065" y="366" width="171" height="54" fill="#0d1b34" />
+            <rect
+              x="1065"
+              y="366"
+              width="171"
+              height="54"
+              fill="url(#win-warm)"
+              opacity="0.76"
+            />
+            <rect x="1138" y="306" width="6" height="60" fill="#253a55" />
+            <circle
+              cx="1141"
+              cy="306"
+              r="2.5"
+              fill="rgba(255,80,60,0.9)"
+              filter="url(#soft-glow)"
+              className="animate-aviation-3"
+            />
+            {/* Bldg 7 */}
+            <rect x="1257" y="480" width="183" height="520" fill="#111e38" />
+            <rect
+              x="1257"
+              y="480"
+              width="183"
+              height="520"
+              fill="url(#win-warm)"
+              opacity="0.7"
+            />
+            <rect
+              x="1257"
+              y="480"
+              width="183"
+              height="520"
+              fill="url(#bldg-shade)"
+            />
+          </g>
+
+          {/* Desktop skyline — original detailed buildings */}
+          <g
+            transform="translate(0,-180)"
+            className="animate-bldg-main hidden sm:block"
+            opacity="0.9"
+          >
+            {/* Atmospheric mid-ground depth haze */}
+            <rect
+              x="0"
+              y="410"
+              width="1440"
+              height="500"
+              fill="url(#mid-haze)"
+              className="pointer-events-none"
+            />
             <rect x="0" y="550" width="75" height="350" fill="#0e1d38" />
             <rect
               x="0"
@@ -418,41 +628,66 @@ const LandingPage = () => {
               height="425"
               fill="url(#bldg-shade)"
             />
-            <rect x="485" y="335" width="112" height="565" fill="#121f3c" />
+            {/* Melbourne Eureka Tower representation */}
+            <rect x="495" y="325" width="92" height="575" fill="#0c182b" />
             <rect
-              x="485"
-              y="335"
-              width="112"
-              height="565"
+              x="495"
+              y="325"
+              width="92"
+              height="575"
               fill="url(#win-wide)"
-              opacity="0.82"
+              opacity="0.85"
             />
             <rect
-              x="485"
-              y="335"
-              width="112"
-              height="565"
+              x="495"
+              y="325"
+              width="92"
+              height="575"
               fill="url(#bldg-shade)"
             />
-            <rect x="498" y="282" width="86" height="53" fill="#121f3c" />
+            {/* Mid tier */}
+            <rect x="505" y="275" width="72" height="50" fill="#0c182b" />
             <rect
-              x="498"
-              y="282"
-              width="86"
-              height="53"
+              x="505"
+              y="275"
+              width="72"
+              height="50"
               fill="url(#win-wide)"
-              opacity="0.82"
+              opacity="0.85"
             />
-            <rect x="516" y="232" width="50" height="50" fill="#121f3c" />
-            <rect x="538" y="188" width="6" height="44" fill="#253a55" />
+            {/* Top crown (gold) */}
+            <rect
+              x="515"
+              y="225"
+              width="52"
+              height="50"
+              fill="#9e7b23"
+              opacity="0.9"
+            />
+            <rect
+              x="515"
+              y="225"
+              width="52"
+              height="50"
+              fill="url(#bldg-shade)"
+            />
+            <rect x="535" y="165" width="6" height="60" fill="#253a55" />
+            <rect
+              x="538"
+              y="155"
+              width="2"
+              height="10"
+              fill="rgba(255,80,60,0.8)"
+            />
             <circle
-              cx="541"
-              cy="188"
+              cx="539"
+              cy="155"
               r="2.5"
               fill="rgba(255,80,60,0.95)"
               filter="url(#soft-glow)"
               className="animate-aviation-2"
             />
+            {/* Next building */}
             <rect x="603" y="430" width="82" height="470" fill="#0d1c35" />
             <rect
               x="603"
@@ -690,6 +925,26 @@ const LandingPage = () => {
             />
           </g>
 
+          {/* Foreground silhouettes — closest layer, no windows */}
+          <g fill="#040b15">
+            <rect x="0" y="615" width="130" height="185" />
+            <rect x="125" y="638" width="85" height="162" />
+            <rect x="205" y="605" width="105" height="195" />
+            <rect x="305" y="648" width="65" height="152" />
+            <rect x="365" y="592" width="90" height="208" />
+            <rect x="450" y="630" width="140" height="170" />
+            <rect x="580" y="610" width="80" height="190" />
+            <rect x="650" y="640" width="110" height="160" />
+            <rect x="750" y="580" width="90" height="220" />
+            <rect x="830" y="625" width="70" height="175" />
+            <rect x="890" y="605" width="100" height="195" />
+            <rect x="980" y="635" width="90" height="165" />
+            <rect x="1070" y="620" width="85" height="180" />
+            <rect x="1150" y="598" width="100" height="202" />
+            <rect x="1245" y="637" width="80" height="163" />
+            <rect x="1320" y="608" width="120" height="192" />
+          </g>
+
           <rect
             x="0"
             y="798"
@@ -701,11 +956,14 @@ const LandingPage = () => {
           <rect x="0" y="798" width="1440" height="282" fill="#071220" />
         </svg>
 
+        {/* Bottom fading scrim */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-64 bg-gradient-to-t from-[#071220] via-[#071220]/80 to-transparent" />
+
         {/* ── Nav ── */}
         <header
           className={`fixed inset-x-0 top-4 z-30 px-4 sm:top-6 transition-transform duration-300 ${navHidden ? "-translate-y-[calc(100%+1.5rem)]" : "translate-y-0"}`}
         >
-          <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 rounded-2xl border border-white/30 bg-white/90 px-3 py-2 shadow-[0_22px_60px_-38px_rgba(15,23,42,0.75)] backdrop-blur-xl sm:px-4">
+          <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[#071220]/65 px-3 py-2 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5)] backdrop-blur-[12px] sm:px-4">
             <a href="/" className="flex items-center gap-2">
               <img
                 src={voxaLogoDark}
@@ -718,7 +976,7 @@ const LandingPage = () => {
                 <a
                   key={link.label}
                   href={link.href}
-                  className="text-sm font-semibold text-slate-900/80 transition-colors hover:text-slate-900"
+                  className="text-sm font-semibold text-white/70 transition-colors hover:text-white"
                 >
                   {link.label}
                 </a>
@@ -734,55 +992,47 @@ const LandingPage = () => {
         </header>
 
         {/* ── Hero copy — centered ── */}
-        <main className="relative z-20 mx-auto flex min-h-[100svh] w-full max-w-4xl flex-col items-center justify-center px-6 pb-14 pt-32 text-center lg:px-10">
+        <main className="relative z-20 mx-auto flex min-h-[100svh] w-full max-w-8xl flex-col items-center justify-center px-6 pb-14 pt-32 text-center lg:px-10">
           <div className="w-full">
             <p className="animate-rise-fade [animation-fill-mode:both] text-[0.68rem] font-bold uppercase tracking-[0.32em] text-[#119c9e]">
               Based in Melbourne
             </p>
-            <h1 className="animate-rise-fade animate-delay-1 [animation-fill-mode:both] mx-auto mt-4 max-w-4xl text-[clamp(2.6rem,6.5vw,5rem)] font-bold leading-[0.93] tracking-tight text-white  [text-shadow:0_10px_26px_rgba(15,23,42,0.32)]">
-              Your Phone Answered,{" "}
-              <span className="text-[#119c9e]">
-                Even When
-                <br />
-                You Cannot.
-              </span>
+            <h1 className="animate-rise-fade font-serif animate-delay-1 [animation-fill-mode:both] mx-auto mt-4 max-w-5xl text-[clamp(2.6rem,6.5vw,5.4rem)] leading-[1.0] text-white [text-shadow:0_10px_26px_rgba(15,23,42,0.32)]">
+              Your Phone Answered,
+              <br />
+              <span className="text-[#119c9e]">Even When You Cannot.</span>
             </h1>
-            <p className="animate-rise-fade animate-delay-2 [animation-fill-mode:both] mx-auto mt-6 max-w-xl text-base font-semibold leading-7 text-sky-50/90 sm:text-[1.05rem]">
-              Voxa answers missed calls, follows up portal leads, and qualifies
-              intent in real time so you walk into every conversation already
-              prepared.
+            <p className="animate-rise-fade animate-delay-2 [animation-fill-mode:both] mx-auto mt-6 mb-2 w-full max-w-[520px] text-center text-base leading-relaxed text-white/90 sm:text-lg">
+              Voxa is an AI Assistant that knows your listings and CRM data,
+              handles missed calls on your behalf, and gives you hours back
+              every week.
             </p>
 
-            <div className="animate-rise-fade animate-delay-3 [animation-fill-mode:both] mt-8 flex flex-wrap items-center justify-center gap-3">
+            <div className="animate-rise-fade animate-delay-3 [animation-fill-mode:both] mt-10 flex flex-col items-center justify-center gap-3">
               <Button
-                className="h-12 rounded-xl bg-[#119c9e] px-7 text-sm font-semibold text-white shadow-[0_18px_40px_-18px_rgba(17,156,158,0.7)] transition-transform hover:-translate-y-0.5 hover:bg-[#0e8082]"
+                className="h-12 w-full sm:w-auto rounded-xl bg-[#119c9e] px-7 text-sm font-semibold text-white shadow-[0_18px_40px_-18px_rgba(17,156,158,0.7)] transition-transform hover:-translate-y-0.5 hover:bg-[#0e8082]"
                 onClick={() => setBookingOpen(true)}
               >
                 Book a strategy call
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-              <a
-                href="tel:+61494092756"
-                className="inline-flex h-12 items-center gap-2 rounded-xl border border-white/30 px-5 text-sm font-bold text-white/80 transition-colors hover:text-white"
-              >
-                <PhoneCall className="h-4 w-4" />
-                +61 (494) 092-756
-              </a>
             </div>
           </div>
 
           {/* ── Proof bar — centered ── */}
-          <div className="animate-rise-fade animate-delay-3 [animation-fill-mode:both] mt-16 flex  justify-center gap-x-10 gap-y-4">
-            {proofStats.map(({ value, label }) => (
-              <div key={label} className="text-center">
-                <p className="text-2xl font-bold text-white sm:text-3xl">
-                  {value}
-                </p>
-                <p className="mt-0.5 text-xs font-bold uppercase tracking-[0.18em] text-sky-200/70">
-                  {label}
-                </p>
-              </div>
-            ))}
+          <div className="animate-rise-fade animate-delay-3 [animation-fill-mode:both] mt-12 w-full max-w-2xl">
+            <div className="flex justify-center gap-x-14 gap-y-6">
+              {proofStats.map(({ value, label }) => (
+                <div key={label} className="text-center">
+                  <p className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+                    {value}
+                  </p>
+                  <p className="mt-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-sky-200/50">
+                    {label}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </main>
       </div>
@@ -829,13 +1079,13 @@ const LandingPage = () => {
                   </li>
                 ))}
               </ul>
-              <a
-                href="/best-ai-receptionist-for-real-estate-agents"
+              <Link
+                to="/best-ai-receptionist-for-real-estate-agents"
                 className="mt-7 inline-flex items-center text-sm font-bold text-[#119c9e] transition-colors hover:text-[#0e8082]"
               >
                 Read the guide
                 <ArrowRight className="ml-2 h-4 w-4" />
-              </a>
+              </Link>
             </div>
 
             {/* Right: call flow diagram */}
@@ -968,14 +1218,14 @@ const LandingPage = () => {
               <div key={step.number} className="relative pl-0 md:pr-8">
                 {/* connector line (desktop) */}
                 {i < workflowSteps.length - 1 && (
-                  <span className="absolute right-0 top-5 hidden h-px w-8 bg-[#119c9e]/40 md:block" />
+                  <span className="absolute right-0 top-5 hidden h-px w-8 bg-white/15 md:block" />
                 )}
                 <div className="mb-5 flex items-center gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-[#119c9e]/50 text-sm font-bold text-[#119c9e]">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-white/20 text-sm font-bold text-white/50">
                     {step.number}
                   </span>
                   {i < workflowSteps.length - 1 && (
-                    <span className="h-px flex-1 bg-[#119c9e]/30 md:hidden" />
+                    <span className="h-px flex-1 bg-white/15 md:hidden" />
                   )}
                 </div>
                 <h3 className="text-xl font-semibold tracking-tight text-white">
@@ -1026,7 +1276,7 @@ const LandingPage = () => {
               </p>
               <Button
                 variant="outline"
-                className="mt-6 h-10 rounded-xl border-[#119c9e]/40 text-sm font-semibold text-[#119c9e] hover:border-[#119c9e]/70 hover:bg-[#119c9e]/5"
+                className="mt-6 h-10 rounded-xl border-slate-200 text-sm font-semibold text-slate-500 hover:border-slate-300 hover:bg-slate-50"
                 onClick={() => setBookingOpen(true)}
               >
                 Book a call
@@ -1062,7 +1312,7 @@ const LandingPage = () => {
       ═══════════════════════════════════════════ */}
       <section className="bg-[#071220] py-20 lg:py-24">
         <div className="mx-auto max-w-5xl px-6 text-center lg:px-10">
-          <p className="text-[0.68rem] font-bold uppercase tracking-[0.3em] text-[#119c9e]">
+          <p className="text-[0.68rem] font-bold uppercase tracking-[0.3em] text-slate-400">
             Ready when you are
           </p>
           <h2 className="mt-4 text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
@@ -1072,7 +1322,7 @@ const LandingPage = () => {
             Book a 20-minute call and we'll map exactly how Voxa fits into your
             current lead workflow.
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          <div className="mt-8 flex flex-col items-center justify-center gap-3">
             <Button
               className="h-12 rounded-xl bg-[#119c9e] px-8 text-sm font-semibold text-white shadow-[0_18px_40px_-18px_rgba(17,156,158,0.55)] transition-transform hover:-translate-y-0.5 hover:bg-[#0e8082]"
               onClick={() => setBookingOpen(true)}
@@ -1080,13 +1330,6 @@ const LandingPage = () => {
               Book a strategy call
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-            <a
-              href="tel:+61494092756"
-              className="inline-flex h-12 items-center gap-2 rounded-xl border border-white/20 px-5 text-sm font-semibold text-white/70 transition-colors hover:text-white"
-            >
-              <PhoneCall className="h-4 w-4" />
-              +61 (494) 092-756
-            </a>
           </div>
         </div>
       </section>
