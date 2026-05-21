@@ -160,24 +160,28 @@ const LandingPage = () => {
     if (!formName || !formPhone || formLoading) return;
 
     setFormLoading(true);
+    const normalizedPhone = `+61${formPhone.replace(/\D/g, "").replace(/^0+/, "")}`;
 
     try {
-      await fetch(
-        "https://hook.eu1.make.com/gf20lg0ptytberzhnzite3oswucpsmv4",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: formName,
-            email: formEmail,
-            phone: formPhone,
-            intent: "book_call",
-            source: "landing_page",
-          }),
+      const response = await fetch("https://formspree.io/f/maqkerye", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
-      );
+        body: JSON.stringify({
+          name: formName,
+          phone: normalizedPhone,
+          agency_suburb: formEmail,
+          intent: "book_call",
+          source: "landing_page",
+          _subject: "New Voxa booking request",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Formspree request failed: ${response.status}`);
+      }
 
       setFormSubmitted(true);
       toast.success(
@@ -1409,17 +1413,23 @@ const LandingPage = () => {
                   >
                     Phone <span className="text-rose-400">*</span>
                   </Label>
-                  <Input
-                    id="booking-phone"
-                    type="tel"
-                    placeholder="+1 (555) 000-0000"
-                    value={formPhone}
-                    onChange={(e) => setFormPhone(e.target.value)}
-                    required
-                    maxLength={20}
-                    disabled={formLoading}
-                    className="h-12 rounded-xl border-white/10 bg-white/5 px-4 text-white placeholder:text-white/30 focus-visible:ring-[#119c9e]"
-                  />
+                  <div className="flex h-12 items-center rounded-xl border border-white/10 bg-white/5 focus-within:ring-2 focus-within:ring-[#119c9e]">
+                    <span className="pl-4 pr-3 text-sm font-semibold text-white/85">
+                      +61
+                    </span>
+                    <Input
+                      id="booking-phone"
+                      type="tel"
+                      inputMode="numeric"
+                      placeholder="4xx xxx xxx"
+                      value={formPhone}
+                      onChange={(e) => setFormPhone(e.target.value)}
+                      required
+                      maxLength={12}
+                      disabled={formLoading}
+                      className="h-full border-0 bg-transparent px-0 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2.5">
                   <Label
