@@ -21,11 +21,15 @@ import {
   Bot,
   CalendarCheck2,
   CheckCircle2,
+  ClipboardList,
   Clock3,
   Fingerprint,
+  Link2,
   Loader2,
   MessageSquare,
+  PhoneForwarded,
   PhoneCall,
+  Rocket,
   Sparkles,
   Check,
 } from "lucide-react";
@@ -47,29 +51,39 @@ const proofStats = [
 const workflowSteps = [
   {
     number: "01",
-    title: "Capture",
+    title: "Customization & Needs Analysis",
+    icon: ClipboardList,
     description:
-      "Missed calls and portal inquiries are intercepted automatically — no lead waits more than a few seconds for a response.",
+      "We define exactly what your AI agent should do — the qualification flow, the questions it needs to ask callers, and how leads should be prioritized from the first ring.",
   },
   {
     number: "02",
-    title: "Qualify",
+    title: "Seamless Integrations",
+    icon: Link2,
     description:
-      "Voxa conducts a natural conversation, asking about intent, timeline, budget, and property type to score lead readiness.",
+      "We connect Voxa directly to your realestate.com.au profile and active listings. Custom CRM integrations ReapitSales, AgentBox, Zenu at zero extra cost.",
   },
   {
     number: "03",
-    title: "Book",
+    title: "Phone Number Mapping",
+    icon: PhoneForwarded,
     description:
-      "High-intent prospects are routed directly to your calendar with a full context summary so agents are always prepared.",
+      "Your existing number stays the same. Missed calls route instantly to Voxa so no lead is ever dropped even when you're mid-showing or off the clock.",
+  },
+  {
+    number: "04",
+    title: "Go Live & Start Using",
+    icon: Rocket,
+    description:
+      "Start your day as normal. Voxa handles every missed call, books appointments, and keeps prospects warm until your team is ready to close.",
   },
 ];
 
 const seoFaqs = [
   {
-    question: "How does Voxa help real estate teams book more calls?",
+    question: "Does Voxa store my data?",
     answer:
-      "Voxa replies instantly to missed calls and portal leads, qualifies intent, and hands agents lead context so booking conversations happen faster.",
+      "No. Voxa processes calls in real-time and fetches CRM data on demand, but does not retain any personal information after the call ends.",
   },
   {
     question: "Can Voxa follow up both buyer and seller leads?",
@@ -77,19 +91,19 @@ const seoFaqs = [
       "Yes. Voxa can guide both buyer and seller conversations, gather key details, and push only qualified leads toward your team.",
   },
   {
-    question: "Is this only for large agencies?",
+    question: "Is this only for solo agents?",
     answer:
-      "No. Voxa works for solo agents, boutique teams, and larger brokerages that want reliable first response and more booked meetings.",
+      "Yesn't. Currently Voxa works for solo agents but can be customized for small teams and larger brokerages upon request.",
   },
   {
-    question: "What happens after I book a call?",
+    question: "How much does it cost?",
     answer:
-      "We review your current lead flow, show the recommended setup, and map exactly how Voxa can fit your sales process.",
+      "For a limited time, we're offering Voxa for just A$79/month. No Lock-in term. To the first 10 agents who sign up. That includes 100 minutes of call time. After that, it will be based on call volume and features used. We aim to keep it affordable for agents at all levels.",
   },
   {
     question: "How long does setup take?",
     answer:
-      "Most teams are live within 48 hours. We handle configuration, connect your existing systems, and run a test workflow before going live.",
+      "Most teams are live within 24 hours. We handle configuration, connect your existing systems, and run a test workflow before going live.",
   },
   {
     question: "Does Voxa replace my agents?",
@@ -1055,30 +1069,13 @@ const LandingPage = () => {
                 Informs. Automatically.
               </h2>
               <p className="mt-4 text-base leading-7 text-slate-500">
-                Every day agents miss calls on inspections, in meetings, or
+                Every day realtors miss calls on inspections, in meetings, or
                 after hours. Voxa answers on their behalf using their own phone
                 number picks up instantly, holds a natural conversation, and
                 qualifies every caller's intent so your agent knows exactly who
                 to call back and why.
               </p>
-              <ul className="mt-6 space-y-3">
-                {[
-                  "Answers within seconds of a missed or declined call",
-                  "Asks qualifying questions naturally, just like a human",
-                  "Sends your agent a complete lead summary",
-                  "Dashboard of call logs with all call information handled by AI",
-                ].map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-3 text-sm text-slate-700"
-                  >
-                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#119c9e]/10 text-[#119c9e]">
-                      <Check className="h-3 w-3" strokeWidth={2.5} />
-                    </span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
+
               <Link
                 to="/best-ai-receptionist-for-real-estate-agents"
                 className="mt-7 inline-flex items-center text-sm font-bold text-[#119c9e] transition-colors hover:text-[#0e8082]"
@@ -1124,9 +1121,9 @@ const LandingPage = () => {
 
               {/* Fork line */}
               <div className="relative mx-8 mt-3 mb-1 h-5">
-                <div className="absolute inset-x-0 top-0 h-0.5 rounded-full bg-slate-200" />
-                <div className="absolute left-[12.5%] top-0 h-full w-0.5 rounded-full bg-slate-200" />
-                <div className="absolute right-[12.5%] top-0 h-full w-0.5 rounded-full bg-slate-200" />
+                <div className="absolute inset-x-0 top-0 h-1 rounded-full bg-slate-200" />
+                <div className="absolute left-[19.5%] top-0 h-full w-1 rounded-full bg-slate-200" />
+                <div className="absolute right-[19.5%] top-0 h-full w-1 rounded-full bg-slate-200" />
               </div>
 
               {/* Two paths */}
@@ -1205,37 +1202,53 @@ const LandingPage = () => {
           WORKFLOW — numbered, linear, connected
       ═══════════════════════════════════════════ */}
       <section id="how-it-works" className="bg-[#071220] py-20 lg:py-28">
-        <div className="mx-auto max-w-5xl px-6 lg:px-10">
-          <div className="max-w-xl">
+        <div className="mx-auto max-w-6xl px-6 lg:px-10">
+          {/* Header */}
+          <div className="max-w-2xl">
             <p className="section-kicker">How it works</p>
             <h2 className="mt-3 text-3xl font-semibold leading-[1.05] tracking-tight text-white sm:text-4xl">
-              From inbound lead to booked call in three steps
+              How It Works
             </h2>
+            <p className="mt-4 text-sm leading-6 text-sky-100/70 sm:text-base">
+              Get your AI receptionist fully customized, integrated, and live in
+              less than 24 hours.
+            </p>
           </div>
 
-          <div className="mt-14 grid gap-0 md:grid-cols-3">
-            {workflowSteps.map((step, i) => (
-              <div key={step.number} className="relative pl-0 md:pr-8">
-                {/* connector line (desktop) */}
-                {i < workflowSteps.length - 1 && (
-                  <span className="absolute right-0 top-5 hidden h-px w-8 bg-white/15 md:block" />
-                )}
-                <div className="mb-5 flex items-center gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-white/20 text-sm font-bold text-white/50">
-                    {step.number}
-                  </span>
-                  {i < workflowSteps.length - 1 && (
-                    <span className="h-px flex-1 bg-white/15 md:hidden" />
-                  )}
+          {/* Steps + flowing connector */}
+          <div className="relative mt-16">
+            {/* Animated connector — desktop only */}
+            <div className="pointer-events-none absolute left-[12.5%] right-[12.5%] top-1/2 z-0 hidden h-2 -translate-y-1/2 lg:block">
+              <div className="pipeline-stream absolute inset-y-0 left-0 right-0 rounded-full" />
+            </div>
+
+            {/* Cards grid */}
+            <div className="relative z-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-14">
+              {workflowSteps.map((step, i) => (
+                <div
+                  key={step.number}
+                  className="relative rounded-2xl border border-white/[0.07] bg-[#0b1726] p-6"
+                >
+                  {/* Step number badge */}
+                  <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-full border border-[#67d7d8]/30 bg-[#67d7d8]/10">
+                    <span className="text-sm font-bold tracking-wide text-[#67d7d8]">
+                      {step.number}
+                    </span>
+                  </div>
+
+                  {/* Icon */}
+                  <step.icon className="mb-5 h-5 w-5 text-[#67d7d8]/75" />
+
+                  {/* Text */}
+                  <h3 className="text-base font-semibold leading-snug tracking-tight text-white sm:text-[1.05rem]">
+                    {step.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-[1.7] text-sky-100/55">
+                    {step.description}
+                  </p>
                 </div>
-                <h3 className="text-xl font-semibold tracking-tight text-white">
-                  {step.title}
-                </h3>
-                <p className="mt-2 text-sm leading-6 text-sky-100/60">
-                  {step.description}
-                </p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           <div className="mt-12 flex flex-wrap items-center gap-4">
