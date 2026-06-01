@@ -13,7 +13,7 @@ type BillingProfile = {
   currency: string;
   overageDueCents: number;
   overageSpentThisMonthCents: number;
-  overageLimitCents: number;
+  overageLimit: number;
   canPayOveragesNow: boolean;
 };
 
@@ -76,7 +76,7 @@ export const fetchBillingProfile = createAsyncThunk<
 
 export const updateOverageLimit = createAsyncThunk<
   BillingResponse,
-  { overageLimitCents: number },
+  { overageLimit: number },
   { rejectValue: string; state: RootState }
 >(
   "profile/updateOverageLimit",

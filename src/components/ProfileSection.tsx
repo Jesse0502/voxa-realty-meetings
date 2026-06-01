@@ -12,6 +12,7 @@ import {
   cancelSubscription,
   payOveragesNow,
 } from "@/store/profileSlice";
+import { fetchCurrentUser } from "@/store/authSlice";
 import { toast } from "sonner";
 
 interface ProfileSectionProps {
@@ -35,7 +36,7 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
 
   useEffect(() => {
     if (profile) {
-      setOverageLimitInput((profile.overageLimitCents / 100).toFixed(2));
+      setOverageLimitInput(Number(profile.overageLimit || 0).toFixed(2));
     }
   }, [profile]);
 
@@ -64,8 +65,8 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
       return;
     }
 
-    const newLimitCents = Math.round(parsed * 100);
-    if (newLimitCents < profile.overageSpentThisMonthCents) {
+    const newLimitDollars = parsed;
+    if (newLimitDollars * 100 < profile.overageSpentThisMonthCents) {
       toast.error(
         `Limit cannot be lower than current month spend (${formatMoney(profile.overageSpentThisMonthCents)})`,
       );
@@ -74,7 +75,7 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
 
     try {
       const result = await dispatch(
-        updateOverageLimit({ overageLimitCents: newLimitCents }),
+        updateOverageLimit({ overageLimit: newLimitDollars }),
       ).unwrap();
       toast.success(result.message || "Overage limit updated");
     } catch (error) {
@@ -93,6 +94,7 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
     try {
       const result = await dispatch(cancelSubscription()).unwrap();
       toast.success(result.message || "Subscription updated");
+      dispatch(fetchCurrentUser());
     } catch (error) {
       toast.error(String(error || "Failed to cancel subscription"));
     }
@@ -109,7 +111,7 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
 
   if (status === "loading" && !profile) {
     return (
-      <main className="flex-1 p-8 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         <div className="mx-auto w-full max-w-4xl">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -121,7 +123,7 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
   }
 
   return (
-    <main className="flex-1 p-8 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+    <main className="flex-1 p-4 md:p-8 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
       <div className="mx-auto w-full max-w-4xl space-y-6">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -173,10 +175,10 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
                     : ""
                 }
               >
-                {(profile?.subscriptionStatus || "inactive").replaceAll(
-                  "_",
-                  " ",
-                )}
+                {profile?.isSubscriptionActive
+                  ? (profile?.subscriptionStatus || "active").replaceAll("_", " ")
+                  : "inactive"
+                }
               </Badge>
               {profile?.cancelAtPeriodEnd && (
                 <div className="text-xs text-amber-600 flex items-center gap-1">

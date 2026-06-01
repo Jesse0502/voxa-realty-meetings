@@ -123,7 +123,7 @@ const BestAiReceptionistPage = () => {
             </p>
           </header>
 
-          <section className="grid gap-4 md:grid-cols-3">
+          <section className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
             {evaluationCriteria.map(({ title, description, icon }) => (
               <div key={title} className="surface-card rounded-2xl p-5">
                 <div className="inline-flex rounded-full bg-primary/10 p-2">
@@ -148,8 +148,8 @@ const BestAiReceptionistPage = () => {
               sales workflows. Voxa is purpose-built for agents who need speed,
               qualification, and clean CRM handoff.
             </p>
-            <div className="overflow-hidden rounded-2xl border border-border/70 bg-white/75">
-              <table className="w-full border-collapse text-left text-sm">
+            <div className="overflow-x-auto rounded-2xl border border-border/70 bg-white/75">
+              <table className="w-full min-w-[480px] border-collapse text-left text-sm">
                 <thead>
                   <tr className="border-b border-border/70 bg-primary/5">
                     <th className="px-4 py-3 font-semibold text-foreground">
@@ -196,7 +196,7 @@ const BestAiReceptionistPage = () => {
             <h2 className="text-4xl font-semibold leading-[0.95] tracking-tight text-foreground sm:text-5xl">
               FAQ: choosing the best AI receptionist for real estate agents
             </h2>
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
               {faqItems.map(({ question, answer }) => (
                 <div key={question} className="surface-card rounded-2xl p-5">
                   <h3 className="text-xl font-semibold leading-tight text-foreground">

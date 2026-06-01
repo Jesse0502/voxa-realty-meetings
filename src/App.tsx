@@ -18,6 +18,10 @@ import BestAiReceptionistPage from "./pages/BestAiReceptionistPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import LoginRegister from "./pages/login/Index.tsx";
 import DashboardPage from "./pages/dashboard/Index.tsx";
+import OnboardingPage from "./pages/OnboardingPage.tsx";
+import SubscriptionSuccessful from "./pages/SubscriptionSuccessful.tsx";
+import PrivacyPolicy from "./pages/PrivacyPolicy.tsx";
+import TermsOfService from "./pages/TermsOfService.tsx";
 
 const queryClient = new QueryClient();
 const SITE_URL = "https://www.voxarealty.com";
@@ -38,6 +42,14 @@ const PAGE_SEO_BY_PATH: Record<string, PageSeoMeta> = {
     title: "Best AI Receptionist for Real Estate Agents in 2026 | Voxa Realty",
     description:
       "Compare what makes the best AI receptionist for real estate agents and see how Voxa improves lead response time, qualification quality, and booked appointments.",
+  },
+  "/privacy-policy": {
+    title: "Privacy Policy | Voxa Realty",
+    description: "Read the Privacy Policy for Voxa Realty.",
+  },
+  "/terms-of-service": {
+    title: "Terms of Service | Voxa Realty",
+    description: "Read the Terms of Service for Voxa Realty.",
   },
 };
 
@@ -157,6 +169,19 @@ const RequireAuth = ({ children }: { children: JSX.Element }) => {
     );
   }
 
+  if (user && user.account_type === "pending") {
+    // Return a restricted message or redirect if they haven't paid logic
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <h2 className="text-2xl font-bold mb-4">Payment Pending</h2>
+        <p className="text-gray-600 mb-4">Please complete your setup fee payment to access the dashboard.</p>
+        <button onClick={() => window.location.href = "/onboarding"} className="px-4 py-2 bg-blue-600 text-white rounded">
+          Go to Onboarding
+        </button>
+      </div>
+    );
+  }
+
   return children;
 };
 
@@ -198,12 +223,32 @@ const App = () => (
             }
           />
           <Route
+            path="/onboarding"
+            element={
+              <RequireGuest>
+                <OnboardingPage />
+              </RequireGuest>
+            }
+          />
+          <Route
             path="/dashboard"
             element={
               <RequireAuth>
                 <DashboardPage />
               </RequireAuth>
             }
+          />
+          <Route
+            path="/subscription_successful"
+            element={<SubscriptionSuccessful />}
+          />
+          <Route
+            path="/privacy-policy"
+            element={<PrivacyPolicy />}
+          />
+          <Route
+            path="/terms-of-service"
+            element={<TermsOfService />}
           />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

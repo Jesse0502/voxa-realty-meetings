@@ -31,6 +31,8 @@ type Assistant = {
   firstLine?: string;
   userId?: string;
   remainingMins?: number;
+  subscriptionActive?: boolean;
+  nextPaymentDate?: string;
   credentials?: any;
   knowledge_bases?: KnowledgeBase[];
 };

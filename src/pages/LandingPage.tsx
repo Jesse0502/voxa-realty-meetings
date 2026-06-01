@@ -98,7 +98,7 @@ const seoFaqs = [
   {
     question: "How much does it cost?",
     answer:
-      "For a limited time, we're offering Voxa for just A$79/month. No Lock-in term. To the first 10 agents who sign up. That includes 100 minutes of call time. After that, it will be based on call volume and features used. We aim to keep it affordable for agents at all levels.",
+      "For a limited time, we're offering Voxa for just A$149/month. No Lock-in term. To the first 10 agents who sign up. That includes 100 minutes of call time. After that, it will be based on call volume and features used. We aim to keep it affordable for agents at all levels.",
   },
   {
     question: "How long does setup take?",
@@ -1039,10 +1039,10 @@ const LandingPage = () => {
 
           {/* ── Proof bar — centered ── */}
           <div className="animate-rise-fade animate-delay-3 [animation-fill-mode:both] mt-12 w-full max-w-2xl">
-            <div className="flex justify-center gap-x-14 gap-y-6">
+            <div className="flex flex-wrap justify-center gap-x-10 gap-y-6 sm:gap-x-14">
               {proofStats.map(({ value, label }) => (
                 <div key={label} className="text-center">
-                  <p className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+              <p className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
                     {value}
                   </p>
                   <p className="mt-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-sky-200/50">
@@ -1479,9 +1479,10 @@ const LandingPage = () => {
           FOOTER
       ═══════════════════════════════════════════ */}
       <footer className="border-t border-border/60 bg-white px-6 py-5 lg:px-10">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 text-xs text-muted-foreground sm:text-sm">
+        <div className="mx-auto flex flex-col md:flex-row max-w-5xl items-center justify-between gap-3 text-xs text-muted-foreground sm:text-sm">
           <p className="font-semibold text-slate-700">Voxa Realty</p>
           <p>AI receptionist and sales agent software for real estate teams.</p>
+          <a href="/privacy-policy" className="hover:underline text-blue-600">Privacy Policy</a>
         </div>
       </footer>
     </div>

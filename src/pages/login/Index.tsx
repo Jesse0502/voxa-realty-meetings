@@ -61,7 +61,7 @@ export default function LoginRegister() {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4">
+    <div className="min-h-screen relative flex items-center justify-center p-4 pt-20">
       <div className="bg-grid-soft absolute inset-0 -z-20 opacity-30" />
       <div className="absolute left-0 top-0 -z-10 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-[100px]" />
       

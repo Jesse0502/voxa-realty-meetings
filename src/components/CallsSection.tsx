@@ -37,24 +37,62 @@ interface CallsSectionProps {
   isDark: boolean;
 }
 
+type CallRow = {
+  id?: string;
+  _id?: string;
+  transcript?: string;
+  recordingUrl?: string;
+  endedReason?: string;
+  direction?: string;
+  durationSeconds?: number;
+  callerNumber?: string;
+  createdAt?: string;
+  structuredOutputs?: Record<string, string | undefined>;
+};
+
 export function CallsSection({ isDark }: CallsSectionProps) {
   const dispatch = useAppDispatch();
-  const [selectedCall, setSelectedCall] = useState<any>(null);
+  const [selectedCall, setSelectedCall] = useState<CallRow | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoadingNextPage, setIsLoadingNextPage] = useState(false);
-  const itemsPerPage = 50;
+  const itemsPerPage = 20;
 
   const calls = useAppSelector((state) => state.calls.calls);
   const callStats = useAppSelector((state) => state.calls.callStats);
   const assistant = useAppSelector((state) => state.assistant.assistant);
   const totalCalls = Math.max(callStats?.totalCalls || 0, calls.length);
   const totalPages = Math.max(1, Math.ceil(totalCalls / itemsPerPage));
+  const canGoPrevious = currentPage > 1;
+  const canGoNext = currentPage < totalPages;
+
+  const pageButtonNumbers = (() => {
+    const maxVisible = 5;
+    const half = Math.floor(maxVisible / 2);
+    let start = Math.max(1, currentPage - half);
+    const end = Math.min(totalPages, start + maxVisible - 1);
+
+    if (end - start + 1 < maxVisible) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+
+    const pages: number[] = [];
+    for (let page = start; page <= end; page += 1) {
+      pages.push(page);
+    }
+    return pages;
+  })();
 
   useEffect(() => {
     if (currentPage > totalPages) {
       setCurrentPage(totalPages);
     }
   }, [currentPage, totalPages]);
+
+  useEffect(() => {
+    if (currentPage < 1) {
+      setCurrentPage(1);
+    }
+  }, [currentPage]);
 
   const user = useAppSelector(
     (state) =>
@@ -123,8 +161,42 @@ export function CallsSection({ isDark }: CallsSectionProps) {
     setCurrentPage(nextPage);
   };
 
+  const handlePreviousPage = () => {
+    if (!canGoPrevious) {
+      return;
+    }
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handlePageSelect = async (page: number) => {
+    const safePage = Math.min(Math.max(1, page), totalPages);
+    if (safePage === currentPage) {
+      return;
+    }
+
+    const requiredLoadedCount = safePage * itemsPerPage;
+    const shouldFetchPage =
+      calls.length < requiredLoadedCount && calls.length < totalCalls;
+
+    if (shouldFetchPage) {
+      try {
+        setIsLoadingNextPage(true);
+        await dispatch(
+          fetchCallsPage({ page: safePage, limit: itemsPerPage }),
+        ).unwrap();
+      } catch (error) {
+        console.error("Failed to fetch calls page", error);
+        return;
+      } finally {
+        setIsLoadingNextPage(false);
+      }
+    }
+
+    setCurrentPage(safePage);
+  };
+
   return (
-    <main className="flex-1 overflow-y-auto p-6 md:p-8 min-w-0 w-full max-w-7xl mx-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+    <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 min-w-0 w-full max-w-7xl mx-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
       <div className="flex flex-col gap-1 mb-8">
         {isLoadingUser ? (
           <div className="flex items-center gap-2 text-xl font-semibold tracking-tight text-gray-500">
@@ -273,7 +345,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
                   (currentPage - 1) * itemsPerPage,
                   currentPage * itemsPerPage,
                 )
-                .map((call: any) => (
+                .map((call: CallRow) => (
                   <TableRow
                     key={call._id || call.id}
                     className="cursor-pointer group hover:bg-muted/50 transition-colors"
@@ -327,7 +399,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
         </Table>
 
         {calls.length > 0 && (
-          <div className="flex items-center justify-between px-4 py-4 border-t border-border">
+          <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-4 border-t border-border">
             <span className="text-sm text-muted-foreground">
               Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
               {Math.min(currentPage * itemsPerPage, totalCalls)} of {totalCalls}{" "}
@@ -337,16 +409,28 @@ export function CallsSection({ isDark }: CallsSectionProps) {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
+                onClick={handlePreviousPage}
+                disabled={!canGoPrevious || isLoadingNextPage}
               >
                 Previous
               </Button>
+              {pageButtonNumbers.map((page) => (
+                <Button
+                  key={page}
+                  variant={page === currentPage ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handlePageSelect(page)}
+                  disabled={isLoadingNextPage}
+                  className="min-w-9"
+                >
+                  {page}
+                </Button>
+              ))}
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleNextPage}
-                disabled={currentPage >= totalPages || isLoadingNextPage}
+                disabled={!canGoNext || isLoadingNextPage}
               >
                 {isLoadingNextPage ? "Loading..." : "Next"}
               </Button>

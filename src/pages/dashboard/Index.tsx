@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Phone, LogOut, Sun, Moon, Bot, UserRound } from "lucide-react";
+import { Phone, LogOut, Sun, Moon, Bot, UserRound, Menu, X } from "lucide-react";
 import voxaLogo from "@/assets/voxa-logo.png";
 import voxaLogoDark from "@/assets/voxa-logo-dark.png";
 import { CallsSection } from "@/components/CallsSection";
@@ -20,6 +20,7 @@ export default function DashboardPage() {
     return saved === "dark";
   });
   const [activeTab, setActiveTab] = useState("Calls");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     dispatch(clearProfile());
@@ -37,21 +38,54 @@ export default function DashboardPage() {
 
   return (
     <div
-      className={`flex h-screen w-full overflow-hidden ${isDark ? "bg-gray-900 text-white" : "bg-gray-50/50"}`}
+      className={`flex flex-col md:flex-row h-screen w-full overflow-hidden ${isDark ? "bg-gray-900 text-white" : "bg-gray-50/50"}`}
     >
-      <aside
-        className={`w-64 items-center py-10 border-r flex flex-col shrink-0 ${isDark ? "bg-gray-800 border-gray-700" : "bg-white"}`}
+      {/* Mobile top bar */}
+      <div
+        className={`flex md:hidden items-center justify-between px-4 py-3 border-b shrink-0 ${isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}
       >
-        <div className="h-20 mb-8 flex items-center px-6 py-4">
+        <img
+          src={isDark ? voxaLogoDark : voxaLogo}
+          alt="Voxa Realty Logo"
+          className="h-8 object-contain"
+        />
+        <button
+          onClick={() => setIsSidebarOpen(true)}
+          className={`p-2 rounded-lg ${isDark ? "text-gray-300 hover:bg-gray-700" : "text-gray-600 hover:bg-gray-100"}`}
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+      </div>
+
+      {/* Backdrop overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col shrink-0 transition-transform duration-300 w-64 items-center py-10 border-r ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } md:relative md:translate-x-0 ${isDark ? "bg-gray-800 border-gray-700" : "bg-white"}`}
+      >
+        <div className="h-20 mb-8 flex items-center justify-between px-6 py-4">
           <img
             src={isDark ? voxaLogoDark : voxaLogo}
             alt="Voxa Realty Logo"
             className="h-16 object-contain"
           />
+          <button
+            onClick={() => setIsSidebarOpen(false)}
+            className={`md:hidden p-1.5 rounded-lg ${isDark ? "text-gray-300 hover:bg-gray-700" : "text-gray-500 hover:bg-gray-100"}`}
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
         <nav className="flex-1 w-full flex flex-col gap-2 overflow-y-auto p-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <button
-            onClick={() => setActiveTab("Calls")}
+            onClick={() => { setActiveTab("Calls"); setIsSidebarOpen(false); }}
             className={`flex justify-start w-full gap-3 rounded-lg px-4 py-3 text-sm font-medium items-center transition-colors ${
               activeTab === "Calls"
                 ? isDark
@@ -67,7 +101,7 @@ export default function DashboardPage() {
           </button>
 
           <button
-            onClick={() => setActiveTab("Assistant")}
+            onClick={() => { setActiveTab("Assistant"); setIsSidebarOpen(false); }}
             className={`flex justify-start w-full gap-3 rounded-lg px-4 py-3 text-sm font-medium items-center transition-colors ${
               activeTab === "Assistant"
                 ? isDark
@@ -83,7 +117,7 @@ export default function DashboardPage() {
           </button>
 
           <button
-            onClick={() => setActiveTab("Profile")}
+            onClick={() => { setActiveTab("Profile"); setIsSidebarOpen(false); }}
             className={`flex justify-start w-full gap-3 rounded-lg px-4 py-3 text-sm font-medium items-center transition-colors ${
               activeTab === "Profile"
                 ? isDark
