@@ -11,8 +11,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Loader2 } from "lucide-react";
-import { useAppSelector, useAppDispatch } from "./store/hooks";
-import { fetchCurrentUser } from "./store/authSlice";
+import { useAppSelector } from "./store/hooks";
 import LandingPage from "./pages/LandingPage.tsx";
 import BestAiReceptionistPage from "./pages/BestAiReceptionistPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -144,13 +143,6 @@ const RequireAuth = ({ children }: { children: JSX.Element }) => {
   const token = useAppSelector((state) => state.auth.token);
   const status = useAppSelector((state) => state.auth.status);
   const user = useAppSelector((state) => state.auth.user);
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    if (token) {
-      dispatch(fetchCurrentUser());
-    }
-  }, [token, dispatch]);
 
   if (!token) {
     return <Navigate to="/login" replace />;
@@ -232,6 +224,46 @@ const App = () => (
           />
           <Route
             path="/dashboard"
+            element={
+              <RequireAuth>
+                <DashboardPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/dashboard/calls"
+            element={
+              <RequireAuth>
+                <DashboardPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/dashboard/assistant"
+            element={
+              <RequireAuth>
+                <DashboardPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/dashboard/contacts"
+            element={
+              <RequireAuth>
+                <DashboardPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/dashboard/contacts/:contactId"
+            element={
+              <RequireAuth>
+                <DashboardPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/dashboard/profile"
             element={
               <RequireAuth>
                 <DashboardPage />

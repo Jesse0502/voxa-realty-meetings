@@ -86,6 +86,11 @@ const seoFaqs = [
       "No. Voxa processes calls in real-time and fetches CRM data on demand, but does not retain any personal information after the call ends.",
   },
   {
+    question: "What information does Voxa collect when I sign in with Google?",
+    answer:
+      "When you sign in using Google, Voxa receives your name and email address from your Google account. This information is used solely to create and identify your Voxa account. Voxa does not access your Google contacts, calendar, Gmail, Google Drive, or any other Google service. You can review our full Privacy Policy for details.",
+  },
+  {
     question: "Can Voxa follow up both buyer and seller leads?",
     answer:
       "Yes. Voxa can guide both buyer and seller conversations, gather key details, and push only qualified leads toward your team.",
@@ -1347,6 +1352,35 @@ const LandingPage = () => {
               Book a strategy call
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          DATA & PRIVACY TRANSPARENCY
+      ═══════════════════════════════════════════ */}
+      <section className="border-t border-slate-100 bg-slate-50 py-12">
+        <div className="mx-auto max-w-5xl px-6 lg:px-10">
+          <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-12">
+            <div className="shrink-0">
+              <p className="text-[0.68rem] font-bold uppercase tracking-[0.28em] text-[#119c9e]">Data &amp; Privacy</p>
+              <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-900">How Voxa uses your information</h2>
+            </div>
+            <div className="flex flex-col gap-4 text-sm leading-6 text-slate-500">
+              <p>
+                <strong className="text-slate-700">Account creation.</strong> Voxa uses Google Sign-In as an optional authentication method. When you sign in with Google, Voxa receives only your <strong className="text-slate-700">name and email address</strong> to create and identify your account. No other Google data (contacts, calendar, Drive, Gmail) is accessed or stored.
+              </p>
+              <p>
+                <strong className="text-slate-700">Call &amp; CRM data.</strong> Voxa processes call information and, where you provide a CRM API key, fetches listing data in real-time during a call. This data is not stored in our database after the call ends.
+              </p>
+              <p>
+                <strong className="text-slate-700">What we collect.</strong> We collect your name, phone number, and email address when you register. This information is used to operate your account, deliver the service, and communicate with you about your subscription. We do not sell your data.
+              </p>
+              <p>
+                For full details, read our{" "}
+                <a href="/privacy-policy" className="font-semibold text-[#119c9e] hover:underline">Privacy Policy</a>.
+              </p>
+            </div>
           </div>
         </div>
       </section>

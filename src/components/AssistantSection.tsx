@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -6,11 +6,17 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Select,
   SelectContent,
@@ -19,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Bot,
+  Sparkles,
   Save,
   Loader2,
   ChevronDown,
@@ -27,6 +33,7 @@ import {
   Link2,
   Lock,
   CalendarDays,
+  CircleHelp,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -99,16 +106,18 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
     assistant?.credentials?.google_calendar?.status;
 
   const [formData, setFormData] = useState({
-    openingLine: "",
+    firstMessage: "",
     prompt: "",
+    greet_with_name: false,
   });
   const [isConnecting, setIsConnecting] = useState(false);
 
   useEffect(() => {
     if (assistant) {
       setFormData({
-        openingLine: assistant.openingLine || assistant.firstLine || "",
+        firstMessage: assistant.firstMessage || assistant.firstLine || "",
         prompt: assistant.prompt || "",
+        greet_with_name: Boolean(assistant.greet_with_name),
       });
       const existing =
         assistant?.knowledge_bases
@@ -185,11 +194,20 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
   };
 
   const handleSave = async () => {
-    if (!formData.prompt.trim() || !formData.openingLine.trim()) {
+    if (!formData.prompt.trim() || !formData.firstMessage.trim()) {
       toast.error("Both Prompt and First Line are required.");
       return;
     }
+
+    if (formData.greet_with_name && !formData.firstMessage.includes("{name}")) {
+      toast.error(
+        "Include {name} in Opening Line when Greet with name is enabled.",
+      );
+      return;
+    }
+
     try {
+      console.log("Saving assistant with data:", formData);
       await dispatch(updateAssistant(formData)).unwrap();
       toast.success("Assistant updated successfully");
     } catch (err: any) {
@@ -332,12 +350,53 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
     loginWithGoogle();
   };
 
-  const initialOpeningLine =
-    assistant?.openingLine || assistant?.firstLine || "";
+  const insertNameTokenSecondPosition = (message: string) => {
+    const normalized = message.replace(/\s+/g, " ").trim();
+    if (!normalized) {
+      return "{name}";
+    }
+    if (normalized.includes("{name}")) {
+      return normalized;
+    }
+    const tokens = normalized.split(" ");
+    if (tokens.length === 1) {
+      return `${tokens[0]} {name}`;
+    }
+    const withName = [...tokens];
+    withName.splice(1, 0, "{name}");
+    return withName.join(" ");
+  };
+
+  const removeNameToken = (message: string) => {
+    const withoutToken = message.replace(/\{name\}/g, "");
+    return withoutToken
+      .replace(/\s{2,}/g, " ")
+      .replace(/\s+,/g, ",")
+      .trim();
+  };
+
+  const handleGreetWithNameChange = (checked: boolean) => {
+    setFormData((prev) => ({
+      ...prev,
+      greet_with_name: checked,
+      firstMessage: checked
+        ? insertNameTokenSecondPosition(prev.firstMessage)
+        : removeNameToken(prev.firstMessage),
+    }));
+  };
+
+  const highlightedFirstMessageParts = useMemo(() => {
+    return formData.firstMessage.split(/(\{name\})/g);
+  }, [formData.firstMessage]);
+
+  const initialfirstMessage =
+    assistant?.firstMessage || assistant?.firstLine || "";
   const initialPrompt = assistant?.prompt || "";
+  const initialGreetWithName = Boolean(assistant?.greet_with_name);
   const hasChanges =
-    formData.openingLine !== initialOpeningLine ||
-    formData.prompt !== initialPrompt;
+    formData.firstMessage !== initialfirstMessage ||
+    formData.prompt !== initialPrompt ||
+    formData.greet_with_name !== initialGreetWithName;
 
   return (
     <main className="flex-1 p-4 md:p-8 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
@@ -345,7 +404,7 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl flex items-center gap-3 font-semibold tracking-tight">
-              <Bot className="h-6 w-6 text-[#2563eb]" />
+              <Sparkles className="h-6 w-6 text-[#2563eb]" />
               Assistant Configuration
             </h1>
             <p className={`${isDark ? "text-gray-400" : "text-gray-500"} mt-2`}>
@@ -424,17 +483,91 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-3">
-              <Label htmlFor="openingLine" className="text-sm font-medium">
+              <Label htmlFor="firstMessage" className="text-sm font-medium">
                 First Spoken Line (Opening Line)
               </Label>
-              <Input
-                id="openingLine"
-                name="openingLine"
-                value={formData.openingLine}
-                onChange={handleChange}
-                placeholder="e.g., Hi, this is Jasmeet from VoxaRealty. How can I help you today?"
-                className={`${isDark ? "bg-gray-900 border-gray-700 text-white" : ""}`}
-              />
+              <div className="relative">
+                <Input
+                  id="firstMessage"
+                  name="firstMessage"
+                  value={formData.firstMessage}
+                  onChange={handleChange}
+                  placeholder=""
+                  className={`relative z-0 text-transparent ${
+                    isDark
+                      ? "bg-gray-900 border-gray-700 caret-white"
+                      : "caret-gray-900"
+                  }`}
+                />
+                <div
+                  aria-hidden="true"
+                  className={`pointer-events-none absolute inset-0 z-10 flex items-center overflow-hidden whitespace-nowrap rounded-md px-3 text-sm ${
+                    isDark ? "text-white" : "text-foreground"
+                  }`}
+                >
+                  {formData.firstMessage ? (
+                    highlightedFirstMessageParts.map((part, index) =>
+                      part === "{name}" ? (
+                        <span
+                          key={`name-token-${index}`}
+                          className="rounded bg-[#139a9d] px-1.5 py-0.5 text-white"
+                        >
+                          {part}
+                        </span>
+                      ) : (
+                        <span key={`message-part-${index}`}>{part}</span>
+                      ),
+                    )
+                  ) : (
+                    <span
+                      className={
+                        isDark ? "text-gray-400" : "text-muted-foreground"
+                      }
+                    >
+                      e.g., Hi, Thanks for calling. How can I help you today?
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="greet_with_name"
+                    checked={formData.greet_with_name}
+                    onCheckedChange={(checked) =>
+                      handleGreetWithNameChange(checked === true)
+                    }
+                  />
+                  <Label
+                    htmlFor="greet_with_name"
+                    className="text-sm cursor-pointer"
+                  >
+                    Greet with name
+                  </Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        className={`${isDark ? "text-gray-400" : "text-gray-500"} hover:text-[#2563eb]`}
+                        aria-label="Greet with name info"
+                      >
+                        <CircleHelp className="h-4 w-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      Greet the caller with their name if they exist in your
+                      contacts list
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              </div>
+              {formData.greet_with_name &&
+                !formData.firstMessage.includes("{name}") && (
+                  <p className="text-xs text-red-500">
+                    Opening Line must include {"{name}"} while Greet with name
+                    is enabled.
+                  </p>
+                )}
               <p
                 className={`text-xs ${isDark ? "text-gray-400" : "text-muted-foreground"}`}
               >

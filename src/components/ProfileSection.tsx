@@ -111,7 +111,7 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
 
   if (status === "loading" && !profile) {
     return (
-        <main className="flex-1 p-4 md:p-8 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <main className="flex-1 p-4 md:p-8 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         <div className="mx-auto w-full max-w-4xl">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -176,9 +176,11 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
                 }
               >
                 {profile?.isSubscriptionActive
-                  ? (profile?.subscriptionStatus || "active").replaceAll("_", " ")
-                  : "inactive"
-                }
+                  ? (profile?.subscriptionStatus || "active").replaceAll(
+                      "_",
+                      " ",
+                    )
+                  : "inactive"}
               </Badge>
               {profile?.cancelAtPeriodEnd && (
                 <div className="text-xs text-amber-600 flex items-center gap-1">
@@ -199,7 +201,7 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
             <CardContent>
               <div className="text-lg font-semibold">
                 {profile?.nextPaymentDueDate
-                  ? new Date(profile.nextPaymentDueDate).toLocaleDateString()
+                  ? `${new Date(profile.nextPaymentDueDate).getDate()}/${new Date(profile.nextPaymentDueDate).getMonth() + 1}/${new Date(profile.nextPaymentDueDate).getFullYear()}`
                   : "Not available"}
               </div>
             </CardContent>
@@ -258,24 +260,36 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
             <CardTitle className="text-base">Billing Actions</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col sm:flex-row gap-3">
-            <Button
-              variant="outline"
-              onClick={handlePayOveragesNow}
-              disabled={
-                actionStatus === "loading" || !profile?.canPayOveragesNow
-              }
-            >
-              Pay Overages Now
-            </Button>
+            {profile?.canPayOveragesNow && (
+              <Button
+                variant="outline"
+                onClick={handlePayOveragesNow}
+                disabled={actionStatus === "loading"}
+              >
+                Pay Overages Now
+              </Button>
+            )}
             <Button
               variant="destructive"
               onClick={handleCancelSubscription}
               disabled={
-                actionStatus === "loading" || !profile?.isSubscriptionActive
+                actionStatus === "loading" ||
+                !profile?.isSubscriptionActive ||
+                profile?.canPayOveragesNow
+              }
+              title={
+                profile?.canPayOveragesNow
+                  ? "Please pay outstanding overages before cancelling"
+                  : undefined
               }
             >
               Cancel Subscription
             </Button>
+            {profile?.canPayOveragesNow && (
+              <p className="text-xs text-muted-foreground self-center">
+                Outstanding overages must be paid before cancelling.
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>

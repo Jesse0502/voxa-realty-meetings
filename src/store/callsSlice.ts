@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import type { RootState } from "./index";
 
-type Call = {
+export type Call = {
   id?: string;
   _id?: string;
   transcript?: string;
@@ -20,7 +21,7 @@ type Call = {
   };
 };
 
-type CallStats = {
+export type CallStats = {
   totalCalls: number;
   totalDurationSecs: number;
   averageDurationSecs: number;
@@ -70,7 +71,7 @@ const getErrorMessage = async (response: Response) => {
 export const fetchCallsPage = createAsyncThunk<
   FetchCallsPageResponse,
   { page: number; limit?: number },
-  { rejectValue: string; state: any }
+  { rejectValue: string; state: RootState }
 >(
   "calls/fetchPage",
   async ({ page, limit = 50 }, { getState, rejectWithValue }) => {

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Phone,
   Clock,
@@ -10,6 +11,7 @@ import {
   FileText,
   ArrowRight,
   Loader2,
+  RefreshCw,
 } from "lucide-react";
 import {
   Table,
@@ -31,7 +33,13 @@ import {
 } from "@/components/ui/sheet";
 
 import { fetchCallsPage } from "@/store/callsSlice";
+import {
+  fetchContactDetail,
+  setSelectedContactId,
+  type Contact,
+} from "@/store/contactsSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { normalizePhoneInternational, normalizePhoneLocal } from "@/lib/phone";
 
 interface CallsSectionProps {
   isDark: boolean;
@@ -52,13 +60,17 @@ type CallRow = {
 
 export function CallsSection({ isDark }: CallsSectionProps) {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const [selectedCall, setSelectedCall] = useState<CallRow | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoadingNextPage, setIsLoadingNextPage] = useState(false);
-  const itemsPerPage = 20;
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const itemsPerPage = 10;
 
   const calls = useAppSelector((state) => state.calls.calls);
   const callStats = useAppSelector((state) => state.calls.callStats);
+  const fetchError = useAppSelector((state) => state.calls.fetchError);
+  const contacts = useAppSelector((state) => state.contacts.contacts);
   const assistant = useAppSelector((state) => state.assistant.assistant);
   const totalCalls = Math.max(callStats?.totalCalls || 0, calls.length);
   const totalPages = Math.max(1, Math.ceil(totalCalls / itemsPerPage));
@@ -102,6 +114,42 @@ export function CallsSection({ isDark }: CallsSectionProps) {
   const isLoadingUser = status === "loading" && !user;
   const userName = user?.name || user?.phoneNumber || null;
 
+  const contactsByPhone = useMemo(() => {
+    const byPhone = new Map<string, Contact>();
+
+    for (const contact of contacts) {
+      const intl = normalizePhoneInternational(contact.phoneNumber);
+      const local = normalizePhoneLocal(contact.phoneNumber);
+
+      if (intl && !byPhone.has(intl)) {
+        byPhone.set(intl, contact);
+      }
+      if (local && !byPhone.has(local)) {
+        byPhone.set(local, contact);
+      }
+    }
+
+    return byPhone;
+  }, [contacts]);
+
+  const getContactByCallerNumber = (callerNumber?: string) => {
+    const intl = normalizePhoneInternational(callerNumber);
+    if (intl && contactsByPhone.has(intl)) {
+      return contactsByPhone.get(intl) || null;
+    }
+
+    const local = normalizePhoneLocal(callerNumber);
+    if (local && contactsByPhone.has(local)) {
+      return contactsByPhone.get(local) || null;
+    }
+
+    return null;
+  };
+
+  const selectedCallContact = selectedCall
+    ? getContactByCallerNumber(selectedCall.callerNumber)
+    : null;
+
   const getIntentBadge = (intent: string) => {
     switch (intent) {
       case "inboundPhoneCall":
@@ -134,28 +182,41 @@ export function CallsSection({ isDark }: CallsSectionProps) {
     return `${secs}s`;
   };
 
+  const loadCallsThroughPage = async (targetPage: number) => {
+    const safeTargetPage = Math.min(Math.max(1, targetPage), totalPages);
+    let loadedCount = calls.length;
+    let nextPageToFetch = Math.floor(loadedCount / itemsPerPage) + 1;
+
+    while (
+      nextPageToFetch <= safeTargetPage &&
+      loadedCount < totalCalls
+    ) {
+      await dispatch(
+        fetchCallsPage({ page: nextPageToFetch, limit: itemsPerPage }),
+      ).unwrap();
+
+      loadedCount = Math.max(
+        loadedCount,
+        Math.min(nextPageToFetch * itemsPerPage, totalCalls),
+      );
+      nextPageToFetch += 1;
+    }
+  };
+
   const handleNextPage = async () => {
     const nextPage = currentPage + 1;
     if (nextPage > totalPages) {
       return;
     }
 
-    const requiredLoadedCount = nextPage * itemsPerPage;
-    const shouldFetchPage =
-      calls.length < requiredLoadedCount && calls.length < totalCalls;
-
-    if (shouldFetchPage) {
-      try {
-        setIsLoadingNextPage(true);
-        await dispatch(
-          fetchCallsPage({ page: nextPage, limit: itemsPerPage }),
-        ).unwrap();
-      } catch (error) {
-        console.error("Failed to fetch next calls page", error);
-        return;
-      } finally {
-        setIsLoadingNextPage(false);
-      }
+    try {
+      setIsLoadingNextPage(true);
+      await loadCallsThroughPage(nextPage);
+    } catch (error) {
+      console.error("Failed to fetch next calls page", error);
+      return;
+    } finally {
+      setIsLoadingNextPage(false);
     }
 
     setCurrentPage(nextPage);
@@ -174,47 +235,99 @@ export function CallsSection({ isDark }: CallsSectionProps) {
       return;
     }
 
-    const requiredLoadedCount = safePage * itemsPerPage;
-    const shouldFetchPage =
-      calls.length < requiredLoadedCount && calls.length < totalCalls;
-
-    if (shouldFetchPage) {
-      try {
-        setIsLoadingNextPage(true);
-        await dispatch(
-          fetchCallsPage({ page: safePage, limit: itemsPerPage }),
-        ).unwrap();
-      } catch (error) {
-        console.error("Failed to fetch calls page", error);
-        return;
-      } finally {
-        setIsLoadingNextPage(false);
-      }
+    try {
+      setIsLoadingNextPage(true);
+      await loadCallsThroughPage(safePage);
+    } catch (error) {
+      console.error("Failed to fetch calls page", error);
+      return;
+    } finally {
+      setIsLoadingNextPage(false);
     }
 
     setCurrentPage(safePage);
   };
 
+  const handleRefreshCalls = async () => {
+    if (isRefreshing || isLoadingNextPage) {
+      return;
+    }
+
+    try {
+      setIsRefreshing(true);
+      await dispatch(fetchCallsPage({ page: 1, limit: itemsPerPage })).unwrap();
+      setCurrentPage(1);
+    } catch (error) {
+      console.error("Failed to refresh calls", error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const handleContactAction = async () => {
+    if (!selectedCall) {
+      return;
+    }
+
+    if (selectedCallContact?.id) {
+      dispatch(setSelectedContactId(selectedCallContact.id));
+      try {
+        await dispatch(fetchContactDetail(selectedCallContact.id)).unwrap();
+      } catch (error) {
+        console.error("Failed to load contact detail", error);
+      }
+      setSelectedCall(null);
+      navigate("/dashboard/contacts", {
+        state: {
+          activeTab: "Contacts",
+        },
+      });
+      return;
+    }
+
+    setSelectedCall(null);
+    navigate("/dashboard/contacts", {
+      state: {
+        activeTab: "Contacts",
+        openAddContact: true,
+        prefillPhoneNumber: selectedCall.callerNumber || "",
+      },
+    });
+  };
+
   return (
     <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 min-w-0 w-full max-w-7xl mx-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-      <div className="flex flex-col gap-1 mb-8">
-        {isLoadingUser ? (
-          <div className="flex items-center gap-2 text-xl font-semibold tracking-tight text-gray-500">
-            <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
-            <span>Loading profile...</span>
-          </div>
-        ) : (
-          <h1 className="text-3xl font-bold tracking-tight">
-            Welcome back{userName ? `, ${userName}` : ""}
-          </h1>
-        )}
-        <p
-          className={`${isDark ? "text-gray-400" : "text-muted-foreground"} text-sm md:text-base`}
+      <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex flex-col gap-1">
+          {isLoadingUser ? (
+            <div className="flex items-center gap-2 text-xl font-semibold tracking-tight text-gray-500">
+              <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+              <span>Loading profile...</span>
+            </div>
+          ) : (
+            <h1 className="text-3xl font-bold tracking-tight">
+              Welcome back{userName ? `, ${userName}` : ""}
+            </h1>
+          )}
+          <p
+            className={`${isDark ? "text-gray-400" : "text-muted-foreground"} text-sm md:text-base`}
+          >
+            Track and monitor all your prospect interactions in one place.
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          onClick={handleRefreshCalls}
+          disabled={isRefreshing || isLoadingNextPage}
+          className="w-full sm:w-auto"
         >
-          Track and monitor all your prospect interactions in one place.
-        </p>
+          <RefreshCw
+            className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`}
+          />
+          {isRefreshing ? "Refreshing..." : "Refresh"}
+        </Button>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 mb-8">
         <Card
           className={
             isDark ? "bg-gray-800 border-gray-700 text-white" : "bg-white"
@@ -317,6 +430,11 @@ export function CallsSection({ isDark }: CallsSectionProps) {
           isDark ? "bg-gray-800 border-gray-700" : "bg-white"
         }`}
       >
+        {fetchError && (
+          <div className="px-4 py-3 border-b border-border text-sm text-red-500">
+            {fetchError}
+          </div>
+        )}
         <Table className="min-w-max">
           <TableHeader>
             <TableRow>
@@ -345,7 +463,10 @@ export function CallsSection({ isDark }: CallsSectionProps) {
                   (currentPage - 1) * itemsPerPage,
                   currentPage * itemsPerPage,
                 )
-                .map((call: CallRow) => (
+                .map((call: CallRow) => {
+                  const matchedContact = getContactByCallerNumber(call.callerNumber);
+
+                  return (
                   <TableRow
                     key={call._id || call.id}
                     className="cursor-pointer group hover:bg-muted/50 transition-colors"
@@ -354,10 +475,10 @@ export function CallsSection({ isDark }: CallsSectionProps) {
                     <TableCell>
                       <div className="flex flex-col">
                         <span className="font-medium text-sm">
-                          {call.callerNumber || "Unknown Caller"}
+                          {matchedContact?.name || call.callerNumber || "Unknown Caller"}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          {call.callerNumber}
+                          {call.callerNumber || "Unknown number"}
                         </span>
                       </div>
                     </TableCell>
@@ -393,7 +514,8 @@ export function CallsSection({ isDark }: CallsSectionProps) {
                       </Button>
                     </TableCell>
                   </TableRow>
-                ))
+                  );
+                })
             )}
           </TableBody>
         </Table>
@@ -452,7 +574,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
                   Call Overview
                 </SheetTitle>
                 <SheetDescription className={isDark ? "text-gray-400" : ""}>
-                  Review the conversation details and push to your CRM.
+                  Review the conversation details and open the linked contact.
                 </SheetDescription>
               </SheetHeader>
 
@@ -469,12 +591,14 @@ export function CallsSection({ isDark }: CallsSectionProps) {
                     </div>
                     <div>
                       <h3 className="font-semibold text-sm">
-                        {selectedCall.callerNumber || "Unknown Caller"}
+                        {selectedCallContact?.name ||
+                          selectedCall.callerNumber ||
+                          "Unknown Caller"}
                       </h3>
                       <p
                         className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}
                       >
-                        {selectedCall.callerNumber}
+                        {selectedCall.callerNumber || "Unknown number"}
                       </p>
                     </div>
                   </div>
@@ -511,10 +635,16 @@ export function CallsSection({ isDark }: CallsSectionProps) {
                   <div className="flex flex-col gap-3">
                     {selectedCall.structuredOutputs &&
                     Object.entries(selectedCall.structuredOutputs).filter(
-                      ([key]) => key.toLowerCase() !== "sms",
+                      ([key]) =>
+                        key.toLowerCase() !== "sms" &&
+                        key.toLowerCase() !== "context",
                     ).length > 0 ? (
                       Object.entries(selectedCall.structuredOutputs)
-                        .filter(([key]) => key.toLowerCase() !== "sms")
+                        .filter(
+                          ([key]) =>
+                            key.toLowerCase() !== "sms" &&
+                            key.toLowerCase() !== "context",
+                        )
                         .map(([key, value], idx) => (
                           <div key={idx} className="flex flex-col gap-1">
                             <span
@@ -579,8 +709,8 @@ export function CallsSection({ isDark }: CallsSectionProps) {
 
                 {/* CRM Action */}
                 <div className="pt-4 border-t border-border">
-                  <Button className="w-full">
-                    Push to CRM (Follow Up Boss)
+                  <Button className="w-full" onClick={handleContactAction}>
+                    {selectedCallContact ? "View Contact" : "Add to Contacts"}
                   </Button>
                 </div>
               </div>

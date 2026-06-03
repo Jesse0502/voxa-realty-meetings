@@ -1,6 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { setAssistant, clearAssistant } from "./assistantSlice";
 import { setCalls, setCallStats, clearCalls } from "./callsSlice";
+import { setContacts, clearContacts } from "./contactsSlice";
+import type { RootState } from "./index";
+import type { Call, CallStats } from "./callsSlice";
+import type { Contact } from "./contactsSlice";
 
 type AuthMode = "login" | "register";
 type AuthStatus = "idle" | "loading" | "succeeded" | "failed";
@@ -16,12 +20,21 @@ type AuthResponse = {
   user?: unknown;
 };
 
+type AuthUserPayload = {
+  assistant?: unknown;
+  calls?: Call[];
+  callStats?: CallStats;
+  contacts?: Contact[];
+  [key: string]: unknown;
+};
+
 type AuthState = {
   status: AuthStatus;
   error: string | null;
   user: unknown | null;
   token: string | null;
   lastAction: AuthMode | null;
+  hasLoadedCurrentUser: boolean;
 };
 
 const initialToken = localStorage.getItem("voxa_token") || null;
@@ -32,6 +45,7 @@ const initialState: AuthState = {
   user: null,
   token: initialToken,
   lastAction: null,
+  hasLoadedCurrentUser: false,
 };
 
 const getErrorMessage = async (response: Response) => {
@@ -46,6 +60,15 @@ const getErrorMessage = async (response: Response) => {
     return "Authentication failed";
   }
 };
+
+const hasDashboardPayload = (payload?: AuthUserPayload | null) =>
+  Boolean(
+    payload &&
+      ("assistant" in payload ||
+        "calls" in payload ||
+        "callStats" in payload ||
+        "contacts" in payload),
+  );
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
@@ -85,10 +108,12 @@ export const login = createAsyncThunk<
     const response = await authenticate("login", payload);
     // Dispatch actions to sync other slices
     if (response.user) {
-      const { assistant, calls, callStats } = response.user as any;
+      const { assistant, calls, callStats, contacts } =
+        response.user as AuthUserPayload;
       dispatch(setAssistant(assistant || null));
       dispatch(setCalls(calls || []));
       if (callStats) dispatch(setCallStats(callStats));
+      dispatch(setContacts(contacts || []));
     }
     return response;
   } catch (error) {
@@ -107,10 +132,12 @@ export const register = createAsyncThunk<
     const response = await authenticate("register", payload);
     // Dispatch actions to sync other slices
     if (response.user) {
-      const { assistant, calls, callStats } = response.user as any;
+      const { assistant, calls, callStats, contacts } =
+        response.user as AuthUserPayload;
       dispatch(setAssistant(assistant || null));
       dispatch(setCalls(calls || []));
       if (callStats) dispatch(setCallStats(callStats));
+      dispatch(setContacts(contacts || []));
     }
     return response;
   } catch (error) {
@@ -121,9 +148,9 @@ export const register = createAsyncThunk<
 });
 
 export const fetchCurrentUser = createAsyncThunk<
-  any,
+  AuthUserPayload,
   void,
-  { rejectValue: string; state: any }
+  { rejectValue: string; state: RootState }
 >("auth/me", async (_, { getState, rejectWithValue, dispatch }) => {
   const state = getState();
   const token = state.auth.token;
@@ -140,6 +167,7 @@ export const fetchCurrentUser = createAsyncThunk<
         dispatch(authSlice.actions.logout());
         dispatch(clearAssistant());
         dispatch(clearCalls());
+        dispatch(clearContacts());
       }
       throw new Error(await getErrorMessage(response));
     }
@@ -148,6 +176,7 @@ export const fetchCurrentUser = createAsyncThunk<
     dispatch(setAssistant(data.assistant || null));
     dispatch(setCalls(data.calls || []));
     if (data.callStats) dispatch(setCallStats(data.callStats));
+    dispatch(setContacts(data.contacts || []));
 
     return data;
   } catch (error) {
@@ -171,6 +200,7 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.status = "idle";
+      state.hasLoadedCurrentUser = false;
       localStorage.removeItem("voxa_token");
       // Note: we handle clearing other slices in the thunks or components
     },
@@ -190,9 +220,10 @@ const authSlice = createSlice({
         state.error = null;
         state.lastAction = "login";
 
-        let userPayload = action.payload.user as any;
+        const userPayload = action.payload.user as AuthUserPayload;
+        state.hasLoadedCurrentUser = hasDashboardPayload(userPayload);
         if (userPayload) {
-          const { assistant, calls, callStats, ...userData } = userPayload;
+          const { assistant, calls, callStats, contacts, ...userData } = userPayload;
           state.user = userData;
         } else {
           state.user = null;
@@ -220,9 +251,10 @@ const authSlice = createSlice({
         state.error = null;
         state.lastAction = "register";
 
-        let userPayload = action.payload.user as any;
+        const userPayload = action.payload.user as AuthUserPayload;
+        state.hasLoadedCurrentUser = hasDashboardPayload(userPayload);
         if (userPayload) {
-          const { assistant, calls, callStats, ...userData } = userPayload;
+          const { assistant, calls, callStats, contacts, ...userData } = userPayload;
           state.user = userData;
         } else {
           state.user = null;
@@ -246,9 +278,10 @@ const authSlice = createSlice({
       })
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
         state.status = "succeeded";
-        const { assistant, calls, callStats, ...userData } = action.payload;
+        const { assistant, calls, callStats, contacts, ...userData } = action.payload;
         state.user = userData;
         state.error = null;
+        state.hasLoadedCurrentUser = true;
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
         state.status = "failed";

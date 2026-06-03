@@ -27,8 +27,9 @@ type Assistant = {
   name?: string;
   virtualNumber?: string;
   prompt?: string;
-  openingLine?: string;
+  firstMessage?: string;
   firstLine?: string;
+  greet_with_name?: boolean;
   userId?: string;
   remainingMins?: number;
   subscriptionActive?: boolean;
@@ -340,13 +341,14 @@ export const disconnectGoogleCalendar = createAsyncThunk<
 
 export const updateAssistant = createAsyncThunk<
   Assistant,
-  { prompt: string; openingLine: string },
+  { prompt: string; firstMessage: string; greet_with_name: boolean },
   { rejectValue: string }
 >("assistant/update", async (data, thunkAPI) => {
   const token = localStorage.getItem("voxa_token");
   if (!token) {
     return thunkAPI.rejectWithValue("No authentication token found");
   }
+  console.log("Updating assistant with data:", data);
 
   const response = await fetch(`${SERVER_URL}/auth/assistant`, {
     method: "PUT",
@@ -356,7 +358,8 @@ export const updateAssistant = createAsyncThunk<
     },
     body: JSON.stringify({
       prompt: data.prompt,
-      openingLine: data.openingLine,
+      firstMessage: data.firstMessage,
+      greet_with_name: data.greet_with_name,
     }),
   });
 
