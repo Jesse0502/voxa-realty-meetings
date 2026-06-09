@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { setAssistant, clearAssistant } from "./assistantSlice";
 import { setCalls, setCallStats, clearCalls } from "./callsSlice";
 import { setContacts, clearContacts } from "./contactsSlice";
@@ -196,6 +196,17 @@ const authSlice = createSlice({
         state.status = "idle";
       }
     },
+    setAuthFromOnboarding(
+      state,
+      action: PayloadAction<{ token: string; user: unknown }>,
+    ) {
+      state.token = action.payload.token;
+      state.user = action.payload.user;
+      state.status = "succeeded";
+      state.error = null;
+      state.hasLoadedCurrentUser = false;
+      localStorage.setItem("voxa_token", action.payload.token);
+    },
     logout(state) {
       state.user = null;
       state.token = null;
@@ -290,5 +301,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearAuthError, logout, resetAuthState } = authSlice.actions;
+export const { clearAuthError, logout, resetAuthState, setAuthFromOnboarding } = authSlice.actions;
 export default authSlice.reducer;

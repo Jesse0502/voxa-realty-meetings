@@ -1324,7 +1324,7 @@ const LandingPage = () => {
               </ul>
               <Button
                 className="mt-8 h-11 w-full rounded-xl bg-[#119c9e] px-6 text-sm font-semibold text-white hover:bg-[#0e8082]"
-                onClick={() => window.location.href = '/signup'}
+                onClick={() => setBookingOpen(true)}
               >
                 Get Started
               </Button>
@@ -1367,7 +1367,7 @@ const LandingPage = () => {
               </ul>
               <Button
                 className="mt-8 h-11 w-full rounded-xl bg-[#119c9e] px-6 text-sm font-semibold text-white hover:bg-[#0e8082]"
-                onClick={() => window.location.href = '/signup'}
+                onClick={() => setBookingOpen(true)}
               >
                 Get Started
               </Button>
@@ -1405,7 +1405,7 @@ const LandingPage = () => {
               <Button
                 variant="outline"
                 className="mt-8 h-11 w-full rounded-xl border-slate-200 px-6 text-sm font-semibold text-slate-700 hover:border-[#119c9e] hover:text-[#119c9e]"
-                onClick={() => window.location.href = 'mailto:mail@voxarealty.com'}
+                onClick={() => setBookingOpen(true)}
               >
                 Contact Sales
               </Button>

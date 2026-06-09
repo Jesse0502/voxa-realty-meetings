@@ -64,7 +64,7 @@ const voices = [
 
 export default function VoiceLibraryPage() {
   return (
-    <main className="min-h-screen overflow-hidden bg-[#06111f] text-white">
+    <main className="bg-[#06111f] text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.28),transparent_34%),radial-gradient(circle_at_80%_20%,rgba(168,85,247,0.2),transparent_30%),linear-gradient(180deg,#06111f_0%,#0b1220_55%,#020617_100%)]" />
       <div className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col px-5 py-6 sm:px-8 lg:px-10">
         <header className="flex items-center justify-between">

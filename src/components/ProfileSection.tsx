@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Loader2, CreditCard, Calendar, ShieldAlert, DollarSign } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { Loader2, CreditCard, Calendar, ShieldAlert, Clock, PlusCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -15,12 +15,13 @@ import { Badge } from "@/components/ui/badge";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   fetchBillingProfile,
-  updateOverageLimit,
+  createCreditsCheckout,
   cancelSubscription,
-  payOveragesNow,
 } from "@/store/profileSlice";
 import { fetchCurrentUser } from "@/store/authSlice";
 import { toast } from "sonner";
+
+const PRESET_MINS = [100, 200, 300, 400, 500, 1000];
 
 interface ProfileSectionProps {
   isDark: boolean;
@@ -28,24 +29,15 @@ interface ProfileSectionProps {
 
 export function ProfileSection({ isDark }: ProfileSectionProps) {
   const dispatch = useAppDispatch();
+  const location = useLocation();
   const profile = useAppSelector((state) => state.profile.profile);
   const assistant = useAppSelector((state) => state.assistant.assistant);
   const status = useAppSelector((state) => state.profile.status);
   const actionStatus = useAppSelector((state) => state.profile.actionStatus);
 
-  const [overageLimitInput, setOverageLimitInput] = useState("");
-  const [isCustomAmount, setIsCustomAmount] = useState(false);
-
-  // Define plan max limits
-  const planMaxLimits: Record<string, number> = {
-    earlyAccess: 50,
-    basic: 79,
-    pro: 149,
-    custom: 500,
-  };
-
-  const subscriptionType = profile?.subscriptionType || "basic";
-  const maxLimit = planMaxLimits[subscriptionType] || planMaxLimits.basic;
+  const [selectedMins, setSelectedMins] = useState<string>("100");
+  const [customMins, setCustomMins] = useState<string>("");
+  const creditSuccessShown = useRef(false);
 
   useEffect(() => {
     if (status === "idle") {
@@ -54,69 +46,41 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
   }, [dispatch, status]);
 
   useEffect(() => {
-    if (profile) {
-      const limit = Number(profile.overageLimit || 0);
-      setOverageLimitInput(limit > 0 ? limit.toFixed(2) : "");
-      // Check if current value is a preset or custom
-      const presets = [1, 5, 10, 20, 50, 79, 149];
-      setIsCustomAmount(limit > 0 && !presets.includes(limit));
+    if (!creditSuccessShown.current && location.search.includes("credits=success")) {
+      creditSuccessShown.current = true;
+      toast.success("Credits added successfully! Your minutes have been topped up.");
+      dispatch(fetchBillingProfile());
     }
-  }, [profile]);
+  }, [location.search, dispatch]);
 
-  // Generate preset amounts based on plan max
-  const getPresetAmounts = () => {
-    const presets = [1, 5, 10, 20];
-    // Add plan-specific amounts up to max
-    if (maxLimit >= 50) presets.push(50);
-    if (maxLimit >= 79) presets.push(79);
-    if (maxLimit >= 149) presets.push(149);
-    // Add max limit if not already included
-    if (!presets.includes(maxLimit)) {
-      presets.push(maxLimit);
-    }
-    return presets.filter(p => p <= maxLimit);
-  };
+  const costPerMin = profile?.overageCostPerMin ?? null;
+  const minsValue = selectedMins === "custom"
+    ? parseInt(customMins || "0", 10)
+    : parseInt(selectedMins, 10);
+  const estimatedCost = minsValue > 0 && costPerMin !== null ? (minsValue * costPerMin).toFixed(2) : null;
 
-  const formatMoney = useMemo(() => {
-    return (amountInCents: number) => {
-      const amount = (amountInCents || 0) / 100;
-      try {
-        return new Intl.NumberFormat("en-AU", {
-          style: "currency",
-          currency: "AUD",
-        }).format(amount);
-      } catch {
-        return `A$${amount.toFixed(2)}`;
-      }
-    };
-  }, []);
+  const remainingMins = profile?.remainingMins ?? assistant?.remainingMins ?? null;
+  const minsColour =
+    remainingMins === null
+      ? ""
+      : remainingMins > 20
+      ? "text-emerald-600"
+      : remainingMins > 0
+      ? "text-amber-500"
+      : "text-red-500";
 
-  const handleSaveLimit = async () => {
-    if (!profile) {
+  const handleAddCredits = async () => {
+    if (!minsValue || minsValue <= 0) {
+      toast.error("Please select or enter a valid number of minutes.");
       return;
     }
-
-    const parsed = Number(overageLimitInput);
-    if (!Number.isFinite(parsed) || parsed < 0) {
-      toast.error("Please enter a valid overage limit amount");
-      return;
-    }
-
-    const newLimitDollars = parsed;
-    if (newLimitDollars * 100 < profile.overageSpentThisMonthCents) {
-      toast.error(
-        `Limit cannot be lower than current month spend (${formatMoney(profile.overageSpentThisMonthCents)})`,
-      );
-      return;
-    }
-
     try {
-      const result = await dispatch(
-        updateOverageLimit({ overageLimit: newLimitDollars }),
-      ).unwrap();
-      toast.success(result.message || "Overage limit updated");
+      const result = await dispatch(createCreditsCheckout({ mins_to_add: minsValue })).unwrap();
+      if (result.checkout_url) {
+        window.location.href = result.checkout_url;
+      }
     } catch (error) {
-      toast.error(String(error || "Failed to update overage limit"));
+      toast.error(String(error || "Failed to start checkout"));
     }
   };
 
@@ -124,25 +88,13 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
     const confirmed = window.confirm(
       "Cancel subscription at period end? Your service stays active until the billing period ends.",
     );
-    if (!confirmed) {
-      return;
-    }
-
+    if (!confirmed) return;
     try {
       const result = await dispatch(cancelSubscription()).unwrap();
       toast.success(result.message || "Subscription updated");
       dispatch(fetchCurrentUser());
     } catch (error) {
       toast.error(String(error || "Failed to cancel subscription"));
-    }
-  };
-
-  const handlePayOveragesNow = async () => {
-    try {
-      const result = await dispatch(payOveragesNow()).unwrap();
-      toast.success(result.message || "Payment successful");
-    } catch (error) {
-      toast.error(String(error || "Failed to pay overages"));
     }
   };
 
@@ -168,7 +120,7 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
               Profile and Billing
             </h1>
             <p className={`${isDark ? "text-gray-400" : "text-gray-600"} mt-1`}>
-              Manage subscription status, overages, and billing controls.
+              Manage your subscription and call minute credits.
             </p>
           </div>
           <Button
@@ -183,9 +135,7 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
         <div className="grid gap-4 md:grid-cols-2">
           <Card className={isDark ? "bg-gray-800 border-gray-700" : "bg-white"}>
             <CardHeader>
-              <CardTitle className="text-sm font-medium">
-                Virtual Number
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">Virtual Number</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-lg font-semibold">
@@ -203,14 +153,8 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
             </CardHeader>
             <CardContent className="space-y-2">
               <Badge
-                variant={
-                  profile?.isSubscriptionActive ? "default" : "secondary"
-                }
-                className={
-                  profile?.isSubscriptionActive
-                    ? "bg-emerald-600 hover:bg-emerald-700"
-                    : ""
-                }
+                variant={profile?.isSubscriptionActive ? "default" : "secondary"}
+                className={profile?.isSubscriptionActive ? "bg-emerald-600 hover:bg-emerald-700" : ""}
               >
                 {profile?.isSubscriptionActive
                   ? (profile?.subscriptionStatus || "active").replace(/_/g, " ")
@@ -243,118 +187,113 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
 
           <Card className={isDark ? "bg-gray-800 border-gray-700" : "bg-white"}>
             <CardHeader>
-              <CardTitle className="text-sm font-medium">
-                Overage Money Due
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Minutes Remaining
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {formatMoney(profile?.overageDueCents || 0)}
+              <div className={`text-2xl font-bold ${minsColour}`}>
+                {remainingMins !== null ? `${remainingMins} min` : "—"}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Accrued this billing cycle
-              </p>
+              {remainingMins !== null && remainingMins <= 0 && (
+                <p className="text-xs text-red-500 mt-1">
+                  Credits exhausted — add more below to keep your assistant active.
+                </p>
+              )}
+              {remainingMins !== null && remainingMins > 0 && remainingMins <= 20 && (
+                <p className="text-xs text-amber-500 mt-1">Running low — consider topping up.</p>
+              )}
             </CardContent>
           </Card>
         </div>
 
+        {/* Add Credits */}
         <Card className={isDark ? "bg-gray-800 border-gray-700" : "bg-white"}>
           <CardHeader>
-            <CardTitle className="text-base">Overage Limit</CardTitle>
+            <CardTitle className="text-base flex items-center gap-2">
+              <PlusCircle className="h-4 w-4" />
+              Add Credits
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <Label htmlFor="overage-limit">
-              Maximum overage amount for current month
-            </Label>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="flex items-center gap-2 sm:max-w-xs">
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-                <Select
-                  value={isCustomAmount ? "custom" : overageLimitInput}
-                  onValueChange={(value) => {
-                    if (value === "custom") {
-                      setIsCustomAmount(true);
-                      setOverageLimitInput("");
-                    } else {
-                      setIsCustomAmount(false);
-                      setOverageLimitInput(value);
-                    }
-                  }}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select amount" />
+          <CardContent className="space-y-4">
+            <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+              Purchase additional call minutes{costPerMin !== null ? <> at <strong>A${costPerMin.toFixed(2)}/min</strong></> : ""}.
+              Minutes are added to your account immediately after payment.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-end">
+              <div className="w-full sm:w-52 space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Minutes to add
+                </label>
+                <Select value={selectedMins} onValueChange={(v) => { setSelectedMins(v); if (v !== "custom") setCustomMins(""); }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select minutes" />
                   </SelectTrigger>
                   <SelectContent>
-                    {getPresetAmounts().map((amount) => (
-                      <SelectItem key={amount} value={amount.toString()}>
-                        ${amount}
+                    {PRESET_MINS.map((m) => (
+                      <SelectItem key={m} value={String(m)}>
+                        {m} mins{costPerMin !== null ? ` — A$${(m * costPerMin).toFixed(2)}` : ""}
                       </SelectItem>
                     ))}
-                    <SelectItem value="custom">Custom amount...</SelectItem>
+                    <SelectItem value="custom">Custom amount…</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              {isCustomAmount && (
-                <Input
-                  id="overage-limit"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  max={maxLimit}
-                  placeholder={`Max $${maxLimit}`}
-                  value={overageLimitInput}
-                  onChange={(event) => setOverageLimitInput(event.target.value)}
-                  className="sm:max-w-xs"
-                />
+
+              {selectedMins === "custom" && (
+                <div className="w-full sm:w-40 space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Enter minutes
+                  </label>
+                  <Input
+                    type="number"
+                    min="1"
+                    placeholder="e.g. 150"
+                    value={customMins}
+                    onChange={(e) => setCustomMins(e.target.value)}
+                  />
+                </div>
               )}
+
               <Button
-                onClick={handleSaveLimit}
-                disabled={actionStatus === "loading"}
+                onClick={handleAddCredits}
+                disabled={actionStatus === "loading" || !minsValue || minsValue <= 0}
+                className="h-10 shrink-0"
               >
-                {actionStatus === "loading" ? "Saving..." : "Save Limit"}
+                {actionStatus === "loading" ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing…</>
+                ) : (
+                  <>Add Credits {estimatedCost ? `— A$${estimatedCost}` : ""}</>
+                )}
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Limit cannot be set lower than already spent this month. Maximum for your plan: ${maxLimit}.
-            </p>
+
+            {estimatedCost && (
+              <p className="text-xs text-muted-foreground">
+                {minsValue} minutes for <strong>A${estimatedCost}</strong> — one-time payment via Stripe.
+              </p>
+            )}
           </CardContent>
         </Card>
 
+        {/* Billing Actions */}
         <Card className={isDark ? "bg-gray-800 border-gray-700" : "bg-white"}>
           <CardHeader>
             <CardTitle className="text-base">Billing Actions</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col sm:flex-row gap-3">
-            {profile?.canPayOveragesNow && (
-              <Button
-                variant="outline"
-                onClick={handlePayOveragesNow}
-                disabled={actionStatus === "loading"}
-              >
-                Pay Overages Now
-              </Button>
-            )}
+          <CardContent>
             <Button
               variant="destructive"
               onClick={handleCancelSubscription}
-              disabled={
-                actionStatus === "loading" ||
-                !profile?.isSubscriptionActive ||
-                profile?.canPayOveragesNow
-              }
-              title={
-                profile?.canPayOveragesNow
-                  ? "Please pay outstanding overages before cancelling"
-                  : undefined
-              }
+              disabled={actionStatus === "loading" || !profile?.isSubscriptionActive}
             >
               Cancel Subscription
             </Button>
-            {profile?.canPayOveragesNow && (
-              <p className="text-xs text-muted-foreground self-center">
-                Outstanding overages must be paid before cancelling.
-              </p>
-            )}
+            <p className={`mt-2 text-xs ${isDark ? "text-gray-500" : "text-gray-400"}`}>
+              Your service stays active until the end of the current billing period.
+            </p>
           </CardContent>
         </Card>
       </div>

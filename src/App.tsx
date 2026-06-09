@@ -222,11 +222,7 @@ const App = () => (
           />
           <Route
             path="/onboarding"
-            element={
-              <RequireGuest>
-                <OnboardingPage />
-              </RequireGuest>
-            }
+            element={<OnboardingPage />}
           />
           <Route
             path="/dashboard"
@@ -277,7 +273,7 @@ const App = () => (
             }
           />
           <Route
-            path="/subscription_successful"
+            path="/payment_successful"
             element={<SubscriptionSuccessful />}
           />
           <Route

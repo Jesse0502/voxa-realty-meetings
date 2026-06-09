@@ -9,13 +9,10 @@ type BillingProfile = {
   subscriptionType?: string;
   cancelAtPeriodEnd: boolean;
   stripeSubscriptionId?: string | null;
-  stripeCustomerId?: string | null;
   nextPaymentDueDate?: string | null;
   currency: string;
-  overageDueCents: number;
-  overageSpentThisMonthCents: number;
-  overageLimit: number;
-  canPayOveragesNow: boolean;
+  remainingMins?: number | null;
+  overageCostPerMin?: number;
 };
 
 type BillingResponse = {
@@ -75,20 +72,18 @@ export const fetchBillingProfile = createAsyncThunk<
   return (await response.json()) as BillingResponse;
 });
 
-export const updateOverageLimit = createAsyncThunk<
-  BillingResponse,
-  { overageLimit: number },
+export const createCreditsCheckout = createAsyncThunk<
+  { success: boolean; checkout_url: string },
+  { mins_to_add: number },
   { rejectValue: string; state: RootState }
 >(
-  "profile/updateOverageLimit",
+  "profile/createCreditsCheckout",
   async (payload, { getState, rejectWithValue }) => {
     const token = getState().auth.token;
-    if (!token) {
-      return rejectWithValue("No authentication token found");
-    }
+    if (!token) return rejectWithValue("No authentication token found");
 
     const response = await fetch(
-      `${SERVER_URL}/auth/subscription/overage-limit`,
+      `${SERVER_URL}/auth/subscription/create-credits-checkout`,
       {
         method: "POST",
         headers: {
@@ -99,11 +94,8 @@ export const updateOverageLimit = createAsyncThunk<
       },
     );
 
-    if (!response.ok) {
-      return rejectWithValue(await getErrorMessage(response));
-    }
-
-    return (await response.json()) as BillingResponse;
+    if (!response.ok) return rejectWithValue(await getErrorMessage(response));
+    return (await response.json()) as { success: boolean; checkout_url: string };
   },
 );
 
@@ -118,30 +110,6 @@ export const cancelSubscription = createAsyncThunk<
   }
 
   const response = await fetch(`${SERVER_URL}/auth/subscription/cancel`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!response.ok) {
-    return rejectWithValue(await getErrorMessage(response));
-  }
-
-  return (await response.json()) as BillingResponse;
-});
-
-export const payOveragesNow = createAsyncThunk<
-  BillingResponse,
-  void,
-  { rejectValue: string; state: RootState }
->("profile/payOveragesNow", async (_, { getState, rejectWithValue }) => {
-  const token = getState().auth.token;
-  if (!token) {
-    return rejectWithValue("No authentication token found");
-  }
-
-  const response = await fetch(`${SERVER_URL}/auth/subscription/pay-overages`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -180,17 +148,16 @@ const profileSlice = createSlice({
         state.status = "failed";
         state.error = action.payload ?? "Failed to fetch billing profile";
       })
-      .addCase(updateOverageLimit.pending, (state) => {
+      .addCase(createCreditsCheckout.pending, (state) => {
         state.actionStatus = "loading";
         state.error = null;
       })
-      .addCase(updateOverageLimit.fulfilled, (state, action) => {
+      .addCase(createCreditsCheckout.fulfilled, (state) => {
         state.actionStatus = "succeeded";
-        state.profile = action.payload.profile;
       })
-      .addCase(updateOverageLimit.rejected, (state, action) => {
+      .addCase(createCreditsCheckout.rejected, (state, action) => {
         state.actionStatus = "failed";
-        state.error = action.payload ?? "Failed to update overage limit";
+        state.error = action.payload ?? "Failed to create credits checkout";
       })
       .addCase(cancelSubscription.pending, (state) => {
         state.actionStatus = "loading";
@@ -204,18 +171,7 @@ const profileSlice = createSlice({
         state.actionStatus = "failed";
         state.error = action.payload ?? "Failed to cancel subscription";
       })
-      .addCase(payOveragesNow.pending, (state) => {
-        state.actionStatus = "loading";
-        state.error = null;
-      })
-      .addCase(payOveragesNow.fulfilled, (state, action) => {
-        state.actionStatus = "succeeded";
-        state.profile = action.payload.profile;
-      })
-      .addCase(payOveragesNow.rejected, (state, action) => {
-        state.actionStatus = "failed";
-        state.error = action.payload ?? "Failed to pay overages";
-      });
+      ;
   },
 });
 
