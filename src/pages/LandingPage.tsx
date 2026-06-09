@@ -39,6 +39,7 @@ import voxaLogoDark from "@/assets/voxa-logo-dark.png";
 const navLinks = [
   { label: "How it works", href: "#how-it-works" },
   { label: "Features", href: "#what-voxa-does" },
+  { label: "Pricing", href: "#pricing" },
   { label: "FAQ", href: "#faq" },
 ];
 
@@ -83,37 +84,37 @@ const seoFaqs = [
   {
     question: "Does Voxa store my data?",
     answer:
-      "No. Voxa processes calls in real-time and fetches CRM data on demand, but does not retain any personal information after the call ends.",
+      "No. Voxa processes calls in real-time and fetches CRM data on demand. We do not retain any personal information after the call ends, ensuring your data remains secure and private.",
   },
   {
     question: "What information does Voxa collect when I sign in with Google?",
     answer:
-      "When you sign in using Google, Voxa receives your name and email address from your Google account. This information is used solely to create and identify your Voxa account. Voxa does not access your Google contacts, calendar, Gmail, Google Drive, or any other Google service. You can review our full Privacy Policy for details.",
+      "When you sign in with Google, Voxa receives only your name and email address to create and identify your account. We do not access your Google contacts, calendar, Gmail, Google Drive, or any other Google services. Please review our Privacy Policy for complete details.",
   },
   {
     question: "Can Voxa follow up both buyer and seller leads?",
     answer:
-      "Yes. Voxa can guide both buyer and seller conversations, gather key details, and push only qualified leads toward your team.",
+      "Yes. Voxa handles both buyer and seller conversations, gathering key property details and qualifying leads before routing them to your team.",
   },
   {
     question: "Is this only for solo agents?",
     answer:
-      "Yesn't. Currently Voxa works for solo agents but can be customized for small teams and larger brokerages upon request.",
+      "Voxa is currently optimized for solo agents. However, we offer custom solutions for small teams and larger brokerages. Contact our sales team to discuss your specific requirements.",
   },
   {
     question: "How much does it cost?",
     answer:
-      "For a limited time, we're offering Voxa for just A$149/month. No Lock-in term. To the first 10 agents who sign up. That includes 100 minutes of call time. After that, it will be based on call volume and features used. We aim to keep it affordable for agents at all levels.",
+      "We offer flexible pricing tiers to suit different needs. The Basic plan starts at A$79/month with 180 call minutes and 100 SMS included. The Pro plan at A$149/month includes 360 minutes and 185 SMS. Custom enterprise solutions are also available for agencies with higher volume requirements.",
   },
   {
     question: "How long does setup take?",
     answer:
-      "Most teams are live within 24 hours. We handle configuration, connect your existing systems, and run a test workflow before going live.",
+      "Most agents are live within 24 hours. Our team handles the entire configuration process, connects your existing systems, and runs comprehensive testing before launch.",
   },
   {
     question: "Does Voxa replace my agents?",
     answer:
-      "No. Voxa handles first response and qualification so your agents spend their time on conversations that are already warmed up and ready to convert.",
+      "No. Voxa complements your team by handling initial lead response and qualification. This allows your agents to focus on high-value conversations with prospects who are already informed and ready to proceed.",
   },
 ];
 
@@ -1268,6 +1269,147 @@ const LandingPage = () => {
               See it in action
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          PRICING — three tier cards
+      ═══════════════════════════════════════════ */}
+      <section
+        id="pricing"
+        className="border-t border-slate-100 bg-white py-20 lg:py-28"
+      >
+        <div className="mx-auto max-w-6xl px-6 lg:px-10">
+          <div className="text-center">
+            <p className="section-kicker">Pricing</p>
+            <h2 className="mt-3 text-3xl font-semibold leading-[1.05] tracking-tight text-slate-900 sm:text-4xl">
+              Simple, transparent pricing
+            </h2>
+            <p className="mt-4 text-base text-slate-500">
+              Choose the plan that fits your call volume. All plans include core features with no lock-in contracts.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {/* Basic Plan */}
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-slate-900">Basic</h3>
+              </div>
+              <div className="mt-4 flex items-baseline">
+                <span className="text-4xl font-bold text-slate-900">$79</span>
+                <span className="ml-2 text-sm text-slate-500">/month</span>
+              </div>
+              <p className="mt-4 text-sm text-slate-600">
+                Perfect for individual agents getting started with AI call handling.
+              </p>
+              <ul className="mt-6 space-y-3">
+                <li className="flex items-center text-sm text-slate-700">
+                  <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
+                  180 call minutes included
+                </li>
+                <li className="flex items-center text-sm text-slate-700">
+                  <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
+                  100 SMS included
+                </li>
+                <li className="flex items-center text-sm text-slate-700">
+                  <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
+                  realestate.com.au integration
+                </li>
+                <li className="flex items-center text-sm text-slate-700">
+                  <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
+                  24/7 call answering
+                </li>
+              </ul>
+              <Button
+                className="mt-8 h-11 w-full rounded-xl bg-[#119c9e] px-6 text-sm font-semibold text-white hover:bg-[#0e8082]"
+                onClick={() => window.location.href = '/signup'}
+              >
+                Get Started
+              </Button>
+            </div>
+
+            {/* Pro Plan — Most Popular */}
+            <div className="relative rounded-2xl border-2 border-[#119c9e] bg-white p-6 shadow-lg">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <span className="rounded-full bg-[#119c9e] px-3 py-1 text-xs font-semibold text-white">
+                  Most Popular
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-slate-900">Pro</h3>
+              </div>
+              <div className="mt-4 flex items-baseline">
+                <span className="text-4xl font-bold text-slate-900">$149</span>
+                <span className="ml-2 text-sm text-slate-500">/month</span>
+              </div>
+              <p className="mt-4 text-sm text-slate-600">
+                For active agents who need more capacity and premium features.
+              </p>
+              <ul className="mt-6 space-y-3">
+                <li className="flex items-center text-sm text-slate-700">
+                  <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
+                  360 call minutes included
+                </li>
+                <li className="flex items-center text-sm text-slate-700">
+                  <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
+                  185 SMS included
+                </li>
+                <li className="flex items-center text-sm text-slate-700">
+                  <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
+                  Custom CRM integration
+                </li>
+                <li className="flex items-center text-sm text-slate-700">
+                  <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
+                  Priority support
+                </li>
+              </ul>
+              <Button
+                className="mt-8 h-11 w-full rounded-xl bg-[#119c9e] px-6 text-sm font-semibold text-white hover:bg-[#0e8082]"
+                onClick={() => window.location.href = '/signup'}
+              >
+                Get Started
+              </Button>
+            </div>
+
+            {/* Custom Plan */}
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-slate-900">Custom</h3>
+              </div>
+              <div className="mt-4 flex items-baseline">
+                <span className="text-4xl font-bold text-slate-900">Contact Us</span>
+              </div>
+              <p className="mt-4 text-sm text-slate-600">
+                Tailored solutions for agencies and teams with higher volume needs.
+              </p>
+              <ul className="mt-6 space-y-3">
+                <li className="flex items-center text-sm text-slate-700">
+                  <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
+                  Custom call minutes
+                </li>
+                <li className="flex items-center text-sm text-slate-700">
+                  <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
+                  Custom SMS volume
+                </li>
+                <li className="flex items-center text-sm text-slate-700">
+                  <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
+                  Multi-agent support
+                </li>
+                <li className="flex items-center text-sm text-slate-700">
+                  <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
+                  Dedicated account manager
+                </li>
+              </ul>
+              <Button
+                variant="outline"
+                className="mt-8 h-11 w-full rounded-xl border-slate-200 px-6 text-sm font-semibold text-slate-700 hover:border-[#119c9e] hover:text-[#119c9e]"
+                onClick={() => window.location.href = 'mailto:mail@voxarealty.com'}
+              >
+                Contact Sales
+              </Button>
+            </div>
           </div>
         </div>
       </section>

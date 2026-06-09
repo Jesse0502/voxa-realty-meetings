@@ -6,6 +6,7 @@ const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 type BillingProfile = {
   isSubscriptionActive: boolean;
   subscriptionStatus: string;
+  subscriptionType?: string;
   cancelAtPeriodEnd: boolean;
   stripeSubscriptionId?: string | null;
   stripeCustomerId?: string | null;

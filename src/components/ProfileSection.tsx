@@ -1,9 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Loader2, CreditCard, Calendar, ShieldAlert } from "lucide-react";
+import { Loader2, CreditCard, Calendar, ShieldAlert, DollarSign } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
@@ -27,6 +34,18 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
   const actionStatus = useAppSelector((state) => state.profile.actionStatus);
 
   const [overageLimitInput, setOverageLimitInput] = useState("");
+  const [isCustomAmount, setIsCustomAmount] = useState(false);
+
+  // Define plan max limits
+  const planMaxLimits: Record<string, number> = {
+    earlyAccess: 50,
+    basic: 79,
+    pro: 149,
+    custom: 500,
+  };
+
+  const subscriptionType = profile?.subscriptionType || "basic";
+  const maxLimit = planMaxLimits[subscriptionType] || planMaxLimits.basic;
 
   useEffect(() => {
     if (status === "idle") {
@@ -36,9 +55,27 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
 
   useEffect(() => {
     if (profile) {
-      setOverageLimitInput(Number(profile.overageLimit || 0).toFixed(2));
+      const limit = Number(profile.overageLimit || 0);
+      setOverageLimitInput(limit > 0 ? limit.toFixed(2) : "");
+      // Check if current value is a preset or custom
+      const presets = [1, 5, 10, 20, 50, 79, 149];
+      setIsCustomAmount(limit > 0 && !presets.includes(limit));
     }
   }, [profile]);
+
+  // Generate preset amounts based on plan max
+  const getPresetAmounts = () => {
+    const presets = [1, 5, 10, 20];
+    // Add plan-specific amounts up to max
+    if (maxLimit >= 50) presets.push(50);
+    if (maxLimit >= 79) presets.push(79);
+    if (maxLimit >= 149) presets.push(149);
+    // Add max limit if not already included
+    if (!presets.includes(maxLimit)) {
+      presets.push(maxLimit);
+    }
+    return presets.filter(p => p <= maxLimit);
+  };
 
   const formatMoney = useMemo(() => {
     return (amountInCents: number) => {
@@ -176,10 +213,7 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
                 }
               >
                 {profile?.isSubscriptionActive
-                  ? (profile?.subscriptionStatus || "active").replaceAll(
-                      "_",
-                      " ",
-                    )
+                  ? (profile?.subscriptionStatus || "active").replace(/_/g, " ")
                   : "inactive"}
               </Badge>
               {profile?.cancelAtPeriodEnd && (
@@ -233,15 +267,46 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
               Maximum overage amount for current month
             </Label>
             <div className="flex flex-col sm:flex-row gap-3">
-              <Input
-                id="overage-limit"
-                type="number"
-                step="0.01"
-                min="0"
-                value={overageLimitInput}
-                onChange={(event) => setOverageLimitInput(event.target.value)}
-                className="sm:max-w-xs"
-              />
+              <div className="flex items-center gap-2 sm:max-w-xs">
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <Select
+                  value={isCustomAmount ? "custom" : overageLimitInput}
+                  onValueChange={(value) => {
+                    if (value === "custom") {
+                      setIsCustomAmount(true);
+                      setOverageLimitInput("");
+                    } else {
+                      setIsCustomAmount(false);
+                      setOverageLimitInput(value);
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select amount" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getPresetAmounts().map((amount) => (
+                      <SelectItem key={amount} value={amount.toString()}>
+                        ${amount}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value="custom">Custom amount...</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {isCustomAmount && (
+                <Input
+                  id="overage-limit"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max={maxLimit}
+                  placeholder={`Max $${maxLimit}`}
+                  value={overageLimitInput}
+                  onChange={(event) => setOverageLimitInput(event.target.value)}
+                  className="sm:max-w-xs"
+                />
+              )}
               <Button
                 onClick={handleSaveLimit}
                 disabled={actionStatus === "loading"}
@@ -250,7 +315,7 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              Limit cannot be set lower than already spent this month.
+              Limit cannot be set lower than already spent this month. Maximum for your plan: ${maxLimit}.
             </p>
           </CardContent>
         </Card>
