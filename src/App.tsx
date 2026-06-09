@@ -166,7 +166,7 @@ const RequireAuth = ({ children }: { children: JSX.Element }) => {
       </div>
     );
   }
-
+// @ts-ignore
   if (user && user.account_type === "pending") {
     // Return a restricted message or redirect if they haven't paid logic
     return (

@@ -1,26 +1,64 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Headphones, Mic2, PlayCircle, Sparkles, Volume2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Headphones,
+  Mic2,
+  PlayCircle,
+  Sparkles,
+  Volume2,
+} from "lucide-react";
 import voxaLogoDark from "@/assets/voxa-logo-dark.png";
 
 const voices = [
   {
     name: "Ana",
-    file: "https://www.voxarealty.com/5GZaeOOG7yqLdoTRsaa6.mp3",
-    accent: "from-blue-500 to-cyan-400",
-    description: "Warm, polished, and natural for premium client conversations.",
+    file: "./voices/5GZaeOOG7yqLdoTRsaa6.mp3",
+    accent: "from-violet-500 to-fuchsia-400",
+    description:
+      "Warm, polished, and natural for premium client conversations.",
   },
   {
     name: "Clara",
-    file: "https://www.voxarealty.com/5TZtQYDIn8M40udRnoVI.mp3",
+    file: "./voices/5TZtQYDIn8M40udRnoVI.mp3",
     accent: "from-violet-500 to-fuchsia-400",
     description: "Clear, confident, and friendly for fast lead qualification.",
   },
   {
     name: "Diana",
-    file: "https://www.voxarealty.com/J70EyBFkBjTKuixo3fV1.mp3",
-    accent: "from-emerald-500 to-teal-400",
+    file: "./voices/J70EyBFkBjTKuixo3fV1.mp3",
+    accent: "from-violet-500 to-fuchsia-400",
     description: "Calm, professional, and reassuring for property enquiries.",
+  },
+  {
+    name: "John",
+    file: "./voices/WLKp2jV6nrS8aMkPPDRO.mp3",
+    accent: "from-emerald-500 to-teal-400",
+    description: "Pofessional, and reassuring voices.",
+  },
+  {
+    name: "Emma",
+    file: "./voices/XEQBC9sleaE3f5ff82UR.mp3",
+    accent: "from-violet-500 to-fuchsia-400",
+    description: "Conversational and approachable voice with a friendly tone.",
+  },
+  {
+    name: "Alex",
+    file: "./voices/xZhTmJnxrn4YyTmPDrfZ.mp3",
+    accent: "from-emerald-500 to-teal-400",
+    description: "Casual and Conversational tone with Australian accent",
+  },
+  {
+    name: "Jess",
+    file: "./voices/ys3XeJJA4ArWMhRpcX1D.mp3",
+    accent: "from-violet-500 to-fuchsia-400",
+    description: "Soft and soothing tone with a calm demeanor",
+  },
+  {
+    name: "Barron",
+    file: "./voices/Ziqfyey5k3R3GRC5abi8.mp3",
+    accent: "from-emerald-500 to-teal-400",
+    description: "Solid and confident voice with a professional tone",
   },
 ];
 
@@ -52,7 +90,8 @@ export default function VoiceLibraryPage() {
             Choose the voice that best represents your brand.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300 sm:text-xl">
-            Listen to three curated AI receptionist voices built for real estate enquiries, lead qualification, and polished first impressions.
+            Listen to three curated AI receptionist voices built for real estate
+            enquiries, lead qualification, and polished first impressions.
           </p>
 
           <div className="mt-12 grid w-full gap-6 md:grid-cols-3">
@@ -61,17 +100,27 @@ export default function VoiceLibraryPage() {
                 key={voice.name}
                 className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.07] p-6 text-left shadow-2xl shadow-black/20 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:bg-white/[0.1]"
               >
-                <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${voice.accent}`} />
+                <div
+                  className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${voice.accent}`}
+                />
                 <div className="mb-6 flex items-center justify-between">
-                  <div className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${voice.accent} shadow-lg`}>
+                  <div
+                    className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${voice.accent} shadow-lg`}
+                  >
                     <Mic2 className="h-7 w-7 text-white" />
                   </div>
                   <Volume2 className="h-6 w-6 text-white/35 transition group-hover:text-white/60" />
                 </div>
 
-                <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-400">Voice</p>
-                <h2 className="mt-2 text-3xl font-semibold text-white">{voice.name}</h2>
-                <p className="mt-3 min-h-[72px] text-base leading-7 text-slate-300">{voice.description}</p>
+                <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-400">
+                  Voice
+                </p>
+                <h2 className="mt-2 text-3xl font-semibold text-white">
+                  {voice.name}
+                </h2>
+                <p className="mt-3 min-h-[72px] text-base leading-7 text-slate-300">
+                  {voice.description}
+                </p>
 
                 <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4">
                   <div className="mb-3 flex items-center gap-2 text-sm font-medium text-slate-200">
@@ -92,7 +141,8 @@ export default function VoiceLibraryPage() {
               <Headphones className="h-6 w-6 text-cyan-200" />
             </div>
             <p className="max-w-2xl text-sm leading-6 text-slate-300 sm:text-left">
-              Pick your preferred voice and Voxa can configure your AI receptionist experience around that tone.
+              Pick your preferred voice and Voxa can configure your AI
+              receptionist experience around that tone.
             </p>
           </div>
         </section>
