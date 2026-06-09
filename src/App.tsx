@@ -21,6 +21,7 @@ import OnboardingPage from "./pages/OnboardingPage.tsx";
 import SubscriptionSuccessful from "./pages/SubscriptionSuccessful.tsx";
 import PrivacyPolicy from "./pages/PrivacyPolicy.tsx";
 import TermsOfService from "./pages/TermsOfService.tsx";
+import VoiceLibraryPage from "./pages/VoiceLibraryPage.tsx";
 
 const queryClient = new QueryClient();
 const SITE_URL = "https://www.voxarealty.com";
@@ -49,6 +50,11 @@ const PAGE_SEO_BY_PATH: Record<string, PageSeoMeta> = {
   "/terms-of-service": {
     title: "Terms of Service | Voxa Realty",
     description: "Read the Terms of Service for Voxa Realty.",
+  },
+  "/voice-library": {
+    title: "Voice Library | Voxa Realty",
+    description:
+      "Listen to Voxa Realty AI receptionist voice samples and choose the voice that best represents your real estate brand.",
   },
 };
 
@@ -282,6 +288,7 @@ const App = () => (
             path="/terms-of-service"
             element={<TermsOfService />}
           />
+          <Route path="/voice-library" element={<VoiceLibraryPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
