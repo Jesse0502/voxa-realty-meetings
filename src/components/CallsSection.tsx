@@ -310,7 +310,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
             </h1>
           )}
           <p
-            className={`${isDark ? "text-gray-400" : "text-muted-foreground"} text-sm md:text-base`}
+            className="text-muted-foreground text-sm md:text-base"
           >
             Track and monitor all your prospect interactions in one place.
           </p>
@@ -330,7 +330,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 mb-8">
         <Card
           className={
-            isDark ? "bg-gray-800 border-gray-700 text-white" : "bg-white"
+            ""
           }
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -338,7 +338,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
               Number of Calls
             </CardTitle>
             <Phone
-              className={`h-4 w-4 ${isDark ? "text-gray-400" : "text-muted-foreground"}`}
+              className="h-4 w-4 text-muted-foreground"
             />
           </CardHeader>
           <CardContent>
@@ -346,7 +346,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
               {callStats?.totalCalls || 0}
             </div>
             <p
-              className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-muted-foreground"}`}
+              className="text-xs mt-1 text-muted-foreground"
             >
               Lifetime calls
             </p>
@@ -354,7 +354,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
         </Card>
         <Card
           className={
-            isDark ? "bg-gray-800 border-gray-700 text-white" : "bg-white"
+            ""
           }
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -362,7 +362,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
               Total Call Mins
             </CardTitle>
             <Clock
-              className={`h-4 w-4 ${isDark ? "text-gray-400" : "text-muted-foreground"}`}
+              className="h-4 w-4 text-muted-foreground"
             />
           </CardHeader>
           <CardContent>
@@ -372,7 +372,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
                 : `~${Math.round((callStats?.totalDurationSecs || 0) / 60)}m`}
             </div>
             <p
-              className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-muted-foreground"}`}
+              className="text-xs mt-1 text-muted-foreground"
             >
               Lifetime duration
             </p>
@@ -380,7 +380,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
         </Card>
         <Card
           className={
-            isDark ? "bg-gray-800 border-gray-700 text-white" : "bg-white"
+            ""
           }
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -388,7 +388,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
               Average Duration
             </CardTitle>
             <Timer
-              className={`h-4 w-4 ${isDark ? "text-gray-400" : "text-muted-foreground"}`}
+              className="h-4 w-4 text-muted-foreground"
             />
           </CardHeader>
           <CardContent>
@@ -396,7 +396,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
               {formatDuration(callStats?.averageDurationSecs || 0)}
             </div>
             <p
-              className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-muted-foreground"}`}
+              className="text-xs mt-1 text-muted-foreground"
             >
               Across all calls
             </p>
@@ -404,13 +404,13 @@ export function CallsSection({ isDark }: CallsSectionProps) {
         </Card>
         <Card
           className={
-            isDark ? "bg-gray-800 border-gray-700 text-white" : "bg-white"
+            ""
           }
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Minutes Left</CardTitle>
             <Hourglass
-              className={`h-4 w-4 ${isDark ? "text-gray-400" : "text-muted-foreground"}`}
+              className="h-4 w-4 text-muted-foreground"
             />
           </CardHeader>
           <CardContent>
@@ -418,7 +418,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
               {assistant?.remainingMins || 0}m
             </div>
             <p
-              className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-muted-foreground"}`}
+              className="text-xs mt-1 text-muted-foreground"
             >
               Available balance
             </p>
@@ -426,9 +426,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
         </Card>
       </div>
       <div
-        className={`rounded-lg border shadow-sm overflow-x-auto ${
-          isDark ? "bg-gray-800 border-gray-700" : "bg-white"
-        }`}
+        className="rounded-lg border border-border bg-card shadow-sm overflow-x-auto"
       >
         {fetchError && (
           <div className="px-4 py-3 border-b border-border text-sm text-red-500">
@@ -565,15 +563,15 @@ export function CallsSection({ isDark }: CallsSectionProps) {
         onOpenChange={(open) => !open && setSelectedCall(null)}
       >
         <SheetContent
-          className={`w-[400px] sm:w-[540px] overflow-y-auto ${isDark ? "bg-gray-900 border-gray-800 text-white" : ""}`}
+          className="w-[400px] sm:w-[540px] overflow-y-auto bg-popover"
         >
           {selectedCall && (
             <>
               <SheetHeader className="mb-6">
-                <SheetTitle className={isDark ? "text-gray-100" : ""}>
+                <SheetTitle>
                   Call Overview
                 </SheetTitle>
-                <SheetDescription className={isDark ? "text-gray-400" : ""}>
+                <SheetDescription>
                   Review the conversation details and open the linked contact.
                 </SheetDescription>
               </SheetHeader>
@@ -581,11 +579,11 @@ export function CallsSection({ isDark }: CallsSectionProps) {
               <div className="space-y-6">
                 {/* Contact Card */}
                 <div
-                  className={`p-4 rounded-xl border ${isDark ? "bg-gray-800 border-gray-700" : "bg-gray-50 border-gray-100"}`}
+                  className="p-4 rounded-xl border border-border bg-muted/40"
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <div
-                      className={`h-10 w-10 rounded-full flex items-center justify-center ${isDark ? "bg-gray-700 text-gray-300" : "bg-white border shadow-sm text-gray-600"}`}
+                      className="h-10 w-10 rounded-full flex items-center justify-center bg-muted text-muted-foreground border border-border"
                     >
                       <User className="h-5 w-5" />
                     </div>
@@ -596,7 +594,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
                           "Unknown Caller"}
                       </h3>
                       <p
-                        className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}
+                        className="text-xs text-muted-foreground"
                       >
                         {selectedCall.callerNumber || "Unknown number"}
                       </p>
@@ -608,7 +606,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
                         "General",
                     )}
                     <span
-                      className={`text-xs ml-auto ${isDark ? "text-gray-400" : "text-gray-500"}`}
+                      className="text-xs ml-auto text-muted-foreground"
                     >
                       {selectedCall.createdAt
                         ? new Date(selectedCall.createdAt).toLocaleString()
@@ -648,12 +646,12 @@ export function CallsSection({ isDark }: CallsSectionProps) {
                         .map(([key, value], idx) => (
                           <div key={idx} className="flex flex-col gap-1">
                             <span
-                              className={`text-xs font-semibold ${isDark ? "text-gray-300" : "text-gray-600"}`}
+                              className="text-xs font-semibold text-foreground"
                             >
                               {key}
                             </span>
                             <div
-                              className={`p-3 rounded-lg text-sm border ${isDark ? "bg-gray-800 border-gray-700 text-gray-300" : "bg-white border-gray-200 text-gray-700"}`}
+                              className="p-3 rounded-lg text-sm border border-border bg-card text-card-foreground"
                             >
                               {String(value)}
                             </div>
@@ -669,7 +667,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
 
                 {/* Audio Player placeholder */}
                 <div
-                  className={`p-3 rounded-lg border flex flex-col gap-2 ${isDark ? "bg-gray-800 border-gray-700" : "bg-white"}`}
+                  className="p-3 rounded-lg border border-border bg-card flex flex-col gap-2"
                 >
                   <h4 className="text-sm font-semibold flex items-center gap-2">
                     <Play className="h-4 w-4" /> Call Recording
@@ -688,7 +686,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
                     </span>
                   )}
                   <span
-                    className={`text-xs ml-auto font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}
+                    className="text-xs ml-auto font-medium text-muted-foreground"
                   >
                     Duration:{" "}
                     {selectedCall.durationSeconds
@@ -701,7 +699,7 @@ export function CallsSection({ isDark }: CallsSectionProps) {
                 <div>
                   <h4 className="text-sm font-semibold mb-3">Transcript</h4>
                   <div
-                    className={`p-4 rounded-xl text-sm leading-relaxed whitespace-pre-wrap border ${isDark ? "bg-gray-800 border-gray-700 text-gray-300" : "bg-gray-50 text-gray-700"}`}
+                    className="p-4 rounded-xl text-sm leading-relaxed whitespace-pre-wrap border border-border bg-muted/40 text-foreground"
                   >
                     {selectedCall.transcript || "No transcript available."}
                   </div>

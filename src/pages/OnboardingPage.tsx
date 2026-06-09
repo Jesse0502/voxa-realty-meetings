@@ -120,7 +120,7 @@ export default function OnboardingPage() {
       <div className="relative mx-auto flex min-h-screen w-full max-w-lg flex-col px-6 py-8">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 self-start">
-          <img src={voxaLogoDark} alt="Voxa" className="h-8 w-auto" />
+          <img src={voxaLogoDark} alt="Voxa" className="h-12 w-auto" />
         </Link>
 
         {/* Step dots */}

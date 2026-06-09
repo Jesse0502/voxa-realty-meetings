@@ -93,23 +93,23 @@
   }
 
   .dark {
-    --background: 193 20% 10%;
-    --foreground: 42 25% 94%;
+    --background: 220 28% 7%;
+    --foreground: 207 30% 93%;
 
-    --card: 193 18% 12%;
-    --card-foreground: 42 25% 94%;
+    --card: 218 22% 11%;
+    --card-foreground: 207 30% 93%;
 
-    --popover: 193 18% 12%;
-    --popover-foreground: 42 25% 94%;
+    --popover: 220 18% 14%;
+    --popover-foreground: 207 30% 93%;
 
     --primary: 181 65% 46%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 181 18% 18%;
-    --secondary-foreground: 42 25% 94%;
+    --secondary: 218 16% 16%;
+    --secondary-foreground: 207 20% 80%;
 
-    --muted: 193 12% 18%;
-    --muted-foreground: 200 12% 68%;
+    --muted: 220 18% 14%;
+    --muted-foreground: 210 7% 59%;
 
     --accent: 181 60% 32%;
     --accent-foreground: 0 0% 100%;
@@ -117,18 +117,18 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 193 10% 24%;
-    --input: 193 10% 24%;
+    --border: 218 16% 18%;
+    --input: 218 16% 18%;
     --ring: 181 65% 46%;
 
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-background: 220 28% 7%;
+    --sidebar-foreground: 207 30% 93%;
+    --sidebar-primary: 181 65% 46%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 218 16% 16%;
+    --sidebar-accent-foreground: 207 30% 93%;
+    --sidebar-border: 218 16% 18%;
+    --sidebar-ring: 181 65% 46%;
   }
 }
 
@@ -160,6 +160,21 @@
     background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  .dark body {
+    background-image:
+      radial-gradient(
+        circle at top left,
+        rgba(17, 156, 158, 0.08),
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at 82% 12%,
+        rgba(17, 156, 158, 0.05),
+        transparent 35%
+      ),
+      linear-gradient(180deg, #0d1117 0%, #0b0f16 100%);
   }
 
   h1,

@@ -407,7 +407,7 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
               <Sparkles className="h-6 w-6 text-[#2563eb]" />
               Assistant Configuration
             </h1>
-            <p className={`${isDark ? "text-gray-400" : "text-gray-500"} mt-2`}>
+            <p className="text-muted-foreground mt-2">
               Manage your AI Assistant's personality, script, and first spoken
               line.
             </p>
@@ -472,11 +472,11 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
         </div>
 
         <Card
-          className={`${isDark ? "bg-gray-800 border-gray-700 text-white" : ""}`}
+          className=""
         >
           <CardHeader>
             <CardTitle>Assistant Identity</CardTitle>
-            <CardDescription className={`${isDark ? "text-gray-400" : ""}`}>
+            <CardDescription>
               These settings define how your Assistant introduces itself and
               handles calls.
             </CardDescription>
@@ -493,17 +493,11 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
                   value={formData.firstMessage}
                   onChange={handleChange}
                   placeholder=""
-                  className={`relative z-0 text-transparent ${
-                    isDark
-                      ? "bg-gray-900 border-gray-700 caret-white"
-                      : "caret-gray-900"
-                  }`}
+                  className="relative z-0 text-transparent caret-foreground"
                 />
                 <div
                   aria-hidden="true"
-                  className={`pointer-events-none absolute inset-0 z-10 flex items-center overflow-hidden whitespace-nowrap rounded-md px-3 text-sm ${
-                    isDark ? "text-white" : "text-foreground"
-                  }`}
+                  className="pointer-events-none absolute inset-0 z-10 flex items-center overflow-hidden whitespace-nowrap rounded-md px-3 text-sm text-foreground"
                 >
                   {formData.firstMessage ? (
                     highlightedFirstMessageParts.map((part, index) =>
@@ -520,9 +514,7 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
                     )
                   ) : (
                     <span
-                      className={
-                        isDark ? "text-gray-400" : "text-muted-foreground"
-                      }
+                      className="text-muted-foreground"
                     >
                       e.g., Hi, Thanks for calling. How can I help you today?
                     </span>
@@ -548,7 +540,7 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
                     <TooltipTrigger asChild>
                       <button
                         type="button"
-                        className={`${isDark ? "text-gray-400" : "text-gray-500"} hover:text-[#2563eb]`}
+                        className="text-muted-foreground hover:text-[#2563eb]"
                         aria-label="Greet with name info"
                       >
                         <CircleHelp className="h-4 w-4" />
@@ -569,7 +561,7 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
                   </p>
                 )}
               <p
-                className={`text-xs ${isDark ? "text-gray-400" : "text-muted-foreground"}`}
+                className="text-xs text-muted-foreground"
               >
                 The very first message the AI will say when a call connects.
                 Keep it short and welcoming.
@@ -587,10 +579,10 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
                 value={formData.prompt}
                 onChange={handleChange}
                 placeholder="You are an expert real estate assistant..."
-                className={`resize-y ${isDark ? "bg-gray-900 border-gray-700 text-white" : ""}`}
+                className="resize-y"
               />
               <p
-                className={`text-xs ${isDark ? "text-gray-400" : "text-muted-foreground"}`}
+                className="text-xs text-muted-foreground"
               >
                 The core instructions that dictate the assistant's behavior,
                 knowledge boundaries, and conversational style.
@@ -617,12 +609,12 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
               </Button>
             </div>
 
-            <div className="border-t border-gray-200/60 pt-6">
+            <div className="border-t border-border pt-6">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-semibold">Knowledge Base</h3>
                   <p
-                    className={`text-sm ${isDark ? "text-gray-400" : "text-muted-foreground"}`}
+                    className="text-sm text-muted-foreground"
                   >
                     Connect Google Sheets and choose a spreadsheet and sheet to
                     use for answers.
@@ -632,8 +624,8 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
                   variant="secondary"
                   className={
                     hasGoogleCreds
-                      ? "bg-emerald-100 text-emerald-700 border-none"
-                      : "bg-gray-100 text-gray-600 border-none"
+                      ? "bg-emerald-500/10 text-emerald-500 border-none"
+                      : "bg-muted text-muted-foreground border-none"
                   }
                 >
                   {hasGoogleCreds ? "Connected" : "Not connected"}
@@ -666,7 +658,7 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
                             }}
                           >
                             <SelectTrigger
-                              className={`${isDark ? "bg-gray-900 border-gray-700 text-white" : ""}`}
+                              className=""
                             >
                               <SelectValue placeholder="Select a spreadsheet" />
                             </SelectTrigger>
@@ -701,7 +693,7 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
                               onValueChange={handleSelectSheet}
                             >
                               <SelectTrigger
-                                className={`${isDark ? "bg-gray-900 border-gray-700 text-white" : ""}`}
+                                className=""
                               >
                                 <SelectValue placeholder="Select a sheet" />
                               </SelectTrigger>
@@ -735,7 +727,7 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
                                   onValueChange={handleSelectPhoneColumn}
                                 >
                                   <SelectTrigger
-                                    className={`${isDark ? "bg-gray-900 border-gray-700 text-white" : ""}`}
+                                    className=""
                                   >
                                     <SelectValue placeholder="Select a column" />
                                   </SelectTrigger>
@@ -753,7 +745,7 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
                               </div>
                             )}
                             <p
-                              className={`text-xs ${isDark ? "text-gray-400" : "text-muted-foreground"} mt-2`}
+                              className="text-xs text-muted-foreground mt-2"
                             >
                               Used to match callers by phone number and pre-fill
                               details in the assistant prompt.
@@ -765,7 +757,7 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
                   </div>
                 ) : (
                   <p
-                    className={`text-sm ${isDark ? "text-gray-400" : "text-muted-foreground"}`}
+                    className="text-sm text-muted-foreground"
                   >
                     Connect Google Sheets from the Connect CRM menu to load your
                     spreadsheets.

@@ -23,6 +23,28 @@ import { toast } from "sonner";
 
 const PRESET_MINS = [100, 200, 300, 400, 500, 1000];
 
+const PLAN_LINKS: Record<string, string> = {
+  basic: import.meta.env.VITE_BASIC_PAYMENT_LINK ?? "",
+  pro: import.meta.env.VITE_PRO_PAYMENT_LINK ?? "",
+};
+
+const PLAN_DETAILS: Record<string, { label: string; price: string; mins: string; description: string }> = {
+  basic: {
+    label: "Basic",
+    price: "A$79/mo",
+    mins: "180 mins",
+    description: "180 call minutes + 100 SMS per month",
+  },
+  pro: {
+    label: "Pro",
+    price: "A$149/mo",
+    mins: "360 mins",
+    description: "360 call minutes + 185 SMS per month",
+  },
+};
+
+const PLAN_TIER: Record<string, number> = { earlyAccess: 0, basic: 1, pro: 2 };
+
 interface ProfileSectionProps {
   isDark: boolean;
 }
@@ -119,7 +141,7 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
             <h1 className="text-2xl font-semibold tracking-tight">
               Profile and Billing
             </h1>
-            <p className={`${isDark ? "text-gray-400" : "text-gray-600"} mt-1`}>
+            <p className="text-muted-foreground mt-1">
               Manage your subscription and call minute credits.
             </p>
           </div>
@@ -133,7 +155,7 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <Card className={isDark ? "bg-gray-800 border-gray-700" : "bg-white"}>
+          <Card className={""}>
             <CardHeader>
               <CardTitle className="text-sm font-medium">Virtual Number</CardTitle>
             </CardHeader>
@@ -144,7 +166,7 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
             </CardContent>
           </Card>
 
-          <Card className={isDark ? "bg-gray-800 border-gray-700" : "bg-white"}>
+          <Card className={""}>
             <CardHeader>
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 <CreditCard className="h-4 w-4" />
@@ -169,7 +191,7 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
             </CardContent>
           </Card>
 
-          <Card className={isDark ? "bg-gray-800 border-gray-700" : "bg-white"}>
+          <Card className={""}>
             <CardHeader>
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
@@ -185,7 +207,7 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
             </CardContent>
           </Card>
 
-          <Card className={isDark ? "bg-gray-800 border-gray-700" : "bg-white"}>
+          <Card className={""}>
             <CardHeader>
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 <Clock className="h-4 w-4" />
@@ -209,7 +231,7 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
         </div>
 
         {/* Add Credits */}
-        <Card className={isDark ? "bg-gray-800 border-gray-700" : "bg-white"}>
+        <Card className={""}>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <PlusCircle className="h-4 w-4" />
@@ -217,7 +239,7 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+            <p className="text-sm text-muted-foreground">
               Purchase additional call minutes{costPerMin !== null ? <> at <strong>A${costPerMin.toFixed(2)}/min</strong></> : ""}.
               Minutes are added to your account immediately after payment.
             </p>
@@ -278,8 +300,86 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
           </CardContent>
         </Card>
 
+        {/* Upgrade Plan */}
+        {(() => {
+          const currentTier = PLAN_TIER[profile?.subscriptionType ?? ""] ?? -1;
+          const upgrades = Object.entries(PLAN_DETAILS).filter(
+            ([key]) => PLAN_TIER[key] > currentTier,
+          );
+          const isOnPro = profile?.subscriptionType === "pro";
+
+          return (
+            <Card className={""}>
+              <CardHeader>
+                <CardTitle className="text-base">Upgrade Plan</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {profile?.subscriptionType && (
+                  <p className="text-sm text-muted-foreground">
+                    Current plan:{" "}
+                    <Badge variant="outline" className="ml-1 capitalize">
+                      {profile.subscriptionType === "earlyAccess" ? "Early Access" : profile.subscriptionType}
+                    </Badge>
+                  </p>
+                )}
+
+                {upgrades.length > 0 && (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {upgrades.map(([key, plan]) => (
+                      <div
+                        key={key}
+                        className="rounded-lg border border-border bg-muted/40 p-4 space-y-2"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold">{plan.label}</span>
+                          <span className="text-sm font-medium text-[#119c9e]">{plan.price}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {plan.description}
+                        </p>
+                        <Button
+                          size="sm"
+                          className="w-full bg-[#119c9e] hover:bg-[#0e8082] text-white"
+                          onClick={() => {
+                            if (PLAN_LINKS[key]) window.location.href = PLAN_LINKS[key];
+                          }}
+                          disabled={!PLAN_LINKS[key]}
+                        >
+                          Upgrade to {plan.label}
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div
+                  className="rounded-lg border border-border bg-muted/40 p-4 space-y-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold">Custom</span>
+                    <span className="text-sm font-medium text-[#119c9e]">Tailored</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {isOnPro
+                      ? "You're on our top plan. Contact us to discuss a custom enterprise solution."
+                      : "Need something specific? We'll build a plan around your requirements."}
+                  </p>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => window.open("mailto:mail@voxarealty.com", "_blank")}
+                  >
+                    Contact mail@voxarealty.com
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })()}
+
         {/* Billing Actions */}
-        <Card className={isDark ? "bg-gray-800 border-gray-700" : "bg-white"}>
+        <Card className={""}>
           <CardHeader>
             <CardTitle className="text-base">Billing Actions</CardTitle>
           </CardHeader>
@@ -291,7 +391,7 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
             >
               Cancel Subscription
             </Button>
-            <p className={`mt-2 text-xs ${isDark ? "text-gray-500" : "text-gray-400"}`}>
+            <p className="mt-2 text-xs text-muted-foreground">
               Your service stays active until the end of the current billing period.
             </p>
           </CardContent>
