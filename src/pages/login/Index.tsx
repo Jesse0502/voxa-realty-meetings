@@ -144,7 +144,7 @@ export default function LoginRegister() {
               <Input
                 id="phone"
                 type="tel"
-                placeholder="(555) 000-0000"
+                placeholder="(444) 000-0000"
                 value={phoneNumber}
                 onChange={(e) => { clearErrors(); setPhoneNumber(e.target.value); }}
                 disabled={loading}

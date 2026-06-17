@@ -24,26 +24,33 @@ import { toast } from "sonner";
 const PRESET_MINS = [100, 200, 300, 400, 500, 1000];
 
 const PLAN_LINKS: Record<string, string> = {
-  basic: import.meta.env.VITE_BASIC_PAYMENT_LINK ?? "",
+  starter: import.meta.env.VITE_STARTER_PAYMENT_LINK ?? "",
+  growth: import.meta.env.VITE_GROWTH_PAYMENT_LINK ?? "",
   pro: import.meta.env.VITE_PRO_PAYMENT_LINK ?? "",
 };
 
 const PLAN_DETAILS: Record<string, { label: string; price: string; mins: string; description: string }> = {
-  basic: {
-    label: "Basic",
-    price: "A$79/mo",
-    mins: "180 mins",
-    description: "180 call minutes + 100 SMS per month",
+  starter: {
+    label: "Starter",
+    price: "A$149/mo",
+    mins: "240 mins",
+    description: "240 coverage mins + 240 SMS per month",
+  },
+  growth: {
+    label: "Growth",
+    price: "A$249/mo",
+    mins: "360 mins",
+    description: "360 coverage mins + 360 SMS per month",
   },
   pro: {
     label: "Pro",
-    price: "A$149/mo",
-    mins: "360 mins",
-    description: "360 call minutes + 185 SMS per month",
+    price: "A$449/mo",
+    mins: "600 mins",
+    description: "600 coverage mins + 600 SMS per month",
   },
 };
 
-const PLAN_TIER: Record<string, number> = { earlyAccess: 0, basic: 1, pro: 2 };
+const PLAN_TIER: Record<string, number> = { earlyAccess: 0, basic: 1, starter: 1, growth: 2, pro: 3 };
 
 interface ProfileSectionProps {
   isDark: boolean;
@@ -104,6 +111,16 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
     } catch (error) {
       toast.error(String(error || "Failed to start checkout"));
     }
+  };
+
+  const handleUpgradePlan = (planKey: string) => {
+    const link = PLAN_LINKS[planKey];
+    if (!link) return;
+    localStorage.setItem("voxa_upgrade", "true");
+    if (profile?.stripeSubscriptionId) {
+      localStorage.setItem("voxa_old_sub_id", profile.stripeSubscriptionId);
+    }
+    window.location.href = link;
   };
 
   const handleCancelSubscription = async () => {
@@ -195,13 +212,13 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
             <CardHeader>
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
-                Next Payment Due
+                Subscribed Since
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-lg font-semibold">
-                {profile?.nextPaymentDueDate
-                  ? `${new Date(profile.nextPaymentDueDate).getDate()}/${new Date(profile.nextPaymentDueDate).getMonth() + 1}/${new Date(profile.nextPaymentDueDate).getFullYear()}`
+                {profile?.subscribedSince
+                  ? `${new Date(profile.subscribedSince).getDate()}/${new Date(profile.subscribedSince).getMonth() + 1}/${new Date(profile.subscribedSince).getFullYear()}`
                   : "Not available"}
               </div>
             </CardContent>
@@ -340,12 +357,10 @@ export function ProfileSection({ isDark }: ProfileSectionProps) {
                         <Button
                           size="sm"
                           className="w-full bg-[#119c9e] hover:bg-[#0e8082] text-white"
-                          onClick={() => {
-                            if (PLAN_LINKS[key]) window.location.href = PLAN_LINKS[key];
-                          }}
+                          onClick={() => handleUpgradePlan(key)}
                           disabled={!PLAN_LINKS[key]}
                         >
-                          Upgrade to {plan.label}
+                          {`Upgrade to ${plan.label}`}
                         </Button>
                       </div>
                     ))}

@@ -32,15 +32,16 @@ import {
   Rocket,
   Sparkles,
   Check,
+  Menu,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import voxaLogoDark from "@/assets/voxa-logo-dark.png";
 
 const navLinks = [
-  { label: "How it works", href: "#how-it-works" },
-  { label: "Features", href: "#what-voxa-does" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "FAQ", href: "#faq" },
+  { label: "Sign In", to: "/login" },
+  { label: "Privacy Policy", to: "/privacy-policy" },
+  { label: "Voice Library", to: "/voice-library" },
 ];
 
 const proofStats = [
@@ -87,11 +88,6 @@ const seoFaqs = [
       "No. Voxa processes calls in real-time and fetches CRM data on demand. We do not retain any personal information after the call ends, ensuring your data remains secure and private.",
   },
   {
-    question: "What information does Voxa collect when I sign in with Google?",
-    answer:
-      "When you sign in with Google, Voxa receives only your name and email address to create and identify your account. We do not access your Google contacts, calendar, Gmail, Google Drive, or any other Google services. Please review our Privacy Policy for complete details.",
-  },
-  {
     question: "Can Voxa follow up both buyer and seller leads?",
     answer:
       "Yes. Voxa handles both buyer and seller conversations, gathering key property details and qualifying leads before routing them to your team.",
@@ -104,7 +100,7 @@ const seoFaqs = [
   {
     question: "How much does it cost?",
     answer:
-      "We offer flexible pricing tiers to suit different needs. The Basic plan starts at A$79/month with 180 call minutes and 100 SMS included. The Pro plan at A$149/month includes 360 minutes and 185 SMS. Custom enterprise solutions are also available for agencies with higher volume requirements.",
+      "We offer flexible pricing tiers to suit different needs. The Starter plan is A$149/month with 240 coverage mins and 240 SMS included. The Growth plan is A$249/month with 360 coverage mins and 360 SMS. The Pro plan is A$449/month with 600 coverage mins and 600 SMS. All plans require a 3-month minimum term and a one-time A$89 refundable setup fee.",
   },
   {
     question: "How long does setup take?",
@@ -139,12 +135,14 @@ const LandingPage = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [navHidden, setNavHidden] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     let lastY = window.scrollY;
     const onScroll = () => {
       const y = window.scrollY;
       setNavHidden(y > lastY && y > 80);
+      if (y > 80) setMobileMenuOpen(false);
       lastY = y;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -987,31 +985,72 @@ const LandingPage = () => {
         <header
           className={`fixed inset-x-0 top-4 z-30 px-4 sm:top-6 transition-transform duration-300 ${navHidden ? "-translate-y-[calc(100%+1.5rem)]" : "translate-y-0"}`}
         >
-          <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[#071220]/65 px-3 py-2 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5)] backdrop-blur-[12px] sm:px-4">
-            <a href="/" className="flex items-center gap-2">
-              <img
-                src={voxaLogoDark}
-                alt="Voxa Realty"
-                className="h-9 w-auto sm:h-10"
-              />
-            </a>
-            <nav className="hidden items-center gap-6 md:flex">
-              {navLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  className="text-sm font-semibold text-white/70 transition-colors hover:text-white"
+          <div className="mx-auto w-full max-w-5xl rounded-2xl border border-white/10 bg-[#071220]/65 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5)] backdrop-blur-[12px]">
+            <div className="flex items-center justify-between gap-3 px-3 py-2 sm:px-4">
+              <a href="/" className="flex items-center gap-2">
+                <img
+                  src={voxaLogoDark}
+                  alt="Voxa Realty"
+                  className="h-9 w-auto sm:h-10"
+                />
+              </a>
+              <nav className="hidden items-center gap-6 md:flex">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.label}
+                    to={link.to}
+                    className="text-sm font-semibold text-white/70 transition-colors hover:text-white"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+              <div className="flex items-center gap-3">
+                <Button
+                  className="hidden md:inline-flex h-10 rounded-xl bg-[#119c9e] px-4 text-sm font-semibold text-white hover:bg-[#0e8082]"
+                  onClick={() => setBookingOpen(true)}
                 >
-                  {link.label}
-                </a>
-              ))}
-            </nav>
-            <Button
-              className="h-10 rounded-xl bg-[#119c9e] px-4 text-sm font-semibold text-white hover:bg-[#0e8082]"
-              onClick={() => setBookingOpen(true)}
-            >
-              Book a call
-            </Button>
+                  Book a call
+                </Button>
+                <button
+                  className="flex h-10 w-10 items-center justify-center text-white/70 transition-colors hover:text-white md:hidden"
+                  onClick={() => setMobileMenuOpen((o) => !o)}
+                  aria-label="Toggle navigation"
+                  aria-expanded={mobileMenuOpen}
+                >
+                  {mobileMenuOpen ? (
+                    <X className="h-5 w-5" />
+                  ) : (
+                    <Menu className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+            </div>
+            {mobileMenuOpen && (
+              <nav className="border-t border-white/10 px-4 pb-4 md:hidden">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.label}
+                    to={link.to}
+                    className="flex items-center py-3 text-sm font-semibold text-white/70 transition-colors hover:text-white"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+                <div className="mt-3 border-t border-white/10 pt-3">
+                  <Button
+                    className="h-11 w-full rounded-xl bg-[#119c9e] text-sm font-semibold text-white hover:bg-[#0e8082]"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setBookingOpen(true);
+                    }}
+                  >
+                    Book a call
+                  </Button>
+                </div>
+              </nav>
+            )}
           </div>
         </header>
 
@@ -1021,7 +1060,7 @@ const LandingPage = () => {
             <p className="animate-rise-fade [animation-fill-mode:both] text-[0.68rem] font-bold uppercase tracking-[0.32em] text-[#119c9e]">
               Based in Melbourne
             </p>
-            <h1 className="animate-rise-fade font-serif animate-delay-1 [animation-fill-mode:both] mx-auto mt-4 max-w-5xl text-[clamp(2.6rem,6.5vw,5.4rem)] leading-[1.0] text-white [text-shadow:0_10px_26px_rgba(15,23,42,0.32)]">
+            <h1 className="animate-rise-fade font-serif animate-delay-1 [animation-fill-mode:both] mx-auto mt-4 max-w-5xl text-[clamp(3.2rem,6.5vw,5.4rem)] leading-[1.0] text-white [text-shadow:0_10px_26px_rgba(15,23,42,0.32)]">
               Your Phone Answered,
               <br />
               <span className="text-[#119c9e]">Even When You Cannot.</span>
@@ -1044,14 +1083,14 @@ const LandingPage = () => {
           </div>
 
           {/* ── Proof bar — centered ── */}
-          <div className="animate-rise-fade animate-delay-3 [animation-fill-mode:both] mt-12 w-full max-w-2xl">
-            <div className="flex flex-wrap justify-center gap-x-10 gap-y-6 sm:gap-x-14">
+          <div className="animate-rise-fade animate-delay-3 [animation-fill-mode:both] mt-10 sm:mt-12 w-full max-w-2xl pt-8">
+            <div className="grid grid-cols-3 gap-x-2 gap-y-6 sm:gap-x-14">
               {proofStats.map(({ value, label }) => (
                 <div key={label} className="text-center">
-              <p className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
+                  <p className="text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-5xl">
                     {value}
                   </p>
-                  <p className="mt-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-sky-200/50">
+                  <p className="mt-2 text-[0.6rem] font-bold uppercase tracking-[0.16em] text-sky-200/50 sm:text-[0.68rem] sm:tracking-[0.22em]">
                     {label}
                   </p>
                 </div>
@@ -1066,7 +1105,7 @@ const LandingPage = () => {
       ═══════════════════════════════════════════ */}
       <section
         id="what-voxa-does"
-        className="relative z-10 bg-white py-20 lg:py-28"
+        className="relative z-10 bg-white py-16 sm:py-20 lg:py-28"
       >
         <div className="mx-auto max-w-5xl px-6 lg:px-10">
           <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.1fr]">
@@ -1096,7 +1135,7 @@ const LandingPage = () => {
             </div>
 
             {/* Right: call flow diagram */}
-            <div className="select-none rounded-2xl border border-slate-100 bg-slate-50 p-5 shadow-[0_32px_80px_-32px_rgba(15,23,42,0.14)]">
+            <div className="select-none rounded-2xl border border-slate-100 bg-slate-50 p-4 sm:p-5 shadow-[0_32px_80px_-32px_rgba(15,23,42,0.14)]">
               <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
                 Call flow
               </p>
@@ -1211,7 +1250,7 @@ const LandingPage = () => {
       {/* ═══════════════════════════════════════════
           WORKFLOW — numbered, linear, connected
       ═══════════════════════════════════════════ */}
-      <section id="how-it-works" className="bg-[#071220] py-20 lg:py-28">
+      <section id="how-it-works" className="bg-[#071220] py-16 sm:py-20 lg:py-28">
         <div className="mx-auto max-w-6xl px-6 lg:px-10">
           {/* Header */}
           <div className="max-w-2xl">
@@ -1263,7 +1302,7 @@ const LandingPage = () => {
 
           <div className="mt-12 flex flex-wrap items-center gap-4">
             <Button
-              className="h-11 rounded-xl bg-[#119c9e] px-6 text-sm font-semibold text-white hover:bg-[#0e8082]"
+              className="h-11 w-full sm:w-auto rounded-xl bg-[#119c9e] px-6 text-sm font-semibold text-white hover:bg-[#0e8082]"
               onClick={() => setBookingOpen(true)}
             >
               See it in action
@@ -1278,7 +1317,7 @@ const LandingPage = () => {
       ═══════════════════════════════════════════ */}
       <section
         id="pricing"
-        className="border-t border-slate-100 bg-white py-20 lg:py-28"
+        className="border-t border-slate-100 bg-white py-16 sm:py-20 lg:py-28"
       >
         <div className="mx-auto max-w-6xl px-6 lg:px-10">
           <div className="text-center">
@@ -1287,18 +1326,18 @@ const LandingPage = () => {
               Simple, transparent pricing
             </h2>
             <p className="mt-4 text-base text-slate-500">
-              Choose the plan that fits your call volume. All plans include core features with no lock-in contracts.
+              Choose the plan that fits your call volume. All plans include core features.
             </p>
           </div>
 
           <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {/* Basic Plan */}
+            {/* Starter Plan */}
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-slate-900">Basic</h3>
+                <h3 className="text-lg font-semibold text-slate-900">Starter</h3>
               </div>
               <div className="mt-4 flex items-baseline">
-                <span className="text-4xl font-bold text-slate-900">$79</span>
+                <span className="text-4xl font-bold text-slate-900">$149</span>
                 <span className="ml-2 text-sm text-slate-500">/month</span>
               </div>
               <p className="mt-4 text-sm text-slate-600">
@@ -1307,11 +1346,11 @@ const LandingPage = () => {
               <ul className="mt-6 space-y-3">
                 <li className="flex items-center text-sm text-slate-700">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
-                  180 call minutes included
+                  240 coverage mins included
                 </li>
                 <li className="flex items-center text-sm text-slate-700">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
-                  100 SMS included
+                  240 SMS included
                 </li>
                 <li className="flex items-center text-sm text-slate-700">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
@@ -1330,7 +1369,7 @@ const LandingPage = () => {
               </Button>
             </div>
 
-            {/* Pro Plan — Most Popular */}
+            {/* Growth Plan — Most Popular */}
             <div className="relative rounded-2xl border-2 border-[#119c9e] bg-white p-6 shadow-lg">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                 <span className="rounded-full bg-[#119c9e] px-3 py-1 text-xs font-semibold text-white">
@@ -1338,10 +1377,10 @@ const LandingPage = () => {
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-slate-900">Pro</h3>
+                <h3 className="text-lg font-semibold text-slate-900">Growth</h3>
               </div>
               <div className="mt-4 flex items-baseline">
-                <span className="text-4xl font-bold text-slate-900">$149</span>
+                <span className="text-4xl font-bold text-slate-900">$249</span>
                 <span className="ml-2 text-sm text-slate-500">/month</span>
               </div>
               <p className="mt-4 text-sm text-slate-600">
@@ -1350,11 +1389,11 @@ const LandingPage = () => {
               <ul className="mt-6 space-y-3">
                 <li className="flex items-center text-sm text-slate-700">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
-                  360 call minutes included
+                  360 coverage mins included
                 </li>
                 <li className="flex items-center text-sm text-slate-700">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
-                  185 SMS included
+                  360 SMS included
                 </li>
                 <li className="flex items-center text-sm text-slate-700">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
@@ -1373,13 +1412,14 @@ const LandingPage = () => {
               </Button>
             </div>
 
-            {/* Custom Plan */}
+            {/* Pro Plan */}
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-slate-900">Custom</h3>
+                <h3 className="text-lg font-semibold text-slate-900">Pro</h3>
               </div>
               <div className="mt-4 flex items-baseline">
-                <span className="text-4xl font-bold text-slate-900">Contact Us</span>
+                <span className="text-4xl font-bold text-slate-900">$449</span>
+                <span className="ml-2 text-sm text-slate-500">/month</span>
               </div>
               <p className="mt-4 text-sm text-slate-600">
                 Tailored solutions for agencies and teams with higher volume needs.
@@ -1387,11 +1427,11 @@ const LandingPage = () => {
               <ul className="mt-6 space-y-3">
                 <li className="flex items-center text-sm text-slate-700">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
-                  Custom call minutes
+                  600 coverage mins included
                 </li>
                 <li className="flex items-center text-sm text-slate-700">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
-                  Custom SMS volume
+                  600 SMS included
                 </li>
                 <li className="flex items-center text-sm text-slate-700">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
@@ -1411,15 +1451,25 @@ const LandingPage = () => {
               </Button>
             </div>
           </div>
+
+          {/* Commitment note */}
+          <div className="mt-10 text-center text-sm text-slate-500">
+            <p className="font-medium text-slate-700">$89 one-time refundable setup fee</p>
+            <p className="mt-1">
+              All plans require a 3-month minimum term, billed monthly. After the initial term, month-to-month, cancel with 30 days notice.
+            </p>
+          </div>
         </div>
       </section>
+
+ 
 
       {/* ═══════════════════════════════════════════
           FAQ — accordion, single column, light
       ═══════════════════════════════════════════ */}
       <section
         id="faq"
-        className="border-t border-slate-100 bg-[#f8fbfb] py-20 lg:py-28"
+        className="border-t border-slate-100 bg-[#f8fbfb] py-16 sm:py-20 lg:py-28"
       >
         <script
           type="application/ld+json"
@@ -1440,7 +1490,7 @@ const LandingPage = () => {
               </p>
               <Button
                 variant="outline"
-                className="mt-6 h-10 rounded-xl border-slate-200 text-sm font-semibold text-slate-500 hover:border-slate-300 hover:bg-slate-50"
+                className="mt-6 h-10 w-full sm:w-auto rounded-xl border-slate-200 text-sm font-semibold text-slate-500 hover:border-slate-300 hover:bg-slate-50"
                 onClick={() => setBookingOpen(true)}
               >
                 Book a call
@@ -1474,13 +1524,13 @@ const LandingPage = () => {
       {/* ═══════════════════════════════════════════
           BOTTOM CTA BAND
       ═══════════════════════════════════════════ */}
-      <section className="bg-[#071220] py-20 lg:py-24">
+      <section className="bg-[#071220] py-16 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-5xl px-6 text-center lg:px-10">
           <p className="text-[0.68rem] font-bold uppercase tracking-[0.3em] text-slate-400">
             Ready when you are
           </p>
           <h2 className="mt-4 text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
-            Stop losing leads to slow follow-up.
+            Stop wasting time on slow follow-up.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-sky-100/70">
             Book a 20-minute call and we'll map exactly how Voxa fits into your
@@ -1488,7 +1538,7 @@ const LandingPage = () => {
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3">
             <Button
-              className="h-12 rounded-xl bg-[#119c9e] px-8 text-sm font-semibold text-white shadow-[0_18px_40px_-18px_rgba(17,156,158,0.55)] transition-transform hover:-translate-y-0.5 hover:bg-[#0e8082]"
+              className="h-12 w-full sm:w-auto rounded-xl bg-[#119c9e] px-8 text-sm font-semibold text-white shadow-[0_18px_40px_-18px_rgba(17,156,158,0.55)] transition-transform hover:-translate-y-0.5 hover:bg-[#0e8082]"
               onClick={() => setBookingOpen(true)}
             >
               Book a strategy call
@@ -1499,154 +1549,147 @@ const LandingPage = () => {
       </section>
 
       {/* ═══════════════════════════════════════════
-          DATA & PRIVACY TRANSPARENCY
-      ═══════════════════════════════════════════ */}
-      <section className="border-t border-slate-100 bg-slate-50 py-12">
-        <div className="mx-auto max-w-5xl px-6 lg:px-10">
-          <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-12">
-            <div className="shrink-0">
-              <p className="text-[0.68rem] font-bold uppercase tracking-[0.28em] text-[#119c9e]">Data &amp; Privacy</p>
-              <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-900">How Voxa uses your information</h2>
-            </div>
-            <div className="flex flex-col gap-4 text-sm leading-6 text-slate-500">
-              <p>
-                <strong className="text-slate-700">Account creation.</strong> Voxa uses Google Sign-In as an optional authentication method. When you sign in with Google, Voxa receives only your <strong className="text-slate-700">name and email address</strong> to create and identify your account. No other Google data (contacts, calendar, Drive, Gmail) is accessed or stored.
-              </p>
-              <p>
-                <strong className="text-slate-700">Call &amp; CRM data.</strong> Voxa processes call information and, where you provide a CRM API key, fetches listing data in real-time during a call. This data is not stored in our database after the call ends.
-              </p>
-              <p>
-                <strong className="text-slate-700">What we collect.</strong> We collect your name, phone number, and email address when you register. This information is used to operate your account, deliver the service, and communicate with you about your subscription. We do not sell your data.
-              </p>
-              <p>
-                For full details, read our{" "}
-                <a href="/privacy-policy" className="font-semibold text-[#119c9e] hover:underline">Privacy Policy</a>.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════
           BOOKING DIALOG
       ═══════════════════════════════════════════ */}
       <Dialog open={bookingOpen} onOpenChange={handleBookingOpenChange}>
-        <DialogContent className="w-[calc(100%-2rem)] overflow-hidden rounded-2xl border-white/10 bg-[#071220] p-0 max-w-xl">
+        <DialogContent className="w-[calc(100%-2rem)] overflow-hidden rounded-2xl border border-white/10 bg-[#071220] p-0 max-w-lg">
           {formSubmitted ? (
-            <div className="flex min-h-[340px] flex-col items-center justify-center px-8 py-10 text-center sm:px-12">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#119c9e]/15 text-[#119c9e]">
-                <CheckCircle2 className="h-8 w-8" />
+            /* ── Success state ── */
+            <div className="relative flex min-h-[360px] flex-col items-center justify-center overflow-hidden px-8 py-12 text-center sm:px-12">
+              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(20,184,166,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(20,184,166,0.04)_1px,transparent_1px)] bg-[size:28px_28px]" />
+              <div className="pointer-events-none absolute left-1/2 top-0 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full bg-teal-500/10 blur-[80px]" />
+              <div className="relative flex h-20 w-20 items-center justify-center rounded-full border border-[#119c9e]/30 bg-[#119c9e]/10 text-[#119c9e]">
+                <CheckCircle2 className="h-9 w-9" />
               </div>
-              <DialogTitle className="mt-6 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                Request received.
+              <DialogTitle className="relative mt-6 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                Request received!
               </DialogTitle>
-              <DialogDescription className="mt-4 max-w-md text-sm leading-7 text-sky-100/60 sm:text-base">
-                We'll send available times shortly so you can book a strategy
-                call with our team.
+              <DialogDescription className="relative mt-3 max-w-xs text-sm leading-6 text-sky-100/50">
+                We'll reach out shortly with available times to book your strategy call.
               </DialogDescription>
               <Button
-                className="mt-7 h-11 rounded-full bg-[#119c9e] px-6 text-white hover:bg-[#0e8082]"
+                className="relative mt-8 h-11 rounded-xl bg-[#119c9e] px-7 text-sm font-semibold text-white hover:bg-[#0e8082]"
                 onClick={() => setBookingOpen(false)}
               >
                 Done
               </Button>
             </div>
           ) : (
-            <div className="p-6 sm:p-8">
-              <DialogHeader>
-                <DialogTitle className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                  Book a call
-                </DialogTitle>
-                <DialogDescription className="pt-2 text-sm leading-7 text-sky-100/60 sm:text-base">
-                  Share your details and we'll call you soon!
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleFormSubmit} className="mt-6 grid gap-5">
-                <div className="space-y-2.5">
-                  <Label
-                    htmlFor="booking-name"
-                    className="text-[13px] font-bold uppercase tracking-wider text-sky-100/80"
-                  >
-                    Name <span className="text-rose-400">*</span>
-                  </Label>
-                  <Input
-                    id="booking-name"
-                    type="text"
-                    placeholder="Your full name"
-                    value={formName}
-                    onChange={(e) => setFormName(e.target.value)}
-                    required
-                    maxLength={100}
-                    disabled={formLoading}
-                    className="h-12 rounded-xl border-white/10 bg-white/5 px-4 text-white placeholder:text-white/30 focus-visible:ring-[#119c9e]"
-                  />
+            <>
+              {/* ── Decorative header ── */}
+              <div className="relative overflow-hidden bg-gradient-to-br from-[#0c1f33] via-[#0a1a2b] to-[#071220] px-7 pb-6 pt-7">
+                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(20,184,166,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(20,184,166,0.06)_1px,transparent_1px)] bg-[size:28px_28px]" />
+                <div className="pointer-events-none absolute right-[-15%] top-[-30%] h-52 w-52 rounded-full bg-teal-400/10 blur-[70px]" />
+                <div className="pointer-events-none absolute bottom-0 left-0 h-px w-full bg-gradient-to-r from-transparent via-[#119c9e]/30 to-transparent" />
+                <div className="relative">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#119c9e]/30 bg-[#119c9e]/10 text-[#119c9e]">
+                    <PhoneCall className="h-5 w-5" />
+                  </div>
+                  <DialogTitle className="mt-4 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                    Book a strategy call
+                  </DialogTitle>
+                  <DialogDescription className="mt-1.5 text-sm leading-6 text-sky-100/50">
+                    Leave your details and our team will reach out to schedule a time.
+                  </DialogDescription>
                 </div>
+              </div>
 
-                <div className="space-y-2.5">
-                  <Label
-                    htmlFor="booking-phone"
-                    className="text-[13px] font-bold uppercase tracking-wider text-sky-100/80"
-                  >
-                    Phone <span className="text-rose-400">*</span>
-                  </Label>
-                  <div className="flex h-12 items-center rounded-xl border border-white/10 bg-white/5 focus-within:ring-2 focus-within:ring-[#119c9e]">
-                    <span className="pl-4 pr-3 text-sm font-semibold text-white/85">
-                      +61
-                    </span>
+              {/* ── Form ── */}
+              <div className="px-7 pb-7 pt-6">
+                <form onSubmit={handleFormSubmit} className="grid gap-4">
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="booking-name"
+                      className="text-[11px] font-bold uppercase tracking-widest text-sky-100/60"
+                    >
+                      Name <span className="text-rose-400">*</span>
+                    </Label>
                     <Input
-                      id="booking-phone"
-                      type="tel"
-                      inputMode="numeric"
-                      placeholder="4xx xxx xxx"
-                      value={formPhone}
-                      onChange={(e) => setFormPhone(e.target.value)}
+                      id="booking-name"
+                      type="text"
+                      placeholder="Your full name"
+                      value={formName}
+                      onChange={(e) => setFormName(e.target.value)}
                       required
-                      maxLength={12}
+                      maxLength={100}
                       disabled={formLoading}
-                      className="h-full border-0 bg-transparent px-0 text-white placeholder:text-white/30 focus-visible:ring-0 focus-visible:ring-offset-0"
+                      className="h-11 rounded-xl border-white/[0.08] bg-white/[0.04] px-4 text-white placeholder:text-white/25 focus-visible:border-[#119c9e]/50 focus-visible:ring-1 focus-visible:ring-[#119c9e]/50"
                     />
                   </div>
-                </div>
-                <div className="space-y-2.5">
-                  <Label
-                    htmlFor="booking-email"
-                    className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-sky-100/80"
+
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="booking-phone"
+                      className="text-[11px] font-bold uppercase tracking-widest text-sky-100/60"
+                    >
+                      Phone <span className="text-rose-400">*</span>
+                    </Label>
+                    <div className="flex h-11 items-center rounded-xl border border-white/[0.08] bg-white/[0.04] focus-within:border-[#119c9e]/50 focus-within:ring-1 focus-within:ring-[#119c9e]/50">
+                      <span className="border-r border-white/[0.08] px-3.5 text-sm font-semibold text-white/70">
+                        +61
+                      </span>
+                      <Input
+                        id="booking-phone"
+                        type="tel"
+                        inputMode="numeric"
+                        placeholder="4xx xxx xxx"
+                        value={formPhone}
+                        onChange={(e) => setFormPhone(e.target.value)}
+                        required
+                        maxLength={12}
+                        disabled={formLoading}
+                        className="h-full border-0 bg-transparent pl-3.5 text-white placeholder:text-white/25 focus-visible:ring-0 focus-visible:ring-offset-0"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="booking-email"
+                      className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-sky-100/60"
+                    >
+                      Agency / Suburb
+                      <span className="rounded bg-white/5 px-1.5 py-0.5 text-[9px] font-medium tracking-widest text-sky-100/35">
+                        optional
+                      </span>
+                    </Label>
+                    <Input
+                      id="booking-email"
+                      type="text"
+                      placeholder="e.g. Ray White · Brighton"
+                      value={formEmail}
+                      onChange={(e) => setFormEmail(e.target.value)}
+                      maxLength={255}
+                      disabled={formLoading}
+                      className="h-11 rounded-xl border-white/[0.08] bg-white/[0.04] px-4 text-white placeholder:text-white/25 focus-visible:border-[#119c9e]/50 focus-visible:ring-1 focus-visible:ring-[#119c9e]/50"
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    disabled={formLoading || !formName || !formPhone}
+                    className="mt-1 h-11 rounded-xl bg-[#119c9e] text-sm font-semibold text-white hover:bg-[#0e8082] disabled:opacity-40"
                   >
-                    Agency / Suburb
-                    <span className="text-[10px] font-medium tracking-[0.14em] text-sky-100/40">
-                      optional
-                    </span>
-                  </Label>
-                  <Input
-                    id="booking-email"
-                    type="text"
-                    placeholder="e.g. Ray White · Brighton"
-                    value={formEmail}
-                    onChange={(e) => setFormEmail(e.target.value)}
-                    maxLength={255}
-                    disabled={formLoading}
-                    className="h-12 rounded-xl border-white/10 bg-white/5 px-4 text-white placeholder:text-white/30 focus-visible:ring-[#119c9e]"
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  disabled={formLoading || !formName || !formPhone}
-                  className="mt-2 h-12 rounded-xl bg-[#119c9e] text-sm font-semibold text-white hover:bg-[#0e8082]"
-                >
-                  {formLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Sending request...
-                    </>
-                  ) : (
-                    <>Send booking request</>
-                  )}
-                </Button>
-                <p className="text-center text-[11px] font-medium uppercase tracking-[0.14em] text-sky-100/40">
-                  A real person will call you back soon!
-                </p>
-              </form>
-            </div>
+                    {formLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Sending…
+                      </>
+                    ) : (
+                      "Send booking request"
+                    )}
+                  </Button>
+
+                  <div className="flex items-center justify-center gap-2 pt-1">
+                    <div className="h-1.5 w-1.5 rounded-full bg-[#119c9e]/60" />
+                    <p className="text-[11px] font-medium tracking-wider text-sky-100/35">
+                      A real person will call you back shortly
+                    </p>
+                    <div className="h-1.5 w-1.5 rounded-full bg-[#119c9e]/60" />
+                  </div>
+                </form>
+              </div>
+            </>
           )}
         </DialogContent>
       </Dialog>
@@ -1655,10 +1698,10 @@ const LandingPage = () => {
           FOOTER
       ═══════════════════════════════════════════ */}
       <footer className="border-t border-border/60 bg-white px-6 py-5 lg:px-10">
-        <div className="mx-auto flex flex-col md:flex-row max-w-5xl items-center justify-between gap-3 text-xs text-muted-foreground sm:text-sm">
+        <div className="mx-auto flex flex-col md:flex-row max-w-5xl items-center justify-between gap-3 text-center md:text-left text-xs text-muted-foreground sm:text-sm">
           <p className="font-semibold text-slate-700">Voxa Realty</p>
-          <p>AI receptionist and sales agent software for real estate teams.</p>
-          <a href="/privacy-policy" className="hover:underline text-blue-600">Privacy Policy</a>
+          <p>Based in Melbourne 📍</p>
+          <a href="/privacy-policy" className="hover:underline">Privacy Policy</a>
         </div>
       </footer>
     </div>

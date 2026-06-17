@@ -10,6 +10,7 @@ type BillingProfile = {
   cancelAtPeriodEnd: boolean;
   stripeSubscriptionId?: string | null;
   nextPaymentDueDate?: string | null;
+  subscribedSince?: string | null;
   currency: string;
   remainingMins?: number | null;
   overageCostPerMin?: number;

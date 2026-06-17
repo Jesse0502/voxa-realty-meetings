@@ -14,6 +14,28 @@ const SubscriptionSuccessful = () => {
   const [activeTab, setActiveTab] = useState<ForwardTab>("telstra");
   const [virtualNumber, setVirtualNumber] = useState<string | null>(null);
   const [loadingNumber, setLoadingNumber] = useState(false);
+  const [isUpgrade, setIsUpgrade] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("voxa_upgrade") === "true") {
+      localStorage.removeItem("voxa_upgrade");
+      setIsUpgrade(true);
+
+      const oldSubId = localStorage.getItem("voxa_old_sub_id");
+      const token = localStorage.getItem("voxa_token");
+      if (oldSubId && token) {
+        localStorage.removeItem("voxa_old_sub_id");
+        fetch(`${SERVER_URL}/auth/subscription/cancel-immediate`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ subscription_id: oldSubId }),
+        }).catch(() => {});
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("voxa_token");
@@ -65,12 +87,21 @@ const SubscriptionSuccessful = () => {
               forwarding set up so you never miss a lead.
             </p>
 
-            <Button
-              onClick={() => setUiState("setup")}
-              className="mt-10 h-12 rounded-xl bg-[#119c9e] px-8 text-sm font-semibold text-white shadow-[0_14px_30px_-12px_rgba(17,156,158,0.5)] hover:bg-[#0e8082]"
-            >
-              Set up call forwarding →
-            </Button>
+            {isUpgrade ? (
+              <Button
+                onClick={() => navigate("/dashboard/profile")}
+                className="mt-10 h-12 rounded-xl bg-[#119c9e] px-8 text-sm font-semibold text-white shadow-[0_14px_30px_-12px_rgba(17,156,158,0.5)] hover:bg-[#0e8082]"
+              >
+                Go to Dashboard →
+              </Button>
+            ) : (
+              <Button
+                onClick={() => setUiState("setup")}
+                className="mt-10 h-12 rounded-xl bg-[#119c9e] px-8 text-sm font-semibold text-white shadow-[0_14px_30px_-12px_rgba(17,156,158,0.5)] hover:bg-[#0e8082]"
+              >
+                Set up call forwarding →
+              </Button>
+            )}
           </div>
         )}
 
