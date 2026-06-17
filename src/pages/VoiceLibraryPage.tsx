@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  CalendarDays,
   CheckCircle2,
   Headphones,
   Loader2,
@@ -10,7 +9,7 @@ import {
   Sparkles,
   Volume2,
 } from "lucide-react";
-import voxaLogoDark from "@/assets/voxa-logo-dark.png";
+import { PublicNavbar } from "@/components/PublicNavbar";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -116,18 +115,7 @@ export default function VoiceLibraryPage() {
     <main className="bg-[#06111f] text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.28),transparent_34%),radial-gradient(circle_at_80%_20%,rgba(168,85,247,0.2),transparent_30%),linear-gradient(180deg,#06111f_0%,#0b1220_55%,#020617_100%)]" />
       <div className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col px-5 py-6 sm:px-8 lg:px-10">
-        <header className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3">
-            <img src={voxaLogoDark} alt="Voxa Realty" className="h-12 w-auto" />
-          </Link>
-          <button
-            onClick={() => setBookingOpen(true)}
-            className="inline-flex items-center gap-2 rounded-full border border-[#119c9e]/40 bg-[#119c9e]/10 px-4 py-2 text-sm font-medium text-[#3ecfcf] backdrop-blur transition hover:bg-[#119c9e]/20"
-          >
-            <CalendarDays className="h-4 w-4" />
-            Book a call
-          </button>
-        </header>
+        <PublicNavbar onBookCall={() => setBookingOpen(true)} />
 
         <section className="flex flex-1 flex-col items-center justify-center py-16 text-center lg:py-20">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-sm font-semibold text-cyan-100 shadow-lg shadow-cyan-950/20 backdrop-blur">

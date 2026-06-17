@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { PublicNavbar } from "@/components/PublicNavbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,18 +33,9 @@ import {
   Rocket,
   Sparkles,
   Check,
-  Menu,
-  X,
 } from "lucide-react";
+import { motion } from "framer-motion";
 import { toast } from "sonner";
-import voxaLogoDark from "@/assets/voxa-logo-dark.png";
-
-const navLinks = [
-  { label: "Sign In", to: "/login" },
-  { label: "Privacy Policy", to: "/privacy-policy" },
-  { label: "Voice Library", to: "/voice-library" },
-];
-
 const proofStats = [
   { value: "<1s", label: "Instant reply time" },
   { value: "24/7", label: "Coverage, no gaps" },
@@ -134,20 +126,6 @@ const LandingPage = () => {
   const [formPhone, setFormPhone] = useState("");
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
-  const [navHidden, setNavHidden] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    let lastY = window.scrollY;
-    const onScroll = () => {
-      const y = window.scrollY;
-      setNavHidden(y > lastY && y > 80);
-      if (y > 80) setMobileMenuOpen(false);
-      lastY = y;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   const handleBookingOpenChange = (open: boolean) => {
     setBookingOpen(open);
@@ -203,7 +181,7 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="relative overflow-hidden bg-white text-slate-900">
+    <div className="relative overflow-hidden bg-[#071220] text-white">
       {/* ═══════════════════════════════════════════
           HERO
       ═══════════════════════════════════════════ */}
@@ -981,78 +959,7 @@ const LandingPage = () => {
         {/* Bottom fading scrim */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-64 bg-gradient-to-t from-[#071220] via-[#071220]/80 to-transparent" />
 
-        {/* ── Nav ── */}
-        <header
-          className={`fixed inset-x-0 top-4 z-30 px-4 sm:top-6 transition-transform duration-300 ${navHidden ? "-translate-y-[calc(100%+1.5rem)]" : "translate-y-0"}`}
-        >
-          <div className="mx-auto w-full max-w-5xl rounded-2xl border border-white/10 bg-[#071220]/65 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5)] backdrop-blur-[12px]">
-            <div className="flex items-center justify-between gap-3 px-3 py-2 sm:px-4">
-              <a href="/" className="flex items-center gap-2">
-                <img
-                  src={voxaLogoDark}
-                  alt="Voxa Realty"
-                  className="h-9 w-auto sm:h-10"
-                />
-              </a>
-              <nav className="hidden items-center gap-6 md:flex">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.label}
-                    to={link.to}
-                    className="text-sm font-semibold text-white/70 transition-colors hover:text-white"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </nav>
-              <div className="flex items-center gap-3">
-                <Button
-                  className="hidden md:inline-flex h-10 rounded-xl bg-[#119c9e] px-4 text-sm font-semibold text-white hover:bg-[#0e8082]"
-                  onClick={() => setBookingOpen(true)}
-                >
-                  Book a call
-                </Button>
-                <button
-                  className="flex h-10 w-10 items-center justify-center text-white/70 transition-colors hover:text-white md:hidden"
-                  onClick={() => setMobileMenuOpen((o) => !o)}
-                  aria-label="Toggle navigation"
-                  aria-expanded={mobileMenuOpen}
-                >
-                  {mobileMenuOpen ? (
-                    <X className="h-5 w-5" />
-                  ) : (
-                    <Menu className="h-5 w-5" />
-                  )}
-                </button>
-              </div>
-            </div>
-            {mobileMenuOpen && (
-              <nav className="border-t border-white/10 px-4 pb-4 md:hidden">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.label}
-                    to={link.to}
-                    className="flex items-center py-3 text-sm font-semibold text-white/70 transition-colors hover:text-white"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-                <div className="mt-3 border-t border-white/10 pt-3">
-                  <Button
-                    className="h-11 w-full rounded-xl bg-[#119c9e] text-sm font-semibold text-white hover:bg-[#0e8082]"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      setBookingOpen(true);
-                    }}
-                  >
-                    Book a call
-                  </Button>
-                </div>
-              </nav>
-            )}
-          </div>
-        </header>
+        <PublicNavbar onBookCall={() => setBookingOpen(true)} />
 
         {/* ── Hero copy — centered ── */}
         <main className="relative z-20 mx-auto flex min-h-[100svh] w-full max-w-8xl flex-col items-center justify-center px-6 pb-14 pt-32 text-center lg:px-10">
@@ -1105,19 +1012,25 @@ const LandingPage = () => {
       ═══════════════════════════════════════════ */}
       <section
         id="what-voxa-does"
-        className="relative z-10 bg-white py-16 sm:py-20 lg:py-28"
+        className="relative z-10 overflow-hidden bg-[#071220] py-16 sm:py-20 lg:py-28"
       >
-        <div className="mx-auto max-w-5xl px-6 lg:px-10">
+        {/* Right ambient glow */}
+        <div className="pointer-events-none absolute right-[-18%] top-[0%] -z-10 h-[36rem] w-[36rem] rounded-full bg-teal-500/8 blur-[110px]" />
+        {/* Left edge accent line */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 -z-10 w-px bg-gradient-to-b from-transparent via-[#119c9e]/20 to-transparent" />
+        {/* Faint dot constellation — top right */}
+        <div className="pointer-events-none absolute right-[4%] top-[8%] -z-10 h-48 w-48 bg-[radial-gradient(circle,rgba(17,156,158,0.18)_1px,transparent_1px)] bg-[size:18px_18px]" />
+        <div className="relative z-10 mx-auto max-w-5xl px-6 lg:px-10">
           <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.1fr]">
             {/* Left: copy */}
             <div>
               <p className="section-kicker">What Voxa actually does</p>
-              <h2 className="mt-3 text-3xl font-semibold leading-[1.05] tracking-tight text-slate-900 sm:text-4xl">
+              <h2 className="mt-3 text-3xl font-semibold leading-[1.05] tracking-tight text-white sm:text-4xl">
                 Responds. Qualifies.
                 <br />
                 Informs. Automatically.
               </h2>
-              <p className="mt-4 text-base leading-7 text-slate-500">
+              <p className="mt-4 text-base leading-7 text-sky-100/60">
                 Every day realtors miss calls on inspections, in meetings, or
                 after hours. Voxa answers on their behalf using their own phone
                 number picks up instantly, holds a natural conversation, and
@@ -1135,34 +1048,34 @@ const LandingPage = () => {
             </div>
 
             {/* Right: call flow diagram */}
-            <div className="select-none rounded-2xl border border-slate-100 bg-slate-50 p-4 sm:p-5 shadow-[0_32px_80px_-32px_rgba(15,23,42,0.14)]">
-              <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+            <div className="select-none rounded-2xl border border-white/[0.07] bg-[#0b1726] p-4 sm:p-5 shadow-[0_32px_80px_-32px_rgba(0,0,0,0.5)]">
+              <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-sky-100/40">
                 Call flow
               </p>
 
               {/* Step 1 — Incoming call */}
               <div className="flex flex-col items-center">
-                <div className="relative flex h-12 w-12 items-center justify-center rounded-full border border-rose-200 bg-rose-50">
-                  <PhoneCall className="h-5 w-5 text-rose-500" />
+                <div className="relative flex h-12 w-12 items-center justify-center rounded-full border border-rose-500/30 bg-rose-500/10">
+                  <PhoneCall className="h-5 w-5 text-rose-400" />
                   <span className="absolute inset-0 animate-ping rounded-full bg-rose-300/40" />
                 </div>
-                <p className="mt-2 text-sm font-semibold text-slate-800">
+                <p className="mt-2 text-sm font-semibold text-white">
                   Incoming call
                 </p>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-sky-100/50">
                   Agent on inspection — unavailable
                 </p>
               </div>
 
               {/* Connector */}
-              <div className="relative mx-auto my-2 flex h-8 w-1 justify-center overflow-hidden rounded-full bg-slate-200">
-                <span className="animate-flow-dot-grey absolute left-1/2 h-3 w-3 -translate-x-1/2 rounded-full bg-slate-400" />
+              <div className="relative mx-auto my-2 flex h-8 w-1 justify-center overflow-hidden rounded-full bg-white/10">
+                <span className="animate-flow-dot-grey absolute left-1/2 h-3 w-3 -translate-x-1/2 rounded-full bg-white/40" />
               </div>
 
               {/* Step 2 — Unanswered */}
               <div className="flex justify-center">
-                <div className="rounded-full border border-amber-200 bg-amber-50 px-4 py-1.5">
-                  <p className="text-xs font-semibold text-amber-700">
+                <div className="rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-1.5">
+                  <p className="text-xs font-semibold text-amber-400">
                     Call unanswered
                   </p>
                 </div>
@@ -1170,30 +1083,30 @@ const LandingPage = () => {
 
               {/* Fork line */}
               <div className="relative mx-8 mt-3 mb-1 h-5">
-                <div className="absolute inset-x-0 top-0 h-1 rounded-full bg-slate-200" />
-                <div className="absolute left-[19.5%] top-0 h-full w-1 rounded-full bg-slate-200" />
-                <div className="absolute right-[19.5%] top-0 h-full w-1 rounded-full bg-slate-200" />
+                <div className="absolute inset-x-0 top-0 h-1 rounded-full bg-white/10" />
+                <div className="absolute left-[19.5%] top-0 h-full w-1 rounded-full bg-white/10" />
+                <div className="absolute right-[19.5%] top-0 h-full w-1 rounded-full bg-white/10" />
               </div>
 
               {/* Two paths */}
               <div className="mt-1 grid grid-cols-2 gap-3">
                 {/* Without Voxa */}
                 <div className="flex flex-col items-center gap-2">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-sky-100/40">
                     Without Voxa
                   </p>
-                  <div className="w-full rounded-xl border border-slate-200 bg-white p-3 text-center">
-                    <p className="text-sm">📭 No answer</p>
-                    <p className="mt-0.5 text-[11px] text-slate-400">
+                  <div className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-center">
+                    <p className="text-sm text-white">📭 No answer</p>
+                    <p className="mt-0.5 text-[11px] text-sky-100/50">
                       Goes to voicemail
                     </p>
                   </div>
-                  <div className="h-5 w-0.5 rounded-full bg-slate-200" />
-                  <div className="w-full rounded-xl border border-red-100 bg-red-50 p-3 text-center">
-                    <p className="text-xs font-semibold text-red-600">
+                  <div className="h-5 w-0.5 rounded-full bg-white/10" />
+                  <div className="w-full rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-center">
+                    <p className="text-xs font-semibold text-red-400">
                       Lead goes cold
                     </p>
-                    <p className="mt-0.5 text-[11px] text-slate-400">
+                    <p className="mt-0.5 text-[11px] text-sky-100/50">
                       Opportunity lost
                     </p>
                   </div>
@@ -1208,7 +1121,7 @@ const LandingPage = () => {
                     <p className="text-xs font-semibold text-[#119c9e]">
                       Voxa answers
                     </p>
-                    <p className="mt-0.5 text-[11px] text-slate-500">
+                    <p className="mt-0.5 text-[11px] text-sky-100/50">
                       On your own number
                     </p>
                   </div>
@@ -1222,7 +1135,7 @@ const LandingPage = () => {
                     <p className="text-xs font-semibold text-[#119c9e]">
                       Qualifies intent
                     </p>
-                    <p className="mt-0.5 text-[11px] text-slate-500">
+                    <p className="mt-0.5 text-[11px] text-sky-100/50">
                       Budget · timeline · type
                     </p>
                   </div>
@@ -1232,11 +1145,11 @@ const LandingPage = () => {
                       style={{ animationDelay: "0.7s" }}
                     />
                   </div>
-                  <div className="w-full rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-center">
-                    <p className="text-xs font-semibold text-emerald-700">
+                  <div className="w-full rounded-xl border border-emerald-500/25 bg-emerald-500/10 p-3 text-center">
+                    <p className="text-xs font-semibold text-emerald-400">
                       ✓ Call booked
                     </p>
-                    <p className="mt-0.5 text-[11px] text-slate-500">
+                    <p className="mt-0.5 text-[11px] text-sky-100/50">
                       Agent gets full brief
                     </p>
                   </div>
@@ -1250,8 +1163,22 @@ const LandingPage = () => {
       {/* ═══════════════════════════════════════════
           WORKFLOW — numbered, linear, connected
       ═══════════════════════════════════════════ */}
-      <section id="how-it-works" className="bg-[#071220] py-16 sm:py-20 lg:py-28">
-        <div className="mx-auto max-w-6xl px-6 lg:px-10">
+      <section id="how-it-works" className="relative overflow-hidden bg-[#040d17] py-16 sm:py-20 lg:py-28">
+        {/* Slow-drifting top-left orb */}
+        <motion.div
+          animate={{ y: [-18, 18, -18], x: [-10, 10, -10] }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+          className="pointer-events-none absolute left-[-10%] top-[5%] -z-10 h-[32rem] w-[32rem] rounded-full bg-teal-600/8 blur-[110px]"
+        />
+        {/* Slow-drifting bottom-right orb */}
+        <motion.div
+          animate={{ y: [12, -12, 12], x: [8, -8, 8] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          className="pointer-events-none absolute bottom-[0%] right-[-8%] -z-10 h-[28rem] w-[28rem] rounded-full bg-cyan-500/6 blur-[100px]"
+        />
+        {/* Diagonal grid accent */}
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(135deg,rgba(20,184,166,0.04)_1px,transparent_1px),linear-gradient(45deg,rgba(20,184,166,0.04)_1px,transparent_1px)] bg-[size:48px_48px]" />
+        <div className="relative z-10 mx-auto max-w-6xl px-6 lg:px-10">
           {/* Header */}
           <div className="max-w-2xl">
             <p className="section-kicker">How it works</p>
@@ -1317,46 +1244,56 @@ const LandingPage = () => {
       ═══════════════════════════════════════════ */}
       <section
         id="pricing"
-        className="border-t border-slate-100 bg-white py-16 sm:py-20 lg:py-28"
+        className="relative overflow-hidden border-t border-white/[0.07] bg-[#071220] py-16 sm:py-20 lg:py-28"
       >
-        <div className="mx-auto max-w-6xl px-6 lg:px-10">
+        {/* Pulsing center glow — sits behind the Growth card */}
+        <motion.div
+          animate={{ scale: [1, 1.25, 1], opacity: [0.07, 0.16, 0.07] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[42rem] w-[42rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-teal-500/10 blur-[130px]"
+        />
+        {/* Top gradient rule */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-[#119c9e]/35 to-transparent" />
+        {/* Corner dot grid — bottom right */}
+        <div className="pointer-events-none absolute bottom-[4%] right-[3%] -z-10 h-40 w-40 bg-[radial-gradient(circle,rgba(17,156,158,0.16)_1px,transparent_1px)] bg-[size:16px_16px]" />
+        <div className="relative z-10 mx-auto max-w-6xl px-6 lg:px-10">
           <div className="text-center">
             <p className="section-kicker">Pricing</p>
-            <h2 className="mt-3 text-3xl font-semibold leading-[1.05] tracking-tight text-slate-900 sm:text-4xl">
+            <h2 className="mt-3 text-3xl font-semibold leading-[1.05] tracking-tight text-white sm:text-4xl">
               Simple, transparent pricing
             </h2>
-            <p className="mt-4 text-base text-slate-500">
+            <p className="mt-4 text-base text-sky-100/60">
               Choose the plan that fits your call volume. All plans include core features.
             </p>
           </div>
 
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {/* Starter Plan */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="rounded-2xl border border-white/[0.07] bg-[#0b1726] p-6">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-slate-900">Starter</h3>
+                <h3 className="text-lg font-semibold text-white">Starter</h3>
               </div>
               <div className="mt-4 flex items-baseline">
-                <span className="text-4xl font-bold text-slate-900">$149</span>
-                <span className="ml-2 text-sm text-slate-500">/month</span>
+                <span className="text-4xl font-bold text-white">$149</span>
+                <span className="ml-2 text-sm text-sky-100/50">/month</span>
               </div>
-              <p className="mt-4 text-sm text-slate-600">
+              <p className="mt-4 text-sm text-sky-100/60">
                 Perfect for individual agents getting started with AI call handling.
               </p>
               <ul className="mt-6 space-y-3">
-                <li className="flex items-center text-sm text-slate-700">
+                <li className="flex items-center text-sm text-sky-100/80">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
                   240 coverage mins included
                 </li>
-                <li className="flex items-center text-sm text-slate-700">
+                <li className="flex items-center text-sm text-sky-100/80">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
                   240 SMS included
                 </li>
-                <li className="flex items-center text-sm text-slate-700">
+                <li className="flex items-center text-sm text-sky-100/80">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
                   realestate.com.au integration
                 </li>
-                <li className="flex items-center text-sm text-slate-700">
+                <li className="flex items-center text-sm text-sky-100/80">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
                   24/7 call answering
                 </li>
@@ -1370,36 +1307,36 @@ const LandingPage = () => {
             </div>
 
             {/* Growth Plan — Most Popular */}
-            <div className="relative rounded-2xl border-2 border-[#119c9e] bg-white p-6 shadow-lg">
+            <div className="relative rounded-2xl border-2 border-[#119c9e] bg-[#0b1726] p-6 shadow-[0_0_40px_-10px_rgba(17,156,158,0.25)]">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                 <span className="rounded-full bg-[#119c9e] px-3 py-1 text-xs font-semibold text-white">
                   Most Popular
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-slate-900">Growth</h3>
+                <h3 className="text-lg font-semibold text-white">Growth</h3>
               </div>
               <div className="mt-4 flex items-baseline">
-                <span className="text-4xl font-bold text-slate-900">$249</span>
-                <span className="ml-2 text-sm text-slate-500">/month</span>
+                <span className="text-4xl font-bold text-white">$249</span>
+                <span className="ml-2 text-sm text-sky-100/50">/month</span>
               </div>
-              <p className="mt-4 text-sm text-slate-600">
+              <p className="mt-4 text-sm text-sky-100/60">
                 For active agents who need more capacity and premium features.
               </p>
               <ul className="mt-6 space-y-3">
-                <li className="flex items-center text-sm text-slate-700">
+                <li className="flex items-center text-sm text-sky-100/80">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
                   360 coverage mins included
                 </li>
-                <li className="flex items-center text-sm text-slate-700">
+                <li className="flex items-center text-sm text-sky-100/80">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
                   360 SMS included
                 </li>
-                <li className="flex items-center text-sm text-slate-700">
+                <li className="flex items-center text-sm text-sky-100/80">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
                   Custom CRM integration
                 </li>
-                <li className="flex items-center text-sm text-slate-700">
+                <li className="flex items-center text-sm text-sky-100/80">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
                   Priority support
                 </li>
@@ -1413,38 +1350,38 @@ const LandingPage = () => {
             </div>
 
             {/* Pro Plan */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="rounded-2xl border border-white/[0.07] bg-[#0b1726] p-6">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-slate-900">Pro</h3>
+                <h3 className="text-lg font-semibold text-white">Pro</h3>
               </div>
               <div className="mt-4 flex items-baseline">
-                <span className="text-4xl font-bold text-slate-900">$449</span>
-                <span className="ml-2 text-sm text-slate-500">/month</span>
+                <span className="text-4xl font-bold text-white">$449</span>
+                <span className="ml-2 text-sm text-sky-100/50">/month</span>
               </div>
-              <p className="mt-4 text-sm text-slate-600">
+              <p className="mt-4 text-sm text-sky-100/60">
                 Tailored solutions for agencies and teams with higher volume needs.
               </p>
               <ul className="mt-6 space-y-3">
-                <li className="flex items-center text-sm text-slate-700">
+                <li className="flex items-center text-sm text-sky-100/80">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
                   600 coverage mins included
                 </li>
-                <li className="flex items-center text-sm text-slate-700">
+                <li className="flex items-center text-sm text-sky-100/80">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
                   600 SMS included
                 </li>
-                <li className="flex items-center text-sm text-slate-700">
+                <li className="flex items-center text-sm text-sky-100/80">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
                   Multi-agent support
                 </li>
-                <li className="flex items-center text-sm text-slate-700">
+                <li className="flex items-center text-sm text-sky-100/80">
                   <Check className="mr-3 h-4 w-4 text-[#119c9e]" />
                   Dedicated account manager
                 </li>
               </ul>
               <Button
                 variant="outline"
-                className="mt-8 h-11 w-full rounded-xl border-slate-200 px-6 text-sm font-semibold text-slate-700 hover:border-[#119c9e] hover:text-[#119c9e]"
+                className="mt-8 h-11 w-full rounded-xl border-white/20 px-6 text-sm font-semibold text-white/70 hover:border-[#119c9e] hover:text-[#119c9e]"
                 onClick={() => setBookingOpen(true)}
               >
                 Contact Sales
@@ -1453,8 +1390,8 @@ const LandingPage = () => {
           </div>
 
           {/* Commitment note */}
-          <div className="mt-10 text-center text-sm text-slate-500">
-            <p className="font-medium text-slate-700">$89 one-time refundable setup fee</p>
+          <div className="mt-10 text-center text-sm text-sky-100/50">
+            <p className="font-medium text-sky-100/80">$89 one-time refundable setup fee</p>
             <p className="mt-1">
               All plans require a 3-month minimum term, billed monthly. After the initial term, month-to-month, cancel with 30 days notice.
             </p>
@@ -1469,8 +1406,18 @@ const LandingPage = () => {
       ═══════════════════════════════════════════ */}
       <section
         id="faq"
-        className="border-t border-slate-100 bg-[#f8fbfb] py-16 sm:py-20 lg:py-28"
+        className="relative overflow-hidden border-t border-white/[0.07] bg-[#040d17] py-16 sm:py-20 lg:py-28"
       >
+        {/* Left drifting orb */}
+        <motion.div
+          animate={{ y: [-14, 14, -14] }}
+          transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+          className="pointer-events-none absolute left-[-12%] top-[15%] -z-10 h-[30rem] w-[30rem] rounded-full bg-teal-500/7 blur-[100px]"
+        />
+        {/* Top gradient rule */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-[#119c9e]/25 to-transparent" />
+        {/* Right dot grid */}
+        <div className="pointer-events-none absolute right-[5%] top-[12%] -z-10 h-44 w-44 bg-[radial-gradient(circle,rgba(17,156,158,0.14)_1px,transparent_1px)] bg-[size:20px_20px]" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -1481,16 +1428,16 @@ const LandingPage = () => {
           <div className="grid gap-14 lg:grid-cols-[1fr_1.6fr] lg:gap-20">
             <div className="lg:sticky lg:top-24 lg:self-start">
               <p className="section-kicker">FAQ</p>
-              <h2 className="mt-3 text-3xl font-semibold leading-[1.05] tracking-tight text-slate-900 sm:text-4xl">
+              <h2 className="mt-3 text-3xl font-semibold leading-[1.05] tracking-tight text-white sm:text-4xl">
                 Common questions
               </h2>
-              <p className="mt-4 text-sm leading-6 text-slate-500">
+              <p className="mt-4 text-sm leading-6 text-sky-100/60">
                 Can't find your answer? Book a call and we'll walk you through
                 everything.
               </p>
               <Button
                 variant="outline"
-                className="mt-6 h-10 w-full sm:w-auto rounded-xl border-slate-200 text-sm font-semibold text-slate-500 hover:border-slate-300 hover:bg-slate-50"
+                className="mt-6 h-10 w-full sm:w-auto rounded-xl border-white/20 text-sm font-semibold text-sky-100/60 hover:border-white/30 hover:bg-white/5"
                 onClick={() => setBookingOpen(true)}
               >
                 Book a call
@@ -1500,7 +1447,7 @@ const LandingPage = () => {
             <Accordion
               type="single"
               collapsible
-              className="divide-y divide-slate-200/60"
+              className="divide-y divide-white/[0.07]"
             >
               {seoFaqs.map(({ question, answer }) => (
                 <AccordionItem
@@ -1508,10 +1455,10 @@ const LandingPage = () => {
                   value={question}
                   className="border-0 py-1"
                 >
-                  <AccordionTrigger className="py-4 text-left text-base font-semibold text-slate-900 hover:no-underline">
+                  <AccordionTrigger className="py-4 text-left text-base font-semibold text-white hover:no-underline">
                     {question}
                   </AccordionTrigger>
-                  <AccordionContent className="pb-5 text-sm leading-6 text-slate-500">
+                  <AccordionContent className="pb-5 text-sm leading-6 text-sky-100/60">
                     {answer}
                   </AccordionContent>
                 </AccordionItem>
@@ -1524,7 +1471,21 @@ const LandingPage = () => {
       {/* ═══════════════════════════════════════════
           BOTTOM CTA BAND
       ═══════════════════════════════════════════ */}
-      <section className="bg-[#071220] py-16 sm:py-20 lg:py-24">
+      <section className="relative overflow-hidden bg-[#071220] py-16 sm:py-20 lg:py-24">
+        {/* Animated left orb */}
+        <motion.div
+          animate={{ x: [-25, 25, -25], y: [-15, 15, -15] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          className="pointer-events-none absolute left-[10%] top-[5%] -z-10 h-[32rem] w-[32rem] rounded-full bg-teal-500/12 blur-[100px]"
+        />
+        {/* Animated right orb */}
+        <motion.div
+          animate={{ x: [18, -18, 18], y: [12, -12, 12] }}
+          transition={{ duration: 13, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+          className="pointer-events-none absolute right-[8%] bottom-[0%] -z-10 h-[26rem] w-[26rem] rounded-full bg-cyan-400/10 blur-[90px]"
+        />
+        {/* Horizontal teal line */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-[#119c9e]/40 to-transparent" />
         <div className="mx-auto max-w-5xl px-6 text-center lg:px-10">
           <p className="text-[0.68rem] font-bold uppercase tracking-[0.3em] text-slate-400">
             Ready when you are
@@ -1697,11 +1658,10 @@ const LandingPage = () => {
       {/* ═══════════════════════════════════════════
           FOOTER
       ═══════════════════════════════════════════ */}
-      <footer className="border-t border-border/60 bg-white px-6 py-5 lg:px-10">
-        <div className="mx-auto flex flex-col md:flex-row max-w-5xl items-center justify-between gap-3 text-center md:text-left text-xs text-muted-foreground sm:text-sm">
-          <p className="font-semibold text-slate-700">Voxa Realty</p>
-          <p>Based in Melbourne 📍</p>
-          <a href="/privacy-policy" className="hover:underline">Privacy Policy</a>
+      <footer className="border-t border-white/[0.07] bg-[#071220] px-6 py-5 lg:px-10">
+        <div className="w-full text-center items-center justify-between gap-3 text-center md:text-left text-xs text-sky-100/40 sm:text-sm">
+          <p className="text-center">© 2026 Voxa Realty · Helping real estate agents never miss a lead</p>
+          
         </div>
       </footer>
     </div>

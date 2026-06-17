@@ -8,7 +8,7 @@ import {
   Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import voxaLogo from "@/assets/voxa-logo.png";
+import { PublicNavbar } from "@/components/PublicNavbar";
 
 const evaluationCriteria = [
   {
@@ -87,25 +87,8 @@ const faqStructuredData = {
 
 const BestAiReceptionistPage = () => {
   return (
-    <div className="min-h-[100svh] bg-background text-foreground">
-      <header className="border-b border-border/60 bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-6 lg:px-10">
-          <Link to="/" className="flex items-center gap-3">
-            <img
-              src={voxaLogo}
-              alt="Voxa Realty"
-              className="h-12 w-auto sm:h-14"
-            />
-          </Link>
-
-          <Button
-            asChild
-            className="h-11 rounded-full px-6 text-sm font-semibold"
-          >
-            <Link to="/">Book a call</Link>
-          </Button>
-        </div>
-      </header>
+    <div className="min-h-[100svh] bg-[#071220] text-white">
+      <PublicNavbar />
 
       <main className="mx-auto max-w-6xl px-6 py-10 lg:px-10 lg:py-14">
         <article className="space-y-12">
@@ -125,7 +108,7 @@ const BestAiReceptionistPage = () => {
 
           <section className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
             {evaluationCriteria.map(({ title, description, icon }) => (
-              <div key={title} className="surface-card rounded-2xl p-5">
+              <div key={title} className="rounded-2xl border border-white/[0.07] bg-[#0b1726] p-5">
                 <div className="inline-flex rounded-full bg-primary/10 p-2">
                   {icon}
                 </div>
@@ -148,10 +131,10 @@ const BestAiReceptionistPage = () => {
               sales workflows. Voxa is purpose-built for agents who need speed,
               qualification, and clean CRM handoff.
             </p>
-            <div className="overflow-x-auto rounded-2xl border border-border/70 bg-white/75">
+            <div className="overflow-x-auto rounded-2xl border border-white/[0.07] bg-[#0b1726]">
               <table className="w-full min-w-[480px] border-collapse text-left text-sm">
                 <thead>
-                  <tr className="border-b border-border/70 bg-primary/5">
+                  <tr className="border-b border-white/[0.07] bg-[#119c9e]/5">
                     <th className="px-4 py-3 font-semibold text-foreground">
                       Capability
                     </th>
@@ -167,7 +150,7 @@ const BestAiReceptionistPage = () => {
                   {comparisonRows.map(({ label, voxa, generic }) => (
                     <tr
                       key={label}
-                      className="border-b border-border/60 last:border-b-0"
+                      className="border-b border-white/[0.05] last:border-b-0"
                     >
                       <td className="px-4 py-3 text-foreground/90">{label}</td>
                       <td className="px-4 py-3 text-foreground">
@@ -198,7 +181,7 @@ const BestAiReceptionistPage = () => {
             </h2>
             <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
               {faqItems.map(({ question, answer }) => (
-                <div key={question} className="surface-card rounded-2xl p-5">
+                <div key={question} className="rounded-2xl border border-white/[0.07] bg-[#0b1726] p-5">
                   <h3 className="text-xl font-semibold leading-tight text-foreground">
                     {question}
                   </h3>
@@ -210,7 +193,7 @@ const BestAiReceptionistPage = () => {
             </div>
           </section>
 
-          <section className="surface-card rounded-3xl p-6 sm:p-8">
+          <section className="rounded-3xl border border-white/[0.07] bg-[#0b1726] p-6 sm:p-8">
             <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
               Ready to map Voxa to your lead flow?
             </h2>
@@ -220,7 +203,7 @@ const BestAiReceptionistPage = () => {
             </p>
             <Button
               asChild
-              className="mt-6 h-11 rounded-full px-6 text-sm font-semibold"
+              className="mt-6 h-11 rounded-full bg-[#119c9e] px-6 text-sm font-semibold text-white hover:bg-[#0e8082]"
             >
               <Link to="/">
                 Book a call

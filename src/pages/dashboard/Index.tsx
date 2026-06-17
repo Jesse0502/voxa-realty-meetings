@@ -78,7 +78,7 @@ export default function DashboardPage() {
 
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem("voxaTheme");
-    return saved === "dark";
+    return saved !== "light";
   });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const activeSection = getDashboardSectionFromPath(location.pathname);
@@ -208,7 +208,15 @@ export default function DashboardPage() {
         </div>
       </aside>
 
-      <div className="flex-1 relative flex flex-col min-w-0 md:overflow-hidden">
+      <div className="flex-1 relative flex flex-col min-w-0 md:overflow-hidden overflow-x-hidden">
+        {isDark && (
+          <>
+            <div className="pointer-events-none absolute left-[-16%] top-[-12%] -z-10 h-[38rem] w-[38rem] rounded-full bg-teal-500/10 blur-[120px]" />
+            <div className="pointer-events-none absolute right-[-14%] bottom-[-10%] -z-10 h-[32rem] w-[32rem] rounded-full bg-teal-400/8 blur-[120px]" />
+            <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(20,184,166,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(20,184,166,0.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
+            <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_55%_at_50%_42%,rgba(4,10,22,0.55),transparent)]" />
+          </>
+        )}
         {activeSection === "calls" && <CallsSection isDark={isDark} />}
         {activeSection === "assistant" && <AssistantSection isDark={isDark} />}
         {activeSection === "contacts" && <ContactsSection isDark={isDark} />}

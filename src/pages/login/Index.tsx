@@ -103,8 +103,16 @@ export default function LoginRegister() {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4 pt-20">
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(17,156,158,0.12),transparent_40%),radial-gradient(circle_at_80%_20%,rgba(17,156,158,0.06),transparent_35%)]" />
+    <div className="min-h-screen relative flex items-center justify-center p-4 pt-20 overflow-x-hidden">
+      {/* Dark base */}
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[#071220]" />
+      {/* Teal ambient glows */}
+      <div className="pointer-events-none absolute left-[-16%] top-[-12%] -z-10 h-[38rem] w-[38rem] rounded-full bg-teal-500/12 blur-[120px]" />
+      <div className="pointer-events-none absolute right-[-14%] top-[0%] -z-10 h-[32rem] w-[32rem] rounded-full bg-teal-400/10 blur-[120px]" />
+      {/* Teal grid */}
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(20,184,166,0.07)_1px,transparent_1px),linear-gradient(to_bottom,rgba(20,184,166,0.07)_1px,transparent_1px)] bg-[size:40px_40px]" />
+      {/* Center vignette */}
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_55%_at_50%_42%,rgba(4,10,22,0.62),transparent)]" />
 
       <div className="absolute top-6 left-6">
         <Link to="/">

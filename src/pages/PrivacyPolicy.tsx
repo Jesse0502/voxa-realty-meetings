@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import voxaLogoDark from '@/assets/voxa-logo-dark.png';
+import { PublicNavbar } from '@/components/PublicNavbar';
 
 const sections: { num: string; title: string; body: React.ReactNode }[] = [
   {
@@ -241,27 +241,7 @@ const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-[#071220] text-white">
 
-      {/* ── Nav ── */}
-      <header className="fixed inset-x-0 top-4 z-30 px-4 sm:top-6">
-        <div className="mx-auto w-full max-w-5xl rounded-2xl border border-white/10 bg-[#071220]/65 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5)] backdrop-blur-[12px]">
-          <div className="flex items-center justify-between gap-3 px-3 py-2 sm:px-4">
-            <Link to="/" className="flex items-center gap-2">
-              <img src={voxaLogoDark} alt="Voxa Realty" className="h-9 w-auto sm:h-10" />
-            </Link>
-            <nav className="hidden items-center gap-6 md:flex">
-              <Link to="/login" className="text-sm font-semibold text-white/70 transition-colors hover:text-white">Sign In</Link>
-              <Link to="/privacy-policy" className="text-sm font-semibold text-[#119c9e]">Privacy Policy</Link>
-              <Link to="/voice-library" className="text-sm font-semibold text-white/70 transition-colors hover:text-white">Voice Library</Link>
-            </nav>
-            <Link
-              to="/"
-              className="inline-flex h-10 items-center rounded-xl bg-[#119c9e] px-4 text-sm font-semibold text-white hover:bg-[#0e8082]"
-            >
-              Book a call
-            </Link>
-          </div>
-        </div>
-      </header>
+      <PublicNavbar />
 
       {/* ── Page header ── */}
       <div className="relative overflow-hidden pt-36 pb-16 sm:pt-44 sm:pb-20">
