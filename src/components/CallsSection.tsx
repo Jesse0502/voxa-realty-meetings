@@ -40,6 +40,7 @@ import {
 } from "@/store/contactsSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { normalizePhoneInternational, normalizePhoneLocal } from "@/lib/phone";
+import { useCallRecordingUrl } from "@/hooks/use-call-recording";
 
 interface CallsSectionProps {
   isDark: boolean;
@@ -149,6 +150,10 @@ export function CallsSection({ isDark }: CallsSectionProps) {
   const selectedCallContact = selectedCall
     ? getContactByCallerNumber(selectedCall.callerNumber)
     : null;
+
+  const { recordingUrl: selectedCallRecordingUrl } = useCallRecordingUrl(
+    selectedCall?._id || selectedCall?.id,
+  );
 
   const getIntentBadge = (intent: string) => {
     switch (intent) {
@@ -672,11 +677,11 @@ export function CallsSection({ isDark }: CallsSectionProps) {
                   <h4 className="text-sm font-semibold flex items-center gap-2">
                     <Play className="h-4 w-4" /> Call Recording
                   </h4>
-                  {selectedCall.recordingUrl ? (
+                  {selectedCallRecordingUrl ? (
                     <audio
                       controls
                       className="w-full h-10 mt-1"
-                      src={selectedCall.recordingUrl}
+                      src={selectedCallRecordingUrl}
                     >
                       Your browser does not support the audio element.
                     </audio>

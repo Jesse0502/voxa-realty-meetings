@@ -534,7 +534,7 @@ const Index = () => {
                                         <Input
                                           id="waitlist-phone"
                                           type="tel"
-                                          placeholder="+1 (555) 000-0000"
+                                          placeholder="+61 (444) 000-0000"
                                           value={formPhone}
                                           onChange={(e) => setFormPhone(e.target.value)}
                                           maxLength={20}

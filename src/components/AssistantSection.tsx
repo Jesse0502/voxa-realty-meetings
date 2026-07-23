@@ -50,6 +50,7 @@ import {
   connectGoogleSheets,
   disconnectGoogleSheets,
   saveKnowledgeBases,
+  syncPropertyListings,
   setSelectedSpreadsheetId,
   setSelectedSheetId,
   setSelectedPhoneColumnName,
@@ -59,6 +60,30 @@ import {
 import { fetchCurrentUser } from "@/store/authSlice";
 import { useGoogleLogin } from "@react-oauth/google";
 import { toast } from "sonner";
+
+type KnowledgeBaseEntry = {
+  id: string;
+  name: string;
+  type: string;
+  spreadsheetId?: string;
+  phoneColumnName?: string;
+  listingsUrl?: string;
+};
+
+// knowledge_bases is saved as a full replace server-side, so any single-KB
+// update must be merged with the other KB types already on the assistant.
+const upsertKnowledgeBase = (
+  existing: KnowledgeBaseEntry[] | undefined,
+  entry: KnowledgeBaseEntry,
+): KnowledgeBaseEntry[] => {
+  const others = (existing || []).filter((kb) => kb.type !== entry.type);
+  return [...others, entry];
+};
+
+const removeKnowledgeBaseType = (
+  existing: KnowledgeBaseEntry[] | undefined,
+  type: string,
+): KnowledgeBaseEntry[] => (existing || []).filter((kb) => kb.type !== type);
 
 export function AssistantSection({ isDark }: { isDark: boolean }) {
   const dispatch = useAppDispatch();
@@ -104,6 +129,10 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
   const hasGoogleCreds = assistant?.credentials?.google_sheets?.status;
   const hasGoogleCalendarCreds =
     assistant?.credentials?.google_calendar?.status;
+  const propertyListingsKb = assistant?.knowledge_bases?.find(
+    (kb) => kb.type === "property_listings",
+  );
+  const hasPropertyListings = Boolean(propertyListingsKb?.listingsUrl);
 
   const [formData, setFormData] = useState({
     firstMessage: "",
@@ -111,6 +140,8 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
     greet_with_name: false,
   });
   const [isConnecting, setIsConnecting] = useState(false);
+  const [listingsUrlInput, setListingsUrlInput] = useState("");
+  const [isSavingListingsUrl, setIsSavingListingsUrl] = useState(false);
 
   useEffect(() => {
     if (assistant) {
@@ -136,6 +167,12 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
           .map((kb) => kb.phoneColumnName)
           .filter(Boolean) || [];
       dispatch(setSelectedPhoneColumnName(existingPhoneColumn[0] || ""));
+      const existingListingsUrl =
+        assistant?.knowledge_bases
+          ?.filter((kb) => kb.type === "property_listings")
+          .map((kb) => kb.listingsUrl)
+          .filter(Boolean) || [];
+      setListingsUrlInput(existingListingsUrl[0] || "");
     }
   }, [assistant, dispatch]);
 
@@ -228,7 +265,11 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
     };
     setIsConnecting(true);
     try {
-      await dispatch(saveKnowledgeBases([updatedBase])).unwrap();
+      await dispatch(
+        saveKnowledgeBases(
+          upsertKnowledgeBase(assistant?.knowledge_bases, updatedBase),
+        ),
+      ).unwrap();
       toast.success("Knowledge base updated");
       dispatch(fetchCurrentUser());
     } catch (err) {
@@ -254,7 +295,11 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
     };
     setIsConnecting(true);
     try {
-      await dispatch(saveKnowledgeBases([updatedBase])).unwrap();
+      await dispatch(
+        saveKnowledgeBases(
+          upsertKnowledgeBase(assistant?.knowledge_bases, updatedBase),
+        ),
+      ).unwrap();
       toast.success("Knowledge base updated");
       dispatch(fetchCurrentUser());
     } catch (err) {
@@ -262,6 +307,61 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
       toast.error(message || "Failed to update knowledge base");
     } finally {
       setIsConnecting(false);
+    }
+  };
+
+  const handleSaveListingsUrl = async () => {
+    const trimmedUrl = listingsUrlInput.trim();
+    if (!trimmedUrl) {
+      toast.error("Enter a listings website URL first.");
+      return;
+    }
+    try {
+      new URL(trimmedUrl);
+    } catch {
+      toast.error("Enter a valid URL, e.g. https://example.com/listings");
+      return;
+    }
+
+    setIsSavingListingsUrl(true);
+    try {
+      const result = await dispatch(
+        syncPropertyListings({ listingsUrl: trimmedUrl }),
+      ).unwrap();
+      const count = result.listings?.length || 0;
+      toast.success(
+        count > 0
+          ? `URL saved. Test scan found ${count} listing${count === 1 ? "" : "s"} — calls will scrape this page fresh.`
+          : "URL saved, but the test scan found no listings on that page — double-check it's the right page.",
+      );
+      dispatch(fetchCurrentUser());
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      toast.error(message || "Failed to scan listings site");
+    } finally {
+      setIsSavingListingsUrl(false);
+    }
+  };
+
+  const handleRemoveListingsUrl = async () => {
+    setIsSavingListingsUrl(true);
+    try {
+      await dispatch(
+        saveKnowledgeBases(
+          removeKnowledgeBaseType(
+            assistant?.knowledge_bases,
+            "property_listings",
+          ),
+        ),
+      ).unwrap();
+      setListingsUrlInput("");
+      toast.success("Listings site removed");
+      dispatch(fetchCurrentUser());
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      toast.error(message || "Failed to remove listings site");
+    } finally {
+      setIsSavingListingsUrl(false);
     }
   };
 
@@ -764,6 +864,81 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
                   </p>
                 )}
               </div>
+            </div>
+
+            <div className="border-t border-border pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold">Property Listings</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Give the assistant the URL of your live listings page.
+                    It's scraped fresh at the start of every call and
+                    pre-filled into the prompt, so listings stay current
+                    automatically as your site changes. The scan below just
+                    previews what the assistant will see — it's not required
+                    for calls to stay up to date.
+                  </p>
+                </div>
+                <Badge
+                  variant="secondary"
+                  className={
+                    hasPropertyListings
+                      ? "bg-emerald-500/10 text-emerald-500 border-none"
+                      : "bg-muted text-muted-foreground border-none"
+                  }
+                >
+                  {hasPropertyListings ? "Connected" : "Not connected"}
+                </Badge>
+              </div>
+
+              <div className="mt-4 flex flex-col sm:flex-row gap-3">
+                <Input
+                  value={listingsUrlInput}
+                  onChange={(e) => setListingsUrlInput(e.target.value)}
+                  placeholder="https://www.example.com/listings"
+                  className="flex-1"
+                />
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleSaveListingsUrl}
+                    disabled={isSavingListingsUrl || !listingsUrlInput.trim()}
+                  >
+                    {isSavingListingsUrl ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Testing...
+                      </>
+                    ) : hasPropertyListings ? (
+                      "Save & Test Again"
+                    ) : (
+                      "Save & Test Scan"
+                    )}
+                  </Button>
+                  {hasPropertyListings && (
+                    <Button
+                      variant="outline"
+                      onClick={handleRemoveListingsUrl}
+                      disabled={isSavingListingsUrl}
+                    >
+                      Remove
+                    </Button>
+                  )}
+                </div>
+              </div>
+              {hasPropertyListings && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  Last test scan found {propertyListingsKb?.listings?.length || 0}{" "}
+                  listing
+                  {propertyListingsKb?.listings?.length === 1 ? "" : "s"}
+                  {propertyListingsKb?.listingsSyncedAt
+                    ? ` on ${new Date(
+                        propertyListingsKb.listingsSyncedAt,
+                      ).toLocaleString()}`
+                    : ""}
+                  . Live calls always scrape this URL fresh, independent of
+                  this preview.
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>

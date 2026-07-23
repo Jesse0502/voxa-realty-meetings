@@ -38,6 +38,7 @@ import {
   updateContact,
 } from "@/store/contactsSlice";
 import { fetchCallsPage } from "@/store/callsSlice";
+import { useCallRecordingUrl } from "@/hooks/use-call-recording";
 import {
   Dialog,
   DialogContent,
@@ -99,6 +100,10 @@ export function ContactsSection({ isDark }: ContactsSectionProps) {
   const [contactCallsPage, setContactCallsPage] = useState(1);
   const [selectedReviewCall, setSelectedReviewCall] =
     useState<ReviewCall | null>(null);
+
+  const { recordingUrl: selectedReviewCallRecordingUrl } = useCallRecordingUrl(
+    selectedReviewCall?._id || selectedReviewCall?.id,
+  );
 
   const selectedContact = useMemo(
     () => contacts.find((contact) => contact.id === selectedContactId) ?? null,
@@ -767,11 +772,11 @@ export function ContactsSection({ isDark }: ContactsSectionProps) {
                   <h4 className="text-sm font-semibold flex items-center gap-2">
                     <Play className="h-4 w-4" /> Call Recording
                   </h4>
-                  {selectedReviewCall.recordingUrl ? (
+                  {selectedReviewCallRecordingUrl ? (
                     <audio
                       controls
                       className="w-full h-10 mt-1"
-                      src={selectedReviewCall.recordingUrl}
+                      src={selectedReviewCallRecordingUrl}
                     >
                       Your browser does not support the audio element.
                     </audio>

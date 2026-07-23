@@ -3,12 +3,25 @@ import type { RootState } from "./index";
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
+type PropertyListing = {
+  address?: string;
+  listing_url?: string;
+  listing_type?: string;
+  rent?: string;
+  bedrooms?: string;
+  bathrooms?: string;
+  car_spaces?: string;
+};
+
 type KnowledgeBase = {
   id: string;
   name: string;
   type: string;
   spreadsheetId?: string;
   phoneColumnName?: string;
+  listingsUrl?: string;
+  listings?: PropertyListing[];
+  listingsSyncedAt?: string;
 };
 
 type SpreadsheetItem = {
@@ -58,6 +71,8 @@ type AssistantState = {
   availableSheetColumnsError: string | null;
   saveKnowledgeBasesStatus: "idle" | "loading" | "succeeded" | "failed";
   saveKnowledgeBasesError: string | null;
+  syncPropertyListingsStatus: "idle" | "loading" | "succeeded" | "failed";
+  syncPropertyListingsError: string | null;
   updateStatus: "idle" | "loading" | "succeeded" | "failed";
   updateError: string | null;
 };
@@ -82,6 +97,8 @@ const initialState: AssistantState = {
   availableSheetColumnsError: null,
   saveKnowledgeBasesStatus: "idle",
   saveKnowledgeBasesError: null,
+  syncPropertyListingsStatus: "idle",
+  syncPropertyListingsError: null,
   updateStatus: "idle",
   updateError: null,
 };
@@ -277,6 +294,36 @@ export const saveKnowledgeBases = createAsyncThunk<
   },
 );
 
+export const syncPropertyListings = createAsyncThunk<
+  KnowledgeBase,
+  { listingsUrl: string },
+  { rejectValue: string; state: RootState }
+>(
+  "assistant/syncPropertyListings",
+  async ({ listingsUrl }, { getState, rejectWithValue }) => {
+    const token = getState().auth.token;
+    if (!token) {
+      return rejectWithValue("No authentication token found");
+    }
+
+    const response = await fetch(`${SERVER_URL}/auth/assistant/property-listings`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ listingsUrl }),
+    });
+
+    if (!response.ok) {
+      return rejectWithValue(await getErrorMessage(response));
+    }
+
+    const data = (await response.json()) as { knowledgeBase: KnowledgeBase };
+    return data.knowledgeBase;
+  },
+);
+
 export const connectGoogleCalendar = createAsyncThunk<
   { success: boolean; message?: string },
   { code: string },
@@ -454,6 +501,24 @@ const assistantSlice = createSlice({
         state.saveKnowledgeBasesStatus = "failed";
         state.saveKnowledgeBasesError =
           action.payload ?? "Failed to save knowledge bases";
+      })
+      .addCase(syncPropertyListings.pending, (state) => {
+        state.syncPropertyListingsStatus = "loading";
+        state.syncPropertyListingsError = null;
+      })
+      .addCase(syncPropertyListings.fulfilled, (state, action) => {
+        state.syncPropertyListingsStatus = "succeeded";
+        if (state.assistant) {
+          const others = (state.assistant.knowledge_bases || []).filter(
+            (kb) => kb.type !== "property_listings",
+          );
+          state.assistant.knowledge_bases = [...others, action.payload];
+        }
+      })
+      .addCase(syncPropertyListings.rejected, (state, action) => {
+        state.syncPropertyListingsStatus = "failed";
+        state.syncPropertyListingsError =
+          action.payload ?? "Failed to sync property listings";
       })
       .addCase(updateAssistant.pending, (state) => {
         state.updateStatus = "loading";
