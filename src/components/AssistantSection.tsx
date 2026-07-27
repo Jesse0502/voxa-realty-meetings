@@ -331,8 +331,8 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
       const count = result.listings?.length || 0;
       toast.success(
         count > 0
-          ? `URL saved. Test scan found ${count} listing${count === 1 ? "" : "s"} — calls will scrape this page fresh.`
-          : "URL saved, but the test scan found no listings on that page — double-check it's the right page.",
+          ? `URL saved. Found ${count} listing${count === 1 ? "" : "s"} — this is refreshed periodically in the background.`
+          : "URL saved, but no listings were found on that page — double-check it's the right page.",
       );
       dispatch(fetchCurrentUser());
     } catch (err) {
@@ -872,11 +872,10 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
                   <h3 className="text-lg font-semibold">Property Listings</h3>
                   <p className="text-sm text-muted-foreground">
                     Give the assistant the URL of your live listings page.
-                    It's scraped fresh at the start of every call and
-                    pre-filled into the prompt, so listings stay current
-                    automatically as your site changes. The scan below just
-                    previews what the assistant will see — it's not required
-                    for calls to stay up to date.
+                    It's scraped periodically in the background and the
+                    result is cached and pre-filled into every call's
+                    prompt — nothing is scraped live during a call. Saving
+                    below pulls an initial snapshot immediately.
                   </p>
                 </div>
                 <Badge
@@ -906,12 +905,12 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
                     {isSavingListingsUrl ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Testing...
+                        Scanning...
                       </>
                     ) : hasPropertyListings ? (
-                      "Save & Test Again"
+                      "Re-scan Now"
                     ) : (
-                      "Save & Test Scan"
+                      "Save & Scan"
                     )}
                   </Button>
                   {hasPropertyListings && (
@@ -927,16 +926,15 @@ export function AssistantSection({ isDark }: { isDark: boolean }) {
               </div>
               {hasPropertyListings && (
                 <p className="text-xs text-muted-foreground mt-2">
-                  Last test scan found {propertyListingsKb?.listings?.length || 0}{" "}
-                  listing
-                  {propertyListingsKb?.listings?.length === 1 ? "" : "s"}
+                  {propertyListingsKb?.listings?.length || 0} listing
+                  {propertyListingsKb?.listings?.length === 1 ? "" : "s"} cached
                   {propertyListingsKb?.listingsSyncedAt
-                    ? ` on ${new Date(
+                    ? ` · last refreshed ${new Date(
                         propertyListingsKb.listingsSyncedAt,
                       ).toLocaleString()}`
                     : ""}
-                  . Live calls always scrape this URL fresh, independent of
-                  this preview.
+                  . Refreshed automatically in the background — use Re-scan
+                  Now to update immediately.
                 </p>
               )}
             </div>

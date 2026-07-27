@@ -106,9 +106,9 @@ a `knowledge_bases` array — an open-ended list of `{ type, ... }` entries
 rather than fixed fields, mirrored by the same loose shape on the backend.
 Today that's used for two source types: `google_sheets` (match callers by
 phone number, pull row data into the prompt) and `property_listings` (a
-listings-site URL; the *actual* scrape happens server-side, live, on every
-call — the dashboard's "Save & Test Scan" here is just a preview, not what
-feeds real calls). Because saving knowledge bases replaces the whole array
-server-side, the component always merges by `type` before saving
-(`upsertKnowledgeBase`/`removeKnowledgeBaseType`) so configuring one source
-never wipes out another.
+listings-site URL; the server scrapes it and caches the result — on save,
+and periodically in the background via a scheduled job — and calls just
+read that cache, never scraping live). Because saving knowledge bases
+replaces the whole array server-side, the component always merges by
+`type` before saving (`upsertKnowledgeBase`/`removeKnowledgeBaseType`) so
+configuring one source never wipes out another.
